@@ -25,7 +25,7 @@ However we greatly appreciate if you decide to use this bundle and we appreciate
 ```json
 {
     "require": {
-        "aboutcoders/job-bundle": "annotation"
+        "aboutcoders/job-bundle": "dev-master"
     }
 }
 ```
