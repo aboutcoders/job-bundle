@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="abc.job.manager.default" class="Abc\Bundle\JobBundle\Job\Manager" public="true">
+            <argument type="service" id="abc.job.registry" />
+            <argument type="service" id="abc.job.job_manager"/>
+            <argument type="service" id="abc.job.invoker"/>
+            <argument type="service" id="abc.job.logger.factory"/>
+            <argument type="service" id="abc.job.log_manager"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="abc.job.helper"/>
+            <argument type="service" id="logger" on-invalid="null"/>
+            <call method="setQueueEngine">
+                <argument type="service" id="abc.job.queue_engine"/>
+            </call>
+            <tag name="monolog.logger" channel="abc.job.manager"/>
+        </service>
+
+        <service id="abc.job.queue_engine.default" class="Abc\Bundle\JobBundle\Sonata\QueueEngine" public="false">
+            <argument type="service" id="sonata.notification.backend"/>
+            <argument type="service" id="sonata.notification.dispatcher"/>
+            <argument type="service" id="logger" on-invalid="null"/>
+            <call method="setManager">
+                <argument type="service" id="abc.job.manager"/>
+            </call>
+            <tag name="monolog.logger" channel="abc.job.queue_engine"/>
+        </service>
+
+        <service id="abc.job.invoker" class="Abc\Bundle\JobBundle\Job\Invoker" public="false">
+            <argument type="service" id="abc.job.registry"/>
+        </service>
+
+        <service id="abc.job.helper" class="Abc\Bundle\JobBundle\Job\JobHelper" public="false">
+            <argument type="service" id="abc.job.logger.factory"/>
+        </service>
+
+        <service id="abc.job.registry" class="Abc\Bundle\JobBundle\Job\JobTypeRegistry" public="false">
+            <argument type="service" id="abc.job.metadata_factory"/>
+        </service>
+
+        <service id="abc.job.type.prototype" class="Abc\Bundle\JobBundle\Job\JobType" abstract="false">
+            <!-- serviceId -->
+            <argument/>
+            <!-- type -->
+            <argument/>
+            <!-- callable -->
+            <argument/>
+            <!-- level -->
+            <argument/>
+        </service>
+
+    </services>
+
+</container>

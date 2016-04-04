@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd"
+                  xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping">
+
+    <entity name="Abc\Bundle\JobBundle\Entity\Job" table="abc_job">
+
+        <id name="ticket" type="guid" column="ticket">
+            <generator strategy="UUID"/>
+        </id>
+        <field name="type" type="string" length="255"/>
+        <field name="status" type="abc.job.status"/>
+        <field name="serializedParameters" column="serialized_parameters" type="text" nullable="true"/>
+        <field name="serializedResponse" column="serialized_response" type="text" nullable="true"/>
+        <field name="processingTime" column="processing_time" type="integer" nullable="true"/>
+        <field name="createdAt" column="created_at" type="datetime">
+            <gedmo:timestampable on="create"/>
+        </field>
+        <field name="terminatedAt" column="terminated_at" type="datetime" nullable="true"/>
+
+        <one-to-many field="schedules" target-entity="Abc\Bundle\JobBundle\Entity\Schedule" mapped-by="job" orphan-removal="true">
+            <cascade>
+                <cascade-all/>
+            </cascade>
+        </one-to-many>
+
+    </entity>
+
+</doctrine-mapping>

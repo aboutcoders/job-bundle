@@ -1,0 +1,13 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        collect: false
+
+abc_job:
+    service:
+        agent_manager: agent_manager_mock

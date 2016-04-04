@@ -1,0 +1,5 @@
+abc-rest-agent:
+    type: rest
+    prefix: /
+    resource: "@AbcJobBundle/Controller/AgentController.php"
+    name_prefix:  api_

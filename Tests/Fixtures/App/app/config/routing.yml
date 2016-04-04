@@ -1,0 +1,14 @@
+abc-rest-job:
+    type: rest
+    resource: "@AbcJobBundle/Resources/config/routing/rest-job.yml"
+    prefix: /api
+
+abc-rest-agent:
+    type: rest
+    resource: "@AbcJobBundle/Resources/config/routing/rest-agent.yml"
+    prefix: /api
+
+abc-rest-type:
+    type: rest
+    resource: "@AbcJobBundle/Resources/config/routing/rest-type.yml"
+    prefix: /api

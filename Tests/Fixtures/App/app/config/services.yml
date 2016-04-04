@@ -1,0 +1,33 @@
+services:
+
+    gedmo.listener.timestampable:
+        class: Gedmo\Timestampable\TimestampableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    abc.job.callable:
+        class: Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable
+        tags:
+
+            - { name: abc.job, type: log, method: log }
+            - { name: abc.job, type: throw_exception, method: throwException }
+            - { name: abc.job, type: set_response, method: setResponse }
+            - { name: abc.job, type: schedule, method: schedule }
+            - { name: abc.job, type: create_schedule, method: createSchedule }
+            - { name: abc.job, type: remove_schedule, method: removeSchedule }
+            - { name: abc.job, type: update_schedule, method: updateSchedule }
+
+
+    abc.job.log.processor:
+        class: Monolog\Processor\PsrLogMessageProcessor
+
+    agent_manager_mock:
+        class: Abc\Bundle\JobBundle\Supervisor\AgentManager
+        factory: ["@mock_factory", getMock]
+        arguments:
+            - 'Abc\Bundle\JobBundle\Model\AgentManagerInterface'
+
+    mock_factory:
+        class: Abc\Bundle\JobBundle\Tests\MockFactory

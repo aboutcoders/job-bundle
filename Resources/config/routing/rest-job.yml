@@ -1,0 +1,5 @@
+abc-rest-job:
+    type: rest
+    prefix: /
+    resource: "@AbcJobBundle/Controller/JobController.php"
+    name_prefix:  api_

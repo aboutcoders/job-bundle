@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                   https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd"
+                  xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping">
+
+    <entity name="Abc\Bundle\JobBundle\Entity\Log" table="abc_log">
+
+        <id name="id" type="integer">
+            <generator strategy="AUTO"/>
+        </id>
+
+        <field name="jobTicket" column="job_ticket" type="string" length="255" nullable="true"/>
+        <field name="channel" type="string" length="255" nullable="true"/>
+        <field name="level" type="integer" nullable="true"/>
+        <field name="levelName" column="level_name" type="string" length="255" nullable="true"/>
+        <field name="message" type="text" nullable="true"/>
+        <field name="datetime" type="datetime" nullable="true"/>
+        <field name="context" type="json_array" nullable="true"/>
+        <field name="extra" type="json_array" nullable="true"/>
+
+    </entity>
+
+</doctrine-mapping>

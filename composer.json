@@ -1,0 +1,56 @@
+{
+    "name": "aboutcoders/job-bundle",
+    "type": "symfony-bundle",
+    "description": "A symfony bundle for asynchronous job processing.",
+    "keywords": ["job", "schedule", "scheduler", "cron", "bundle", "queue", "task", "background", "rest", "asynchronous"],
+    "homepage": "http://aboutcoders.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hannes Schulz",
+            "email": "hannes.schulz@aboutcoders.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:hasc/process-control.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:hasc/process-control-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:hasc/scheduler-bundle.git"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/symfony": "~2.3",
+        "myclabs/php-enum": "~1.2",
+        "gedmo/doctrine-extensions": "~2.0",
+        "jms/serializer-bundle": "~1.0",
+        "nelmio/api-doc-bundle": "~2",
+        "doctrine/annotations": "1.*",
+        "aboutcoders/scheduler-bundle": "~1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4",
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/doctrine-bundle": "~1.2",
+        "symfony/monolog-bundle": "~2",
+        "symfony/swiftmailer-bundle": "~2.3",
+        "sonata-project/notification-bundle": "~2.2",
+        "yzalis/supervisor-bundle": "~1",
+        "zendframework/zendxml": "~1",
+        "friendsofsymfony/rest-bundle": "~1",
+        "sensio/framework-extra-bundle": "~3",
+        "symfony/phpunit-bridge": "^3.0"
+    },
+    "autoload": {
+        "psr-4": { "Abc\\Bundle\\JobBundle\\": "" }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

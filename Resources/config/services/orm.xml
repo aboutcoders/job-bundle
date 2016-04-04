@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="abc.job.job_manager.default" class="Abc\Bundle\JobBundle\Entity\JobManager" public="true">
+            <argument type="service" id="abc.job.entity_manager" />
+            <argument>Abc\Bundle\JobBundle\Entity\Job</argument>
+            <argument type="service" id="abc.job.schedule_manager" />
+            <argument type="service" id="jms_serializer" />
+            <argument type="service" id="abc.job.registry" />
+        </service>
+
+        <service id="abc.job.schedule_manager.default" class="Abc\Bundle\JobBundle\Doctrine\ScheduleManager" public="true">
+            <argument type="service" id="abc.job.entity_manager"/>
+            <argument>Abc\Bundle\JobBundle\Entity\Schedule</argument>
+        </service>
+
+        <service id="abc.job.entity_manager" class="Doctrine\ORM\EntityManager" public="false">
+            <factory service="doctrine" method="getManager" />
+            <argument>%abc.job.model_manager_name%</argument>
+        </service>
+
+    </services>
+
+</container>

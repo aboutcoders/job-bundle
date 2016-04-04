@@ -1,0 +1,106 @@
+imports:
+    - { resource: services.yml }
+#    - { resource: parameters.yml }
+
+framework:
+    secret: Hell yeah!
+    router: { resource: "%kernel.root_dir%/config/routing.yml" }
+    form: true
+    csrf_protection: true
+    templating:
+        engines: ['twig']
+    session: ~
+    default_locale: en
+    translator: { fallback: en }
+    profiler: { only_exceptions: false }
+    validation:    { enable_annotations: true }
+
+monolog:
+    handlers:
+        main:
+            type:     stream
+            path:     "%kernel.logs_dir%/%kernel.environment%.log"
+            level:    debug
+        abc_job:
+            type:     stream
+            path:     "%kernel.logs_dir%/abc_job_%kernel.environment%.log"
+            channels: ["abc.job.manager", "abc.job.queue_engine", "abc.job.eraser", "abc.job.listener.schedule"]
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+
+doctrine:
+    dbal:
+        driver:   "pdo_sqlite"
+        path:     "%kernel.cache_dir%/sqlite.db"
+        #driver:   pdo_mysql
+        #host:     "%database_host%"
+        #port:     "%database_port%"
+        #dbname:   "%database_name%"
+        #user:     "%database_user%"
+        #password: "%database_password%"
+        #charset:  UTF8
+
+        types:
+            json: Sonata\Doctrine\Types\JsonType
+            abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
+
+    orm:
+        auto_generate_proxy_classes: true
+        auto_mapping: true
+
+swiftmailer:
+    disable_delivery: true
+
+sensio_framework_extra:
+    request: { converters: true }
+    view:
+        annotations: false
+
+fos_rest:
+    param_fetcher_listener: true
+    body_converter:
+        enabled: true
+        validate: true
+    body_listener: true
+    format_listener: true
+    view:
+        view_response_listener: 'force'
+        formats:
+            xml: true
+            json : true
+        templating_formats:
+            html: true
+        force_redirects:
+            html: true
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: twig
+    routing_loader:
+        default_format: json
+    exception:
+        messages:
+            'Exception': true
+
+sonata_notification:
+    consumers:
+        register_default: false
+
+yz_supervisor:
+    default_environment: dev
+    servers:
+        dev:
+            localhost:
+                host:     ""
+                username: ""
+                password: ""
+                port:
+
+abc_scheduler:
+    db_driver: orm
+
+abc_job:
+    db_driver: orm
+    logging:
+        default_level: debug

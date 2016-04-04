@@ -1,0 +1,5 @@
+- only create log database if orm is configured
+- locking (consider that there are multiple nodes processing messages from the queue, what happens wif two nodes process the same job)
+- extend rest api
+- add option to configure the event notified when job terminates?
+- add option to cancel a running job
