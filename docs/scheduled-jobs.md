@@ -1,7 +1,7 @@
 Scheduled Jobs
 ==============
 
-You can configure one or more schedules for a job in order to configure repeated execution of a job. The bundle relies on the [scheduler-bundle](https://bitbucket.org/hasc/scheduler-bundle) to provide this functionality.
+You can configure one or more schedules for a job in order to configure repeated execution of a job. The bundle relies on the [scheduler-bundle](https://github.org/aboutcoders/scheduler-bundle) to provide this functionality.
 
 ## Creating a schedule
 
