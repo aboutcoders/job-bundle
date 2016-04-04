@@ -50,8 +50,8 @@ public function registerBundles()
 
 Please follow the installation instructions of the following third party bundles:
 
-* [AbcSchedulerBundle](https://bitbucket.org/hasc/scheduler-bundle)
-* [AbcProcessControlBundle](https://bitbucket.org/hasc/process-control-bundle)
+* [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
+* [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
 * [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
 * [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
 * [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
