@@ -148,6 +148,7 @@ __Note:__ You only have to provide the __@JobParameters__ or __@JobResponse__ in
 
 Next you have to register the job as a service within the service container by tagging it.
 
+##### Using XML
 ```xml
 <?xml version="1.0" ?>
 <container xmlns="http://symfony.com/schema/dic/services"
@@ -159,6 +160,16 @@ Next you have to register the job as a service within the service container by t
         </service>
     </services>
 </container>
+```
+
+##### Using YML
+
+```yaml
+services:
+    my_job:
+        class: My\Bundle\ExampleBundle\Job\MyJob
+        tags:
+            -  { name: abc.job, type: "my_job" method: "doSomething" }
 ```
 
 The tag must define the attributes `name`, `type` and `method` where besides the tag name `type` specifies the unique name of the job (e.g. "mailer") and `method` references the method of the class to be executed.
