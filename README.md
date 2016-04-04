@@ -110,7 +110,7 @@ php app/console doctrine:schema:update --force
 In order to register a new job, you have to take two steps:
 
 - Create the job class (that performs the actual work)
-- Register the class in the service
+- Register the class in the service container
 
 #### Step 1: Create the job class
 
