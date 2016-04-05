@@ -1,4 +1,4 @@
-How-To work with the job status
+How-to work with the job status
 ===============================
 
 The status of a job is defined as an enumeration (based on [myclabs/php-enum](https://github.com/myclabs/php-enum)) with the following values:
@@ -15,17 +15,18 @@ const ERROR      = 6;
 ## Getting the status:
 
 ```php
-$status = $manager->get($ticket)->getStatus());
+$status = $manager->get($ticket)->getStatus();
 ```
 
 ## Status checks:
 
-Status checks should be done on the class level like this
+Status checks can be done like this:
 
 ```php
 $status = $manager->getStatus($ticket));
 
 if($status == Status::PROCESSED())
 {
+    // ...
 }
 ```

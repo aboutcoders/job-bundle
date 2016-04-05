@@ -3,7 +3,7 @@ Logging
 
 During the execution of a job each job has access to it's own standard PSR logger.
 
-To access the logger of a job you simply have to annotate your method and the logger will be injected.
+To access the logger of a job you simply have to specify the `@logger` in the `@JobParameters` annotation of your method and the logger will be injected.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -22,18 +22,17 @@ class MyJob
 
 ## Writing log files to the database
 
-By default the logs are written to files. This only makes sense in a development environment. In a productive environment you might want to store the logs in the database. To do so you simply have to change the handler to `orm` in the config.yaml:
-
-´
+By default the logs are written to files. However this only makes sense in the development environment. In the production environment you probably want to store the logs in the database instead. To do so you simply have to change the handler to `orm` in the `app/config.yml` file:
 
 ## Changing the directory of log files
 
-By default log files are stored in the directory %kernel.logs_dir%. If you want to store the log files in a different directory you can do so by changing the logging configuration.
+By default log files are stored in the directory `%kernel.logs_dir%`. If you want to store the log files in a different directory you can do so by setting a different path in `app/config.yml`.
 
 ```yaml
 # app/config.yml
 abc_job:
-    log_dir: /path/to/directory
+    logging:
+        directory: '/path/to/directory'
 ```
 
 ## Changing the default log level
@@ -47,7 +46,7 @@ abc_job:
         default_level: debug
 ```
 
-Allowed values for the log level are: debug, info, notice, warning, error, critical and alert.
+Allowed values for the log level are: `debug`, `info`, `notice`, `warning`, `error`, `critical` and `alert`.
 
 ## Changing the log level of a specific job
 
@@ -58,11 +57,11 @@ You can configure a different log level for each type of job.
 abc_job:
     logging:
         default_level: error
-        levels:
+        custom_level:
             my_job: debug
 ```
 
-This will set the default level to error and the level of the job "my_job" to debug.
+This will set the default level to `error` and the level of the job "my_job" to `debug`.
 
 ## Changing the formatter
 
@@ -77,7 +76,7 @@ abc_job:
 
 ## Register processors
 
-You can register custom processors for the logger. To do so the processors need to be registered as services within the service container. You can then specify these processors you want to use within the logging configuration.
+You can register custom processors for the logger. To do so the processors need to be registered as services within the service container. You can then specify these processors within the logging configuration.
 
 ```yaml
 # app/config.yml
@@ -92,7 +91,7 @@ abc_job:
 
 Besides the dedicated logger for jobs the bundle also uses the logger registered within the service container. To ease debugging different internal services are logging to different log channels. The following log channels are used:
 
-- "abc.job.eraser"
-- "abc.job.manager"
-- "abc.job.listener.schedule"
-- "abc.job.queue_engine"
+- abc.job.eraser
+- abc.job.manager
+- abc.job.listener.schedule
+- abc.job.queue_engine
