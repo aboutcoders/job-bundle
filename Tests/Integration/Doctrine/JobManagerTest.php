@@ -75,7 +75,10 @@ class JobManagerTest extends DatabaseTestCase
         $this->subject->save($job);
 
         $this->assertCount(1, $this->subject->findAll());
-        $this->assertLessThanOrEqual(new \DateTime(), $job->getCreatedAt());
+        //Just in case save operation is delayed
+        $now = new \DateTime();
+        $now->add(new \DateInterval('P5M'));
+        $this->assertLessThanOrEqual($now, $job->getCreatedAt());
 
         /** @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context */
         $context   = $this->getMock('Symfony\Component\Validator\Context\ExecutionContext', [], [], '', false);
