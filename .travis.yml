@@ -1,21 +1,21 @@
 language: php
-
 php:
-  - 5.6
-  - 7.0
-
+- 5.6
+- 7.0
 env:
-  - SYMFONY_VERSION=2.6.*
-  - SYMFONY_VERSION=2.8.*
-  - SYMFONY_VERSION=3.0.*
-
+- SYMFONY_VERSION=2.6.*
+- SYMFONY_VERSION=2.8.*
+- SYMFONY_VERSION=3.0.*
 matrix:
   allow_failures:
-    - env: SYMFONY_VERSION=2.6.*
-    - env: SYMFONY_VERSION=3.0.*
-
+  - env: SYMFONY_VERSION=2.6.*
+  - env: SYMFONY_VERSION=3.0.*
 before_script:
-  - wget http://getcomposer.org/composer.phar
-  - php -d memory_limit=-1 composer.phar require symfony/symfony:${SYMFONY_VERSION}
-  - php -d memory_limit=-1 composer.phar install
-  - phpunit
+- wget http://getcomposer.org/composer.phar
+- php -d memory_limit=-1 composer.phar require symfony/symfony:${SYMFONY_VERSION}
+- php -d memory_limit=-1 composer.phar install
+- phpunit
+notifications:
+  hipchat:
+    rooms:
+      secure: uypSLOcHE2VlVWRlZFR0lwlj+1+I/oG10qAa3QA9LnJT6bIDGO9FBrKDvyhOhd/HmufQD35ytvrn2O3JUh9S25arjqoFEg4Or1MDymeUuSH6X1gV+pftDj/EEPTBZVNzpWOw+fCqASCmUsSFt6B9jd0QfnFMDbYKVaCS3Il+53+rRljvlCP55biFXOkHc4lsQ5FDJlal+5nmm8/SxGAN/IVnIfkHdHB+ljVKeU62F4OBLe0IiYvhmrgWt81D64zp96I5XvltvXT960QndIzVdp4rhB0L7GYxFiamiS9AhMcUVS4avlUwLbDtKQDe8VeKPxx2wsGwHD/zwjcs6QLxoyZfyofSRylhZYpuYLy938Wgl95euoA6gqfV4EtaTOkaVB/s1z6NuoAGPUEfFm8OvKJBxEX0/3hOsMdEsk5272WlTNyNRwNf0g2R2wS1y24OUZjSjroxKMZ3D77vX0xnmjzPecLkxpp5vGmNtBtP/eQ6PKwRPMPLBTUPsAlQzgU/BMQ/1WQKG9lBFHP62DXUlORxyZ6FuLat6gDTLayuPXNHoNFgTgnuCCx34n36MBSja1tQxY5ERglmzlk4tRARCCdww2TF0lFmgB00qesIzF0v3pXw/v84lj2r2XJ/cQFYDhZi3YF4VPLVVqxylOeREClWZ/xjYnDK/fm3JJpAf9M=
