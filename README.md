@@ -223,3 +223,13 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - [Logging](./docs/logging.md)
 - [The REST-API](./docs/rest.md)
 - [Configuration Reference](./docs/configuration-reference.md)
+
+## ToDo:
+
+- Ensure that a job that terminated with a fatal PHP error is not executed a second time
+- Do not create table `abc_job_log` if jobs are configured to log to files
+- Implement a locking mechanism to prevent parallel execution of jobs
+- Finalize the REST-API
+- Add option to set the name of the event that is notified for lifecycle events
+- Add option to cancel a currently running job
+- Support alternative queue backends such as [qpush-bundle](https://www.google.de/webhp?q=qpushbundle) or [IronMQ](https://www.iron.io/platform/ironmq/)
