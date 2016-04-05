@@ -57,7 +57,7 @@ interface ManagerInterface
      * Cancels execution of a job.
      *
      * @param JobInterface $job
-     * @return void
+     * @return JobInterface The job
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */
@@ -67,7 +67,7 @@ interface ManagerInterface
      * Cancels execution of a job.
      *
      * @param string $ticket The ticket of the job
-     * @return void
+     * @return JobInterface The job
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */
