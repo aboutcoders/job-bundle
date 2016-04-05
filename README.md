@@ -3,6 +3,8 @@ AbcJobBundle
 
 A symfony bundle that allows you to process jobs asynchronously, by simply annotating the method of a class and registering it within the service container.
 
+[![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?branch=master)](https://travis-ci.org/aboutcoders/job-bundle)
+
 ## Overview
 
 This bundle provides the following features:
