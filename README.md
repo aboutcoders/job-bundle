@@ -16,9 +16,9 @@ This bundle provides the following features:
 
 ## Disclaimer
 
-This bundle is still under development. At the current moment we do not consider this bundle as stable and thus we feel free to change things.
+Please note that this bundle is still in development and thus we feel free to change things including the external API if necessary. We are planning to release the first stable release the next weeks.
 
-However we appreciate if you decide to use this bundle and we appreciate your feedback, suggestions or contributions.
+We appreciate if you decide to use this bundle and we appreciate your feedback, suggestions or contributions.
 
 ## Installation
 
@@ -225,3 +225,15 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - [Logging](./docs/logging.md)
 - [The REST-API](./docs/rest.md)
 - [Configuration Reference](./docs/configuration-reference.md)
+
+## ToDo:
+
+- Ensure that a job that terminated with a fatal PHP error is not executed a second time
+- Do not create table `abc_job_log` if jobs are configured to log to files
+- Implement a locking mechanism to prevent parallel execution of jobs
+- Finalize the REST-API
+- Provide statistics
+- Utilize stopwatch to detect bottle necks
+- Add option to set the name of the event that is notified for lifecycle events
+- Add option to cancel a currently running job
+- Support alternative queue backends such as [qpush-bundle](https://www.google.de/webhp?q=qpushbundle) or [IronMQ](https://www.iron.io/platform/ironmq/)
