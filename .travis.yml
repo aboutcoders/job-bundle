@@ -9,8 +9,13 @@ env:
   - SYMFONY_VERSION=2.8.*
   - SYMFONY_VERSION=3.0.*
 
+matrix:
+  allow_failures:
+    - env: SYMFONY_VERSION=2.6.*
+    - env: SYMFONY_VERSION=3.0.*
+
 before_script:
-  - composer require symfony/symfony:${SYMFONY_VERSION}
   - wget http://getcomposer.org/composer.phar
+  - php -d memory_limit=-1 composer.phar require symfony/symfony:${SYMFONY_VERSION}
   - php -d memory_limit=-1 composer.phar install
   - phpunit
