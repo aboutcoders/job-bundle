@@ -90,6 +90,9 @@ class Manager implements ManagerInterface
         $this->queueEngine = $queueEngine;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function create($type, array $parameters = null, BaseScheduleInterface $schedule = null)
     {
         return $this->jobManager->create($type, $parameters, $schedule);
@@ -151,6 +154,8 @@ class Manager implements ManagerInterface
         $this->jobManager->save($job);
 
         $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
+
+        return $job;
     }
 
     /**
@@ -158,7 +163,7 @@ class Manager implements ManagerInterface
      */
     public function cancelJob($ticket)
     {
-        $this->cancel($this->findJob($ticket));
+        return $this->cancel($this->findJob($ticket));
     }
 
     /**

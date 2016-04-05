@@ -59,7 +59,7 @@ Finally follow the installation instructions of the required third party bundles
 
 ## Configuration
 
-### Configure doctrine orm
+__Configure doctrine orm__
 
 At the current point only doctrine is supported as ORM. However by changing the configuration you can use a different persistence layer.
 
@@ -68,7 +68,7 @@ abc_job:
   db_driver: orm
 ```
 
-### Register a doctrine mapping type for the job status
+__Register a doctrine mapping type for the job status__
 
 ```yaml
 doctrine:
@@ -78,11 +78,11 @@ doctrine:
             abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
 ```
 
-### Register GDMO Timestampable
+__Register GDMO Timestampable__
 
 The bundle makes use of the GDMO Timestampable behavior. There are different approaches on how you can set up this behavior. Please refer to the [official symfony documentation](http://symfony.com/doc/current/cookbook/doctrine/common_extensions.html) and follow the instructions there.
 
-### Import AbcJobBundle routing files
+__Import AbcJobBundle routing files__
 
 If you want to work with the REST-API you have to import the routing files.
 
@@ -93,7 +93,7 @@ abc-rest-job:
     prefix: /api
 ```
 
-### Update the database schema
+__Update the database schema__
 
 Finally you need to update your database schema in order to create the required tables.
 
@@ -228,6 +228,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## ToDo:
 
+- Add support for symfony < 2.8 && symfony >= 3.x
 - Ensure that a job that terminated with a fatal PHP error is not executed a second time
 - Do not create table `abc_job_log` if jobs are configured to log to files
 - Implement a locking mechanism to prevent parallel execution of jobs
