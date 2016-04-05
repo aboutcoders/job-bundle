@@ -1,7 +1,7 @@
 Configuration Reference
 =======================
 
-``yaml
+```yaml
 # app/config.yml
 abc_job:
     db_driver: orm                # allowed values: [orm]

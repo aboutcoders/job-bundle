@@ -7,7 +7,7 @@ During the lifecycle of a job events are dispatched using the [Symfony Event Dis
 
 Before every execution of a job an event with the name `abc.job.pre_execute` is dispatched.
 
-In order to register an event listener for this event you have to define the listener class register it as a service and tag it.
+In order to register an event listener for this event you have to define the listener class, register it as a service and tag it.
 
 ```yml
 # app/config/config.yml
@@ -24,7 +24,7 @@ The dispatched event is of type [ExecutionEvent](../Event/ExecutionEvent.php) wh
 
 After every execution of a job an event with the name `abc.job.pre_execute` is dispatched.
 
-In order to register an event listener for this event you have to define the listener class register it as a service and tag it.
+In order to register an event listener for this event you have to define the listener class, register it as a service and tag it.
 
 ```yml
 # app/config/config.yml
@@ -35,14 +35,14 @@ services:
             - { name: abc.job.event_listener, event: abc.job.post_execute, method: onPostExecute }
 ```
 
-The dispatched event is of type [ExecutionEvent](../Event/ExecutionEvent.php) which gives listeners the option to modify the job or to [provide runtime parameters](./howto-inject-runtime-parameters.md).
+Like the Pre Execution Event the dispatched event is of type [ExecutionEvent](../Event/ExecutionEvent.php).
 
 
 ### Terminate Event
 
-Whenever a job terminates an event with the name `abc.job.terminated` is dispatched.
+Whenever a job terminates an event with the name `abc.job.terminated` and of type [TerminationEvent](../Event/TerminationEvent.php is dispatched.
 
-In order to register an event listener for this event you have to define the listener class register it as a service and tag it.
+In order to register an event listener for this event you have to define the listener class, register it as a service and tag it.
 
 ```yml
 # app/config/config.yml
@@ -52,5 +52,3 @@ services:
         tags:
             - { name: abc.job.event_listener, event: abc.job.terminated, method: onTerminate }
 ```
-
-The dispatched event is of type [TerminationEvent](../Event/TerminationEvent.php) which gives listeners access to the job.

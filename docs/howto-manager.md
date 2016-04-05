@@ -1,9 +1,11 @@
 How-to work with the manager
 ============================
 
+The API of the manager is defined by the interface [ManagerInterface](../Job/ManagerInterface.php).
+
 ## Retrieving the manager
 
-In order to retrieve the manager you need the container:
+You can retrieve the manager from the service container with the following command:
 
 ```php
 $manager = $container->get('abc.job.manager');
@@ -16,20 +18,24 @@ There are two ways to add a new job:
 The short ways is to create and add the job in one step:
 
 ```php
-$job = $manager->addJob('say_hello', array('Hello World!'));
+$job = $manager->addJob('say_hello', array('World'));
 ```
 
-The longer way is to do it on two steps. This can be useful if you e.g. want to add one or more schedules for a job.
+The other way is to first create the job and then add it. This can be useful if you e.g. want to add one or more schedules for a job.
 
 ```php
-$job = $manager->create('say_hello', array('Hello World!'));
+$job = $manager->create('say_hello', array('World'));
 
-$manager->add($job);
+// do something with the job
+
+$job = $manager->add($job);
+
+$ticket = $job->getTicket();
 ```
 
 ## Getting a job
 
-At some point you might want to check the status of job, check whether it was already processed or not. To do this you must have the job ticket, that you got, when the job was created.
+After a job was added you can get information about with the following command:
 
 ```php
 $ticket = getTicketFromSomewhere();
@@ -39,7 +45,7 @@ $job = $manager->get($ticket);
 
 ## Cancelling a job
 
-You can cancel a job at anytime. At this point however jobs can only be cancelled effectively if they are not currently being processed. There are two ways to cancel a job:
+You can cancel a job with one og the following commands:
 
 Use `cancelJob` in case you only know the ticket:
 
@@ -55,16 +61,16 @@ $manager->cancel($job);
 
 ## Retrieving the logs
 
-Each job can log to a dedicated log file. There are two ways to get the logs:
+Each has its own logger. You can retrieve the logs of a job with one of the following commands:
 
-Use `cancelJob` in case you only know the ticket:
+Use `getJobLogs` in case you only know the ticket:
 
 ```php
-$logsString->getJobLogs($ticket);
+$logsString = $manager->getLogs($job);
 ```
 
 Use `getLogs` in case you already retrieved the job from the manager:
 
 ```php
-$logsString->getLogs($job);
+$logsString = $manager->getLogs($job);
 ```

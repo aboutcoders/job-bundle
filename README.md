@@ -14,13 +14,13 @@ This bundle provides the following features:
 
 ## Disclaimer
 
-This bundle is still under development. At the current moment we do not consider this bundle as stable and we feel free to change things at any level.
+This bundle is still under development. At the current moment we do not consider this bundle as stable and thus we feel free to change things.
 
-However we greatly appreciate if you decide to use this bundle and we appreciate your feedback, suggestions or even contributions.
+However we appreciate if you decide to use this bundle and we appreciate your feedback, suggestions or contributions.
 
 ## Installation
 
-### Add the AbcJobBundle using composer
+Add the AbcJobBundle to your `composer.json` file
 
 ```json
 {
@@ -30,9 +30,7 @@ However we greatly appreciate if you decide to use this bundle and we appreciate
 }
 ```
 
-### Update AppKernel.php of your symfony application
-
-Add the following bundles to your kernel bootstrap sequence, in the `$bundles` array.
+Then include the bundle in the AppKernel.php class
 
 ```php
 public function registerBundles()
@@ -46,9 +44,7 @@ public function registerBundles()
 }
 ```
 
-### Install third party bundles
-
-Please follow the installation instructions of the following third party bundles:
+Finally follow the installation instructions of the required third party bundles:
 
 * [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
 * [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
@@ -70,7 +66,7 @@ abc_job:
   db_driver: orm
 ```
 
-### Register a doctrine mapping type for a job status
+### Register a doctrine mapping type for the job status
 
 ```yaml
 doctrine:
@@ -107,14 +103,14 @@ php app/console doctrine:schema:update --force
 
 ### Registering a new job
 
-In order to register a new job, you have to take two steps:
+To register a new job, you have to do two things
 
-- Create the job class (that performs the actual work)
-- Register the class in the service container
+- Create the job class
+- Register the job class in the service container
 
 #### Step 1: Create the job class
 
-Create the class that performs the actual job. This can be any kind of class.
+First you have to create the class that will perform the actual work. This can be any kind of class.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -128,7 +124,7 @@ class MyJob
      * @JobParameters({"string", "@logger"})
      * @JobResponse("string")
      */
-    public function hello($whom, Logger $logger)
+    public function sayHello($whom, Logger $logger)
     {
         $logger->debug('Hello ' . $whom);
 
@@ -137,16 +133,16 @@ class MyJob
 }
 ```
 
-Please note the two annotations __@JobParameters__ and __@JobResponse__. Both parameters and response (return value) of a job must be serializable and deserializable using the [JMS Serializer](http://jmsyst.com/libs/serializer).
+Please note the two annotations __@JobParameters__ and __@JobResponse__. They are used to specify the type of parameters the job must be invoked with as well as the type of response that is returned by the job. Since jobs are executed in the background both parameters and response must be serializable in order to persist them. However there is special parameter type called [runtime parameter](./docs/howto-inject-runtime-parameters.md), that are specified with the `@` character. Runtime parameters can be of type, since they are provided at runtime by event listeners. The `@logger` in the previous example is such a runtime parameter. The `@logger` is a runtime parameters that is available for every job. It provides a dedicated PSR compliant logger for each job.
 
-The example uses a special parameter `@logger` which is a [runtime parameter](./docs/howto-inject-runtime-parameters.md). Each job can log to its own dedicated logger. All you have to do is specifying the parameter `@logger` within the __@JobParameters__.
+Both parameters and response (return value) of are serialized/deserialized using the [JMS Serializer](http://jmsyst.com/libs/serializer).
 
 __Note:__ You only have to provide the __@JobParameters__ or __@JobResponse__ in case your job requires parameters or returns a response.
 
 
-#### Step 2: Register the class in the service
+#### Step 2: Register the class in the service container
 
-Next you have to register the job as a service within the service container by tagging it.
+Next you have to register the job as a service within the service container and tag it.
 
 ##### Using XML
 ```xml
@@ -156,7 +152,7 @@ Next you have to register the job as a service within the service container by t
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="my_job" class="My\Bundle\ExampleBundle\Job\MyJob">
-            <tag name="abc.job" type="my_job" method="doSomething"/>
+            <tag name="abc.job" type="say_hello" method="sayHello"/>
         </service>
     </services>
 </container>
@@ -169,7 +165,7 @@ services:
     my_job:
         class: My\Bundle\ExampleBundle\Job\MyJob
         tags:
-            -  { name: abc.job, type: "my_job" method: "doSomething" }
+            -  { name: "abc.job", type: "say_hello", method: "sayHello" }
 ```
 
 The tag must define the attributes `name`, `type` and `method` where besides the tag name `type` specifies the unique name of the job (e.g. "mailer") and `method` references the method of the class to be executed.
@@ -179,7 +175,9 @@ The tag must define the attributes `name`, `type` and `method` where besides the
 To execute a job asynchronously you need to retrieve the job manager from the service container and add the job.
 
 ```php
-$job = $container->get('abc.job.manager')->addJob('my_job', array('Hello ' 'World!'));
+$manager = $container->get('abc.job.manager')
+
+$job = $manager->addJob('say_hello', array('World'));
 ```
 
 The first argument of `addJob` specifies the type (unique name) of the job. This value must equal `type` that was chosen in the service tag. The second (optional) argument is an array of parameters the job will be executed with.
@@ -190,11 +188,11 @@ The return value is an implementation of [JobInterface](./Job/JobInterface.php).
 $ticket = $job->getTicket();
 ```
 
-The job ticket can be used to retrieve information about the job at a later point. Besides that you have access to more detailed information about the job such as status, execution time, associated schedules and more. Please refer to the documentation of the [JobManagerInterface](../Job/JobManagerInterface.php) to get an overview of the full API.
+The job ticket can be used to retrieve information about the job at a later point. Besides that you have access to more detailed information about the job such as status, execution time, associated schedules and so on. Please refer to the documentation of the [JobManagerInterface](../Job/JobManagerInterface.php) to get an overview of the full API.
 
 ### Scheduling a job
 
-You can also define schedules for jobs for repeated execution. To do so you have to provide the schedule as an argument when the job is
+You can define schedules for jobs in order to execute them repeatedly. To do so you simply have to provide the schedule as an argument when the job is added to the manager.
 
 ```php
 /**
@@ -202,20 +200,21 @@ You can also define schedules for jobs for repeated execution. To do so you have
  */
 $manager = $container->get('abc.job.manager');
 
-$schedule = Abc\Bundle\SchedulerBundle\Model\Schedule('cron', '*/5 * * * *');
+$job = $manager->create('say_hello', array('World'));
 
-$job = $manager->addJob('my_job', array('Hello ' 'World!'), $schedule);
+$schedule = $job->createSchedule('cron', '*/5 * * * *');
+
+$job = $manager->add($job);
 ```
 
-In this example we created a CRON schedule with a CRON specification that will execute the job every 5 minutes.
-
+This will create a job that is executed every 5 minutes. Please take a look at the documentation o the [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle) to get more information on how to work with schedules.
 
 ## How-Tos
 
-- [How-To work with the manager](./docs/howto-manager.md)
-- [How-To work with the job status](./docs/howto-status.md)
-- [How-To modify a job at runtime](./docs/howto-modify-job.md)
-- [How-To inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
+- [How-to work with the manager](./docs/howto-manager.md)
+- [How-to modify a job at runtime](./docs/howto-modify-job.md)
+- [How-to inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
+- [How-to work with the job status](./docs/howto-status.md)
 
 ## Further Documentation
 
