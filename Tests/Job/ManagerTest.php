@@ -457,7 +457,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $this->dispatcher->expects($this->at(0))
                 ->method('dispatch')
                 ->willReturnCallback(
-                    function (ExecutionEvent $event) use ($logger)
+                    function ($eventName, ExecutionEvent $event) use ($logger)
                     {
                         $event->getContext()->set('logger', $logger);
                     }
