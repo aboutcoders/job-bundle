@@ -35,7 +35,7 @@ $ticket = $job->getTicket();
 
 ## Getting a job
 
-After a job was added you can get information about with the following command:
+After a job was added you can get information about it with the following command:
 
 ```php
 $ticket = getTicketFromSomewhere();
@@ -45,7 +45,7 @@ $job = $manager->get($ticket);
 
 ## Cancelling a job
 
-You can cancel a job with one og the following commands:
+You can cancel a job with one of the following commands:
 
 Use `cancelJob` in case you only know the ticket:
 
@@ -61,7 +61,7 @@ $manager->cancel($job);
 
 ## Retrieving the logs
 
-Each has its own logger. You can retrieve the logs of a job with one of the following commands:
+Each job has access its own logger. You can retrieve the logs of a job with one of the following commands:
 
 Use `getJobLogs` in case you only know the ticket:
 

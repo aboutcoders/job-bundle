@@ -1,9 +1,9 @@
 How-to modify a job at runtime
 ===================================
 
-In some cases it might be necessary to modify the parameters of a job, add or remove schedules of a job or set or change the response of a job at runtime to change the behavior of subsequent executions.
+In some cases it might be necessary to modify the parameters of a job, add or remove schedules or set or change the response of the job at runtime in order to change the behavior of subsequent executions.
 
-In order to modify a job at runtime your job class must implement the interface [JobAwareInterface](../Job/JobAwareInterface.php).
+To modify a job at runtime your job class must implement the interface [JobAwareInterface](../Job/JobAwareInterface.php).
 
 ```php
 interface JobAwareInterface

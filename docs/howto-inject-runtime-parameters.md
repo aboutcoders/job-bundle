@@ -1,9 +1,9 @@
 How-to inject runtime parameters
 ================================
 
-A job can be invoked with two types of parameters. First type are parameters that can be serialized/deserialized with the [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle). Second type are runtime parameters. As the name suggests, runtime parameters are provided at runtime. This is done with event listeners that register the runtime parameters within the execution context of a jobm, which is much simpler than it might sound.
+A job can be invoked with two types of parameters. First type are parameters that can be serialized/deserialized with the [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle). Second type are runtime parameters. As the name suggests, runtime parameters are provided at runtime. This is done with event listeners that register the runtime parameters within the execution context of a job.
 
-__Note:__ The job logger, that is available for every job, is provided with this very same approach.
+__Note:__ The job logger, that is available for every job, is provided with the same approach.
 
 To inject a parameter at runtime you need to do two things:
 
@@ -23,7 +23,9 @@ class LoggerProviderJobListener
 
     public function onPreExecute(ExecutionEvent $event)
     {
-        $event->getContext()->set('logger', $this->factory->create($event->getJob()));
+        $logger = $this->factory->create($event->getJob());
+
+        $event->getContext()->set('logger', $logger);
     }
 }
 ```
@@ -45,11 +47,11 @@ The runtime parameter now only needs to be referenced in the __@JobParameter__ a
 
 ```php
 /**
- * @JobParameters({"string", "@logger"})
+ * @JobParameters({"@logger"})
  */
-public function doSomething($string, Psr\Log\LoggerInterface $logger) {
+public function doSomething(Psr\Log\LoggerInterface $logger) {
 
 }
 ```
 
-__Note:__ The name of the runtime parameter reference in the `@JobParameter` annotation must match key that the parameter was registered in the execution context.
+__Note:__ The name of the runtime parameter referenced in the `@JobParameter` annotation must match key that the parameter was registered with in the execution context.
