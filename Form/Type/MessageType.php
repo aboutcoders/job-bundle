@@ -44,10 +44,10 @@ class MessageType extends AbstractType
             $options['data'] = new Message();
         }
 
-        $builder->add('to', EmailType::class);
-        $builder->add('from', EmailType::class);
-        $builder->add('subject', TextType::class);
-        $builder->add('message', TextAreaType::class);
+        $builder->add('to', 'email');
+        $builder->add('from', $this->methodBlockPrefixExists() ? EmailType::class : 'email');
+        $builder->add('subject', $this->methodBlockPrefixExists() ? TextType::class : 'text');
+        $builder->add('message', $this->methodBlockPrefixExists() ? TextAreaType::class : 'textarea');
 
         // transform Abc\Bundle\JobBundle\Job\Mailer\Message to array for model
         $builder->addModelTransformer(new SingleParameterTransformer);
@@ -70,6 +70,14 @@ class MessageType extends AbstractType
      */
     public function getName()
     {
-        return $this->getBlockPrefix();
+        return 'abc_job_message';
+    }
+
+    /**
+     * @return bool
+     */
+    private function methodBlockPrefixExists()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
     }
 }

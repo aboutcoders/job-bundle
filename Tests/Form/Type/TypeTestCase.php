@@ -11,12 +11,15 @@
 namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 
 use Abc\Bundle\JobBundle\Form\Type\JobType as FormJobType;
+use Abc\Bundle\JobBundle\Form\Type\MessageType;
+use Abc\Bundle\JobBundle\Form\Type\ScheduleType;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Entity\Job;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Tests\Extension\Validator\Type\TypeTestCase as BaseTypeTestCase;
+use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
@@ -35,11 +38,11 @@ abstract class TypeTestCase extends BaseTypeTestCase
     public abstract function getType();
 
     /**
-     * Returns the form class configured for the job
+     * Returns the form type configured for the job
      *
      * @return string|null
      */
-    public abstract function getFormClass();
+    public abstract function getFormType();
 
     /**
      * Provides the test data.
@@ -78,10 +81,6 @@ abstract class TypeTestCase extends BaseTypeTestCase
             ->willReturn(true);
 
         parent::setUp();
-
-        $this->validator
-            ->method('validate')
-            ->will($this->returnValue(new ConstraintViolationList()));
     }
 
     /**
@@ -105,21 +104,21 @@ abstract class TypeTestCase extends BaseTypeTestCase
         $expectedJob->setParameters($expectedParameters);
 
         $jobType = new JobType('serviceId', $this->getType(), function (){});
-        $jobType->setFormClass($this->getFormClass());
+        $jobType->setFormType($this->getFormType());
 
         $this->registry
             ->method('get')
             ->willReturn($jobType);
 
         // test
-        $form = $this->factory->create(FormJobType::class, $job);
+        $form = $this->factory->create($this->methodBlockPrefixExists() ? FormJobType::class : 'abc_job', $job);
 
         $form->submit($formData);
 
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedJob, $form->getData());
 
-        $view     = $form->createView();
+        $view = $form->createView();
         $children = $view->children;
 
         foreach(array_keys($formData) as $key)
@@ -131,13 +130,36 @@ abstract class TypeTestCase extends BaseTypeTestCase
     protected function getExtensions()
     {
         // create a type instance with the mocked dependencies
-        $type = new FormJobType($this->registry);
+        $form = new FormJobType($this->registry);
 
-        return array_merge(
-            parent::getExtensions(),
-            array(
-                new PreloadedExtension(array($type), array()),
-            )
+        if($this->methodBlockPrefixExists())
+        {
+            $forms = [$form];
+        }
+        else{
+            $forms = [
+                'abc_job' => $form,
+                'abc_job_schedule' => new ScheduleType,
+                'abc_job_message' => new MessageType,
+            ];
+        }
+
+        $validator = $this->getMock('\Symfony\Component\Validator\Validator\ValidatorInterface');
+        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $validator->expects($this->any())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
+        $validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $metadataFactory->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
+        $validator->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
+
+        return array(
+            new PreloadedExtension($forms, []),
+            new ValidatorExtension($validator),
         );
+    }
+
+    private function methodBlockPrefixExists()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
     }
 }

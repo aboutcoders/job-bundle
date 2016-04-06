@@ -13,7 +13,7 @@ framework:
     default_locale: en
     translator: { fallback: en }
     profiler: { only_exceptions: false }
-    validation:    { enable_annotations: true }
+    validation: { enable_annotations: true }
 
 monolog:
     handlers:

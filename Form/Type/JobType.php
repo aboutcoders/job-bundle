@@ -45,11 +45,11 @@ class JobType extends AbstractType
 
     /**
      * @param JobTypeRegistry $registry
-     * @param string $dataClass
+     * @param string          $dataClass
      */
     public function __construct(JobTypeRegistry $registry, $dataClass = 'Abc\Bundle\JobBundle\Entity\Job')
     {
-        $this->registry = $registry;
+        $this->registry  = $registry;
         $this->dataClass = $dataClass;
     }
 
@@ -60,7 +60,7 @@ class JobType extends AbstractType
     {
         $registry = $this->registry;
 
-        $builder->add('type', TextType::class);
+        $builder->add('type', $this->methodBlockPrefixExists() ? TextType::class : 'text');
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -74,20 +74,30 @@ class JobType extends AbstractType
 
                 if(!is_null($job) && !is_null($job->getType()) && $registry->has($job->getType()))
                 {
-                    $formClass = $registry->get($job->getType())->getFormClass();
-                    if(!is_null($formClass))
+                    $formType = $registry->get($job->getType())->getFormType();
+                    if(!is_null($formType))
                     {
-                        $form->add('parameters', MessageType::class, [
-                            'constraints' => [new Valid()]
-                        ]);
+                        $form->add(
+                            'parameters',
+                            $formType,
+                            [
+                                'constraints' => [new Valid()]
+                            ]
+                        );
                     }
                 }
             }
         );
 
-        $builder->add('schedules', CollectionType::class, [
+        $typeKey   = $this->methodBlockPrefixExists() ? 'entry_type' : 'type';
+        $typeValue = $this->methodBlockPrefixExists() ? ScheduleType::class : 'abc_job_schedule';
+
+        $builder->add(
+            'schedules',
+            $this->methodBlockPrefixExists() ? CollectionType::class : 'collection',
+            [
                 'by_reference' => false,
-                'entry_type' => ScheduleType::class,
+                $typeKey => $typeValue,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => true,
@@ -95,6 +105,11 @@ class JobType extends AbstractType
                 'constraints' => [new Valid()]
             ]
         );
+    }
+
+    public function setDefaultOptions(\Symfony\Component\OptionsResolver\OptionsResolverInterface $resolver)
+    {
+        $this->configureOptions($resolver);
     }
 
     /**
@@ -106,7 +121,6 @@ class JobType extends AbstractType
             [
                 'data_class' => $this->dataClass,
                 'csrf_protection' => false,
-
             ]
         );
     }
@@ -124,6 +138,14 @@ class JobType extends AbstractType
      */
     public function getName()
     {
-        return $this->getBlockPrefix();
+        return 'abc_job';
+    }
+
+    /**
+     * @return bool
+     */
+    private function methodBlockPrefixExists()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
     }
 }

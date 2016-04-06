@@ -94,12 +94,12 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('response', $this->subject->getResponseType());
     }
 
-    public function testGetSetFormClass()
+    public function testGetSetFormType()
     {
-        $this->assertNull($this->subject->getFormClass());
+        $this->assertNull($this->subject->getFormType());
 
-        $this->subject->setFormClass('form-service-id');
-        $this->assertEquals('form-service-id', $this->subject->getFormClass());
+        $this->subject->setFormType('form-service-id');
+        $this->assertEquals('form-service-id', $this->subject->getFormType());
     }
 
     public static function getInvalidConstructorArgs()

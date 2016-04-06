@@ -77,10 +77,10 @@ class RegisterJobsPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "method" attribute on "%s" tags.', $id, $this->jobTag));
                 }
 
-                if(isset($tag['formClass']) && !class_exists($tag['formClass']))
+                if(isset($tag['formType']) &&  method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') && !class_exists($tag['formType']))
                 {
                     throw new \InvalidArgumentException(
-                        sprintf('The form "%s" specified in the tag "%s" of the service "%s" does not exist.', $tag['formClass'], $this->jobTag, $id)
+                        sprintf('The form "%s" specified in the tag "%s" of the service "%s" does not exist.', $tag['formType'], $this->jobTag, $id)
                     );
                 }
 
@@ -94,7 +94,7 @@ class RegisterJobsPass implements CompilerPassInterface
                     $tag['type'],
                     array(new Reference($id), $tag['method']),
                     $logLevel,
-                    isset($tag['formClass']) ? $tag['formClass'] : null
+                    isset($tag['formType']) ? $tag['formType'] : null
                 );
 
                 $container->setDefinition($jobTypeId, $definition);
@@ -115,10 +115,10 @@ class RegisterJobsPass implements CompilerPassInterface
      * @param string           $type
      * @param callable         $callable
      * @param string|null      $logLevel
-     * @param string|null      $formClass
+     * @param string|null      $formType
      * @return DefinitionDecorator
      */
-    protected function createType(ContainerBuilder $container, $serviceId, $type, $callable, $logLevel = null, $formClass = null)
+    protected function createType(ContainerBuilder $container, $serviceId, $type, $callable, $logLevel = null, $formType = null)
     {
         $jobType = new DefinitionDecorator('abc.job.type.prototype');
         $jobType->replaceArgument(0, $serviceId);
@@ -126,9 +126,9 @@ class RegisterJobsPass implements CompilerPassInterface
         $jobType->replaceArgument(2, $callable);
         $jobType->replaceArgument(3, $logLevel);
 
-        if($formClass != null)
+        if($formType != null)
         {
-            $jobType->addMethodCall('setFormClass', array($formClass));
+            $jobType->addMethodCall('setFormType', array($formType));
         }
 
         return $jobType;

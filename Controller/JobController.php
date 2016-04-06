@@ -139,7 +139,9 @@ class JobController extends FOSRestController
             throw $this->createNotFoundException(sprintf('A job of type "%s" not found', $type));
         }
 
-        $form = $this->createForm(JobType::class, $this->getEntityManager()->create($type));
+        $formType = method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? JobType::class : 'abc_job';
+
+        $form = $this->createNamedForm('', $formType, $this->getEntityManager()->create($type));
 
         return $this->processForm($form, $request);
     }
@@ -215,5 +217,17 @@ class JobController extends FOSRestController
     protected function getRegistry()
     {
         return $this->get('abc.job.registry');
+    }
+
+    /**
+     * @param       $name
+     * @param       $type
+     * @param null  $data
+     * @param array $options
+     * @return mixed
+     */
+    private function createNamedForm($name, $type, $data = null, array $options = array())
+    {
+        return $this->container->get('form.factory')->createNamed($name, $type, $data, $options);
     }
 }

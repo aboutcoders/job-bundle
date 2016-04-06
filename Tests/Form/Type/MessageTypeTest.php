@@ -24,9 +24,9 @@ class MessageTypeTest extends TypeTestCase
         return 'mailer';
     }
 
-    public function getFormClass()
+    public function getFormType()
     {
-        return MessageType::class;
+        return new MessageType();
     }
 
     public function provideTestData()

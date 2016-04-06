@@ -13,7 +13,7 @@ In case want to be able to add a job from the REST-API you need to define the fo
 
 1. Define the form class
 2. Register the form class as service
-3. Configure the formClass in the service definition of the job
+3. Configure the formType in the service definition of the job
 
 ### Step 1: Define a form class
 
@@ -31,14 +31,14 @@ Register the form class as a service in the service container and tag it with ta
 </service>
 ```
 
-### Step 3: Configure the formClass of your job
+### Step 3: Configure the formType of your job
 
 Next you need to register the form class for your job. This is done in the same place where you registered the job as a service:
 
 ```xml
 <service id="abc.job.mailer" class="Abc\Bundle\JobBundle\Job\Mailer\Mailer" public="true">
     <argument type="service" id="mailer"/>
-    <tag name="abc.job" type="mailer" method="send" formClass="Abc\Bundle\JobBundle\Form\Type\MessageType"/>
+    <tag name="abc.job" type="mailer" method="send" formType="Abc\Bundle\JobBundle\Form\Type\MessageType"/>
 </service>
 ```
 

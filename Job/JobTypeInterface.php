@@ -86,12 +86,12 @@ interface JobTypeInterface
      * @param string $class The fully qualified class name
      * @return void
      */
-    public function setFormClass($class);
+    public function setFormType($class);
 
     /**
      * Sets the name of the form class to enter the parameters of this job
      *
      * @return string|null The fully qualified class name
      */
-    public function getFormClass();
+    public function getFormType();
 }

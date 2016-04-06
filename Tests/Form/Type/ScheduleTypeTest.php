@@ -36,7 +36,7 @@ class ScheduleTypeTest extends ValidatorTypeTestCase
      */
     public function testSubmitValidData($formData, $object)
     {
-        $form = $this->factory->create(ScheduleType::class, new Schedule());
+        $form = $this->factory->create(new ScheduleType(), new Schedule());
 
         $form->submit($formData);
 

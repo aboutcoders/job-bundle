@@ -40,6 +40,7 @@ class AbcJobExtension extends Extension
         $container->setAlias('abc.job.queue_engine', $config['service']['queue_engine']);
         $container->setAlias('abc.job.schedule_manager', $config['service']['schedule_manager']);
         $container->setAlias('abc.job.schedule_iterator', $config['service']['schedule_iterator']);
+        $container->setParameter('abc.job.form_type_message', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? JobType::class : 'abc_job_message');
 
         if('custom' !== $config['db_driver'])
         {

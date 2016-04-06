@@ -35,8 +35,8 @@ class ScheduleType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('type', TextType::class);
-        $builder->add('expression', TextType::class);
+        $builder->add('type', $this->methodBlockPrefixExists() ? TextType::class : 'text');
+        $builder->add('expression', $this->methodBlockPrefixExists() ? TextType::class : 'text');
     }
 
     /**
@@ -56,6 +56,14 @@ class ScheduleType extends AbstractType
      */
     public function getName()
     {
-        return $this->getBlockPrefix();
+        return 'abc_job_schedule';
+    }
+
+    /**
+     * @return bool
+     */
+    private function methodBlockPrefixExists()
+    {
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
     }
 }

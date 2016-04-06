@@ -62,7 +62,7 @@ class JobType implements JobTypeInterface
     /**
      * @var string
      */
-    private $formClass;
+    private $formType;
 
     /**
      * @param string            $serviceId The name of the service within the container
@@ -210,16 +210,16 @@ class JobType implements JobTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function setFormClass($class)
+    public function setFormType($class)
     {
-        $this->formClass = $class;
+        $this->formType = $class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFormClass()
+    public function getFormType()
     {
-        return $this->formClass;
+        return $this->formType;
     }
 }
