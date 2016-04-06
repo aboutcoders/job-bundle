@@ -44,7 +44,7 @@ class MessageType extends AbstractType
             $options['data'] = new Message();
         }
 
-        $builder->add('to', 'email');
+        $builder->add('to', $this->methodBlockPrefixExists() ? EmailType::class : 'email');
         $builder->add('from', $this->methodBlockPrefixExists() ? EmailType::class : 'email');
         $builder->add('subject', $this->methodBlockPrefixExists() ? TextType::class : 'text');
         $builder->add('message', $this->methodBlockPrefixExists() ? TextAreaType::class : 'textarea');

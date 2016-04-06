@@ -18,17 +18,25 @@ use Abc\Bundle\JobBundle\Job\Mailer\Message;
  */
 class MessageTypeTest extends TypeTestCase
 {
-
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return 'mailer';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFormType()
     {
-        return new MessageType();
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function provideTestData()
     {
         return [

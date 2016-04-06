@@ -77,12 +77,12 @@ class RegisterJobsPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "method" attribute on "%s" tags.', $id, $this->jobTag));
                 }
 
-                if(isset($tag['formType']) &&  method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') && !class_exists($tag['formType']))
+                /*if(isset($tag['formType']) &&  method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') && !class_exists($tag['formType']))
                 {
                     throw new \InvalidArgumentException(
                         sprintf('The form "%s" specified in the tag "%s" of the service "%s" does not exist.', $tag['formType'], $this->jobTag, $id)
                     );
-                }
+                }*/
 
                 $logLevel  = isset($customLogLevels[$tag['type']]) ? $customLogLevels[$tag['type']] : $defaultLogLevel;
                 $logLevel  = $this->levelToMonologConst($logLevel);

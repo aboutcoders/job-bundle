@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 
 use Abc\Bundle\JobBundle\Form\Type\ScheduleType;
 use Abc\Bundle\JobBundle\Entity\Schedule;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Tests\Extension\Validator\Type\TypeTestCase as ValidatorTypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -36,17 +37,18 @@ class ScheduleTypeTest extends ValidatorTypeTestCase
      */
     public function testSubmitValidData($formData, $object)
     {
-        $form = $this->factory->create(new ScheduleType(), new Schedule());
+        $form = $this->factory->create(method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? ScheduleType::class : 'abc_job_schedule', new Schedule());
 
         $form->submit($formData);
 
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($object, $form->getData());
 
-        $view = $form->createView();
+        $view     = $form->createView();
         $children = $view->children;
 
-        foreach (array_keys($formData) as $key) {
+        foreach(array_keys($formData) as $key)
+        {
             $this->assertArrayHasKey($key, $children);
         }
     }
@@ -56,5 +58,25 @@ class ScheduleTypeTest extends ValidatorTypeTestCase
         return [
             [['type' => 'cron', 'expression' => '* * * * *'], new Schedule('cron', '* * * * *')]
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        if(method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix'))
+        {
+            return parent::getExtensions();
+        }
+        else
+        {
+            $form = new ScheduleType();
+
+            return array_merge(parent::getExtensions(), array(
+                new PreloadedExtension([
+                    $form->getName() => $form
+                ], [])));
+        }
     }
 }

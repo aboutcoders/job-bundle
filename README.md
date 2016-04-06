@@ -228,7 +228,6 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## ToDo:
 
-- Add support for symfony < 2.8 && symfony >= 3.x
 - Ensure that a job that terminated with a fatal PHP error is not executed a second time
 - Do not create table `abc_job_log` if jobs are configured to log to files
 - Implement a locking mechanism to prevent parallel execution of jobs
