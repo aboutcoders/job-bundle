@@ -50,4 +50,12 @@ class ScheduleType extends AbstractType
             )
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
 }

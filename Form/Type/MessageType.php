@@ -64,4 +64,12 @@ class MessageType extends AbstractType
             )
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
 }

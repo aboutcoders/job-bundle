@@ -118,4 +118,12 @@ class JobType extends AbstractType
     {
         return '';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
 }
