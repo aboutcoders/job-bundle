@@ -9,8 +9,6 @@ matrix:
   fast_finish: true
   include:
     - php: 5.6
-      env: SYMFONY_VERSION=2.3.*
-    - php: 5.6
       env: SYMFONY_VERSION=2.7.*
     - php: 5.6
       env: SYMFONY_VERSION=2.8.*
@@ -25,11 +23,14 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-before_script:
-- wget http://getcomposer.org/composer.phar
-- php -d memory_limit=-1 composer.phar require symfony/symfony:${SYMFONY_VERSION} --no-update
-- php -d memory_limit=-1 composer.phar install --no-interaction $COMPOSER_FLAGS
-- phpunit --coverage-text
+before_install:
+  - wget http://getcomposer.org/composer.phar
+  - if [ "$SYMFONY_VERSION" != "" ]; then php -d memory_limit=-1 composer.phar require symfony/symfony:${SYMFONY_VERSION} --no-update; fi;
+
+install: php -d memory_limit=-1 composer.phar install --no-interaction $COMPOSER_FLAGS
+
+script:
+  - phpunit --coverage-text
 
 notifications:
   hipchat:
