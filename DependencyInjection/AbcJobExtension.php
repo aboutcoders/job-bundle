@@ -83,24 +83,29 @@ class AbcJobExtension extends Extension
             $loader->load('default_jobs.xml');
         }
 
-        $this->loadLogger($config['logging'], $container, $loader);
+        $this->loadLogger($config['logging'], $container, $loader, $config['db_driver']);
 
     }
 
-    private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
     {
         if('custom' !== $config['handler'])
         {
-            $loader->load('logger_'. $config['handler'] .'.xml');
+            $loader->load('logger_' . $config['handler'] . '.xml');
+
+            if('orm' == $config['handler'])
+            {
+                $container->setParameter('abc.job.register_mapping.' . $dbDriver, true);
+            }
         }
 
-        if (isset($config['formatter']))
+        if(isset($config['formatter']))
         {
             $jobType = $container->getDefinition('abc.job.logger.factory');
             $jobType->addMethodCall('setFormatter', array(new Reference($config['formatter'])));
         }
 
-        if (!empty($config['processor']))
+        if(!empty($config['processor']))
         {
             $jobType = $container->getDefinition('abc.job.logger.factory');
 

@@ -24,16 +24,16 @@ class ManagerTest extends DatabaseTestCase
 {
     public function testJobsCanLog()
     {
-        $ticket = $this->getManager()->addJob('log', array('message'));
+        $ticket = $this->getJobManager()->addJob('log', array('message'));
 
-        $logs = $this->getManager()->getLogs($ticket);
+        $logs = $this->getJobManager()->getLogs($ticket);
 
         $this->assertContains('message', $logs);
     }
 
     public function testHandlesExceptionsThrownByJob()
     {
-        $job = $this->getManager()->addJob('throw_exception', array('message', 100));
+        $job = $this->getJobManager()->addJob('throw_exception', array('message', 100));
 
         $this->assertEquals(Status::ERROR(), $job->getStatus());
         $this->assertInstanceOf('Abc\Bundle\JobBundle\Job\ExceptionResponse', $job->getResponse());
@@ -44,18 +44,18 @@ class ManagerTest extends DatabaseTestCase
     public function testJobCanSetResponse()
     {
         $expectedResponse = new TestResponse('foobar');
-        $ticket = $this->getManager()->addJob('set_response', array($expectedResponse));
+        $ticket = $this->getJobManager()->addJob('set_response', array($expectedResponse));
 
-        $response = $this->getManager()->get($ticket)->getResponse();
+        $response = $this->getJobManager()->get($ticket)->getResponse();
 
         $this->assertEquals($expectedResponse, $response);
     }
 
     public function testJobCanCreateSchedule()
     {
-        $ticket = $this->getManager()->addJob('create_schedule', array('cron', '* * * * *'));
+        $ticket = $this->getJobManager()->addJob('create_schedule', array('cron', '* * * * *'));
 
-        $this->assertEquals(Status::SLEEPING(), $this->getManager()->get($ticket)->getStatus());
+        $this->assertEquals(Status::SLEEPING(), $this->getJobManager()->get($ticket)->getStatus());
 
         $schedules = $this->getScheduleManager()->findSchedules();
 
@@ -73,7 +73,7 @@ class ManagerTest extends DatabaseTestCase
         // create scheduled job
         $schedule = $this->getScheduleManager()->create('cron', '* * * * *');
 
-        $ticket = $this->getManager()->addJob('update_schedule', array('cron', '1 1 * * *'), $schedule);
+        $ticket = $this->getJobManager()->addJob('update_schedule', array('cron', '1 1 * * *'), $schedule);
 
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
@@ -96,16 +96,16 @@ class ManagerTest extends DatabaseTestCase
         // create scheduled job
         $schedule = $this->getScheduleManager()->create('cron', '* * * * *');
 
-        $ticket = $this->getManager()->addJob('remove_schedule', null, $schedule);
+        $ticket = $this->getJobManager()->addJob('remove_schedule', null, $schedule);
 
         $this->assertCount(1, $this->getScheduleManager()->findSchedules());
-        $this->assertEquals(Status::REQUESTED(), $this->getManager()->get($ticket)->getStatus());
+        $this->assertEquals(Status::REQUESTED(), $this->getJobManager()->get($ticket)->getStatus());
 
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
 
-        $this->assertContains('removed schedule', $this->getManager()->getLogs($ticket));
-        $this->assertEquals(Status::PROCESSED(), $this->getManager()->get($ticket)->getStatus());
+        $this->assertContains('removed schedule', $this->getJobManager()->getLogs($ticket));
+        $this->assertEquals(Status::PROCESSED(), $this->getJobManager()->get($ticket)->getStatus());
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
     }
 
@@ -115,17 +115,14 @@ class ManagerTest extends DatabaseTestCase
         $schedule->setExpression('* * * * *');
         $schedule->setType('cron');
 
-        $ticket = $this->getManager()->addJob('schedule', array(1), $schedule);
+        $ticket = $this->getJobManager()->addJob('schedule', array(1), $schedule);
 
-        $this->getManager()->cancelJob($ticket);
+        $this->getJobManager()->cancelJob($ticket);
 
-        $this->assertNull($this->getManager()->getLogs($ticket));
-        $this->assertEquals(Status::CANCELLED(), $this->getManager()->get($ticket)->getStatus());
+        $this->assertEmpty($this->getJobManager()->getLogs($ticket));
+        $this->assertEquals(Status::CANCELLED(), $this->getJobManager()->get($ticket)->getStatus());
 
-        /** @var ScheduleManagerInterface $scheduleManager */
-        $scheduleManager = $this->getContainer()->get('abc.job.schedule_manager');
-
-        $this->assertEmpty($scheduleManager->findSchedules());
+        $this->assertEmpty($this->getScheduleManager()->findSchedules());
     }
 
     public function testScheduleIsDisabledIfJobThrowsException()
@@ -135,12 +132,12 @@ class ManagerTest extends DatabaseTestCase
         $schedule->setExpression('* * * * *');
         $schedule->setType('cron');
 
-        $ticket = $this->getManager()->addJob('throw_exception', array('message', 100), $schedule);
+        $ticket = $this->getJobManager()->addJob('throw_exception', array('message', 100), $schedule);
 
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
 
-        $this->assertEquals(Status::ERROR(), $this->getManager()->get($ticket)->getStatus());
+        $this->assertEquals(Status::ERROR(), $this->getJobManager()->get($ticket)->getStatus());
 
         $schedules = $this->getScheduleManager()->findSchedules();
 
@@ -150,7 +147,7 @@ class ManagerTest extends DatabaseTestCase
     /**
      * @return ManagerInterface
      */
-    protected function getManager()
+    protected function getJobManager()
     {
         return $this->getContainer()->get('abc.job.manager');
     }

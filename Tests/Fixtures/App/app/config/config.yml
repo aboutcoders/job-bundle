@@ -104,3 +104,4 @@ abc_job:
     db_driver: orm
     logging:
         default_level: debug
+        handler: orm

@@ -31,7 +31,7 @@ class LogManagerTest extends DatabaseTestCase
 
         $this->subject = new \Abc\Bundle\JobBundle\Entity\LogManager(
             $this->getEntityManager(),
-            'Abc\Bundle\JobBundle\Entity\Log'
+            'Abc\Bundle\JobBundle\Logger\Entity\Log'
         );
     }
 

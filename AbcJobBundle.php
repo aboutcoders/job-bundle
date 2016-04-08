@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle;
 
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterJobsPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterListenersPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -28,5 +29,22 @@ class AbcJobBundle extends Bundle
     {
         $container->addCompilerPass(new RegisterJobsPass());
         $container->addCompilerPass(new RegisterListenersPass());
+
+        $this->addRegisterMappingsPass($container);
     }
-} 
+
+    /**
+     * Conditionally register mapping paths if bundle is configured to log to database
+     *
+     * @param ContainerBuilder $container
+     * @see
+     */
+    private function addRegisterMappingsPass(ContainerBuilder $container)
+    {
+        $mappings = array(
+            realpath(__DIR__ . '/Resources/config/doctrine-mapping') => 'Abc\Bundle\JobBundle\Logger\Entity',
+        );
+
+        $container->addCompilerPass(DoctrineOrmMappingsPass::createXmlMappingDriver($mappings, array('abc.job.model_manager_name'), 'abc.job.register_mapping.orm'));
+    }
+}

@@ -5,7 +5,7 @@
                    https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd"
                   xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping">
 
-    <entity name="Abc\Bundle\JobBundle\Entity\Log" table="abc_log">
+    <entity name="Abc\Bundle\JobBundle\Logger\Entity\Log" table="abc_log">
 
         <id name="id" type="integer">
             <generator strategy="AUTO"/>
