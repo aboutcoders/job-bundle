@@ -11,6 +11,8 @@
 namespace Abc\Bundle\JobBundle\Controller;
 
 use Abc\Bundle\JobBundle\Form\Type\JobType;
+use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
+use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
@@ -147,8 +149,37 @@ class JobController extends FOSRestController
     }
 
     /**
-     * @param Form $form
-     * @param Request       $request
+     * @param string $ticket
+     * @return JobInterface
+     *
+     * @Post
+     *
+     * @ApiDoc(
+     * description="Cancels a job",
+     * section="AbcJobBundle",
+     * output="Abc\Bundle\JobBundle\Model\Job",
+     * parameters={},
+     * statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when job not found",
+     *   }
+     * )
+     */
+    public function cancelAction($ticket)
+    {
+        try
+        {
+            return $this->getJobManager()->cancelJob($ticket);
+        }
+        catch(TicketNotFoundException $e)
+        {
+            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+        }
+    }
+
+    /**
+     * @param Form    $form
+     * @param Request $request
      * @return object Entity
      */
     protected function processForm(Form $form, $request)

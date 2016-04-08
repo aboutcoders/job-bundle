@@ -17,6 +17,14 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 class AppKernel extends Kernel
 {
 
+    /**
+     * @var \Closure
+     */
+    private $kernelModifier = null;
+
+    /**
+     * {@inheritdoc}
+     */
     public function registerBundles()
     {
         return array(
@@ -39,7 +47,7 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
+        $loader->load(__DIR__ . '/config/config_' . $this->getEnvironment() . '.yml');
     }
 
     /**
@@ -47,7 +55,7 @@ class AppKernel extends Kernel
      */
     public function getCacheDir()
     {
-        return $this->rootDir .'/../../../../build/app/cache';
+        return $this->rootDir . '/../../../../build/app/cache';
     }
 
     /**
@@ -55,6 +63,32 @@ class AppKernel extends Kernel
      */
     public function getLogDir()
     {
-        return $this->rootDir .'/../../../../build/app/logs';
+        return $this->rootDir . '/../../../../build/app/logs';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        parent::boot();
+
+        if($kernelModifier = $this->kernelModifier)
+        {
+            $kernelModifier($this);
+            $this->kernelModifier = null;
+        };
+    }
+
+    /**
+     * @param \Closure $kernelModifier
+     * @see http://blog.lyrixx.info/2013/04/12/symfony2-how-to-mock-services-during-functional-tests.html
+     */
+    public function setKernelModifier(\Closure $kernelModifier)
+    {
+        $this->kernelModifier = $kernelModifier;
+
+        // We force the kernel to shutdown to be sure the next request will boot it
+        $this->shutdown();
     }
 }

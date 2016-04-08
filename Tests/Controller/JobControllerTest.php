@@ -10,21 +10,37 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Controller;
 
+use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
+use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Tests\DatabaseWebTestCase;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class JobControllerTest extends DatabaseWebTestCase
 {
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     private $serializer;
+
+    /**
+     * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $manager;
+
+    /**
+     * @var bool
+     */
+    private static $initialized = false;
 
     /**
      * {@inheritDoc}
@@ -33,7 +49,17 @@ class JobControllerTest extends DatabaseWebTestCase
     {
         parent::setUp();
 
+        $this->manager    = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
         $this->serializer = SerializerBuilder::create()->build();
+
+        // setup serializer (otherwise ->equalTo wil)
+        if(!static::$initialized)
+        {
+            /** @var SerializerInterface $serializer */
+            $serializer = static::$kernel->getContainer()->get('jms_serializer');
+            Job::setSerializer($this->serializer);
+            static::$initialized = true;
+        }
     }
 
     /**
@@ -69,7 +95,6 @@ class JobControllerTest extends DatabaseWebTestCase
             $url .= '?' . http_build_query($parameters);
         }
 
-
         $client->request(
             'GET',
             $url,
@@ -97,7 +122,24 @@ class JobControllerTest extends DatabaseWebTestCase
      */
     public function testPostAction($parameters, $expectedStatusCode)
     {
+        $job      = $this->buildJobFromArray($parameters);
+
+        if($expectedStatusCode >= 200 && $expectedStatusCode < 400)
+        {
+            $this->manager->expects($this->once())
+                ->method('add')
+                ->with($this->equalTo($job))
+                ->willReturnCallback(function() use ($job) {
+                    $job = clone $job;
+                    $job->setTicket('JobTicket');
+
+                    return $job;
+                });
+        }
+
         $client = static::createClient();
+
+        $this->mockManager();
 
         $client->request(
             'POST',
@@ -111,25 +153,39 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $this->assertEquals($expectedStatusCode, $client->getResponse()->getStatusCode());
 
+        $data = json_decode($client->getResponse()->getContent(), true);
 
-        // echo $client->getResponse()->getContent();
+        if($expectedStatusCode >= 200 && $expectedStatusCode < 400)
+        {
+            $this->assertEquals('JobTicket', $data['ticket']);
+        }
+    }
 
+    public function testCancelAction()
+    {
+        $job = new Job();
+        $job->setTicket('12345');
+        $job->setStatus(Status::CANCELLED());
 
-        /*
-        echo $client->getResponse()->getContent();
+        $client = static::createClient();
 
+        $this->mockManager();
 
-        $this->assertJsonResponse($client->getResponse(), 200);
+        $this->manager->expects($this->once())
+            ->method('cancelJob')
+            ->with($job->getTicket())
+            ->willReturn($job);
 
-        $mailCollector = $client->getProfile()->getCollector('swiftmailer');
+        $client->request('POST', '/api/jobs/12345/cancel');
 
-        $collectedMessages = $mailCollector->getMessages();
-        $this->assertGreaterThan(0, $collectedMessages);
-        $message = $collectedMessages[0];
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        $this->assertInstanceOf('Swift_Message', $message);
-        $this->assertEquals('foobar subject', $message->getSubject());*/
+        $data = $client->getResponse()->getContent();
 
+        /** @var JobInterface $deserializedObject */
+        $deserializedObject = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\Job', 'json');
+
+        $this->assertEquals($job->getStatus(), $deserializedObject->getStatus());
     }
 
     public static function providePostData()
@@ -213,5 +269,59 @@ class JobControllerTest extends DatabaseWebTestCase
                 3
             ]
         ];
+    }
+
+    /**
+     * Injects a mock object for the service abc.job.manager
+     *
+     * @see http://blog.lyrixx.info/2013/04/12/symfony2-how-to-mock-services-during-functional-tests.html
+     */
+    private function mockManager()
+    {
+        $manager = $this->manager;
+
+        /**
+         * @ignore
+         */
+        static::$kernel->setKernelModifier(
+            function (KernelInterface $kernel) use ($manager)
+            {
+                $kernel->getContainer()->set('abc.job.manager', $manager);
+            }
+        );
+    }
+
+    /**
+     * @param array $parameters
+     * @return Job
+     */
+    private function buildJobFromArray($parameters)
+    {
+        $job = new Job();
+
+        $job->setType(isset($parameters['type']) ? $parameters['type'] : null);
+
+        if(isset($parameters['parameters']))
+        {
+            $message = new Message(
+                $parameters['parameters']['to'],
+                $parameters['parameters']['from'],
+                $parameters['parameters']['subject'],
+                $parameters['parameters']['message']
+            );
+
+            $job->setParameters([$message]);
+        }
+
+        if(isset($parameters['schedules']))
+        {
+            foreach($parameters['schedules'] as $scheduleParameters)
+            {
+                $schedule = $job->createSchedule($scheduleParameters['type'], $scheduleParameters['expression']);
+                $job->addSchedule($schedule);
+            }
+        }
+
+        return $job;
     }
 }

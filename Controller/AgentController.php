@@ -76,7 +76,7 @@ class AgentController extends FOSRestController
     /**
      * @param int $id
      * @param boolean $wait Whether to wait until agent is started (optional, true by default)
-     * @return void
+     * @return AgentInterface
      *
      * @Put
      *
@@ -101,7 +101,7 @@ class AgentController extends FOSRestController
 
         if(is_null($agent))
         {
-            throw $this->createNotFoundException('Unable to find Node entity.');
+            throw $this->createNotFoundException(sprintf('Agent with id %s not found', $id));
         }
 
         $manager->start($agent, $wait);
