@@ -512,14 +512,18 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
-    public function testOnMessageSkipsCancelledJobs()
+    /**
+     * @param Status $status
+     * @dataProvider provideStatusToSkip
+     */
+    public function testOnMessageSkipsExecutionIfStatusIs(Status $status)
     {
         $message = new Message('job-type', 'job-ticket');
 
         $job = new Job();
         $job->setType($message->getType());
         $job->setTicket($message->getTicket());
-        $job->setStatus(Status::CANCELLED());
+        $job->setStatus($status);
 
         $this->jobManager->expects($this->any())
             ->method('findByTicket')
@@ -539,6 +543,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [new \Exception('foo', 100)],
             [new \Exception('foo', 100), new NullLogger()]
+        ];
+    }
+
+    public static function provideStatusToSkip()
+    {
+        return [
+            [Status::PROCESSING()],
+            [Status::CANCELLED()]
         ];
     }
 

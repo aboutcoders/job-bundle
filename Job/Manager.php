@@ -201,9 +201,11 @@ class Manager implements ManagerInterface
     {
         $job = $this->findJob($message->getTicket());
 
-        if($job->getStatus() == Status::CANCELLED())
+        if($job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::PROCESSING())
         {
-            $this->logger->debug('Skipped execution of job because has been CANCELLED');
+            $this->logger->debug('Skipped execution of job {ticket} because status is {status}', [
+                'ticket' => $job->getType(),
+                'status' => $job->getStatus()]);
 
             return;
         }
