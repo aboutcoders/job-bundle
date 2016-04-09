@@ -10,11 +10,13 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Integration\Job;
 
+use Abc\Bundle\JobBundle\Job\Manager;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\ScheduleManagerInterface;
 use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse;
+use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 
 /**
@@ -44,7 +46,7 @@ class ManagerTest extends DatabaseTestCase
     public function testJobCanSetResponse()
     {
         $expectedResponse = new TestResponse('foobar');
-        $ticket = $this->getJobManager()->addJob('set_response', array($expectedResponse));
+        $ticket           = $this->getJobManager()->addJob('set_response', array($expectedResponse));
 
         $response = $this->getJobManager()->get($ticket)->getResponse();
 
@@ -107,6 +109,7 @@ class ManagerTest extends DatabaseTestCase
         $this->assertContains('removed schedule', $this->getJobManager()->getLogs($ticket));
         $this->assertEquals(Status::PROCESSED(), $this->getJobManager()->get($ticket)->getStatus());
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
+        $this->assertFalse($this->getLockManager()->isLocked(Manager::JOB_LOCK_PREFIX . $ticket->getTicket()));
     }
 
     public function testCancelJobWithSchedule()
@@ -123,6 +126,7 @@ class ManagerTest extends DatabaseTestCase
         $this->assertEquals(Status::CANCELLED(), $this->getJobManager()->get($ticket)->getStatus());
 
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
+        $this->assertFalse($this->getLockManager()->isLocked(Manager::JOB_LOCK_PREFIX . $ticket->getTicket()));
     }
 
     public function testScheduleIsDisabledIfJobThrowsException()
@@ -150,6 +154,14 @@ class ManagerTest extends DatabaseTestCase
     protected function getJobManager()
     {
         return $this->getContainer()->get('abc.job.manager');
+    }
+
+    /**
+     * @return LockManagerInterface
+     */
+    protected function getLockManager()
+    {
+        return $this->getContainer()->get('abc.resource_lock.lock_manager');
     }
 
     /**

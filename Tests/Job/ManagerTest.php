@@ -27,12 +27,14 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ * @author Wojciech Ciolko <wojciech.ciolko@aboutcoders.com>
  */
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +52,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     private $dispatcher;
     /** @var JobHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $helper;
+    /** @var LockManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $locker;    
     /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $logger;
     /** @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -67,6 +71,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->logManager    = $this->getMock('Abc\Bundle\JobBundle\Job\LogManagerInterface');
         $this->dispatcher    = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->helper        = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobHelper')->disableOriginalConstructor()->getMock();
+        $this->locker        = $this->getMock('Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface');
         $this->logger        = $this->getMock('Psr\Log\LoggerInterface');
         $this->queueEngine   = $this->getMock('Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface');
 
@@ -81,6 +86,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $this->logManager,
             $this->dispatcher,
             $this->helper,
+            $this->locker,
             $this->logger
         );
 
@@ -161,32 +167,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setTicket('ticket');
 
-        $terminationEvent = new TerminationEvent($job);
-
-        $this->helper->expects($this->once())
-            ->method('updateJob')
-            ->with($job, Status::CANCELLED())
-            ->willReturnCallback(
-                function (JobInterface $job, Status $status)
-                {
-                    $job->setStatus($status);
-                }
-            );
-
-        $this->jobManager->expects($this->once())
-            ->method('save')
-            ->with(
-                $this->callback(
-                    function ($arg) use ($job)
-                    {
-                        return $arg === $job && $job->getStatus() == Status::CANCELLED();
-                    }
-                )
-            );
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
+        $this->cancelExpectations($job);
 
         $this->subject->cancel($job);
     }
@@ -196,37 +177,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setTicket('ticket');
 
-        $terminationEvent = new TerminationEvent($job);
-
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
             ->with($job->getTicket())
             ->willReturn($job);
 
-        $this->helper->expects($this->once())
-            ->method('updateJob')
-            ->with($job, Status::CANCELLED())
-            ->willReturnCallback(
-                function (JobInterface $job, Status $status)
-                {
-                    $job->setStatus($status);
-                }
-            );
-
-        $this->jobManager->expects($this->once())
-            ->method('save')
-            ->with(
-                $this->callback(
-                    function ($arg) use ($job)
-                    {
-                        return $arg === $job && $job->getStatus() == Status::CANCELLED();
-                    }
-                )
-            );
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
+        $this->cancelExpectations($job);
 
         $this->subject->cancelJob($job->getTicket());
     }
@@ -286,6 +242,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->invoker->expects($this->once())
             ->method('invoke');
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
+
         $this->subject->onMessage($message);
     }
 
@@ -310,6 +270,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
 
         // set something in context to ensure that job is invoked before JOB_POST_EXECUTE is dispatched
         $this->invoker->expects($this->once())
@@ -362,6 +326,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
+        
         $this->invoker->expects($this->once())
             ->method('invoke')
             ->with(
@@ -395,6 +363,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($message->getTicket())
             ->willReturn($job);
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
+        
         $this->invoker->expects($this->once())
             ->method('invoke')
             ->with($job, $this->isInstanceOf('Abc\Bundle\JobBundle\Job\Context\Context'))
@@ -434,6 +406,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($message->getTicket())
             ->willReturn($job);
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
+        
         $this->expectsCallsUpdateJob($job, Status::SLEEPING());
 
         $this->expectEventNeverDispatched(JobEvents::JOB_TERMINATED);
@@ -509,6 +485,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($ticket)
             ->willReturn(null);
 
+        $this->locker->expects($this->never())
+            ->method('lock');
+
         $this->subject->onMessage($message);
     }
 
@@ -531,6 +510,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
+
+        $this->locker->expects($this->never())
+            ->method('lock');
 
         $this->subject->onMessage($message);
     }
@@ -628,5 +610,41 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+    }
+
+    /**
+     * @param Job $job
+     */
+    protected function cancelExpectations(Job $job)
+    {
+        $terminationEvent = new TerminationEvent($job);
+
+        $this->helper->expects($this->once())
+            ->method('updateJob')
+            ->with($job, Status::CANCELLED())
+            ->willReturnCallback(
+                function (JobInterface $job, Status $status) {
+                    $job->setStatus($status);
+                }
+            );
+
+        $this->jobManager->expects($this->once())
+            ->method('save')
+            ->with(
+                $this->callback(
+                    function ($arg) use ($job) {
+                        return $arg === $job && $job->getStatus() == Status::CANCELLED();
+                    }
+                )
+            );
+
+        $this->locker->expects($this->once())
+            ->method('release')
+            ->with(Manager::JOB_LOCK_PREFIX.$job->getTicket());
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
+
     }
 }
