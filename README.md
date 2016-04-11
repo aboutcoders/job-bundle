@@ -230,7 +230,6 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 - Finalize the REST-API
-- Implement a locking mechanism to prevent parallel execution of jobs
 - Utilize stopwatch to detect bottle necks
 - Improve configurability
 - Provide statistics

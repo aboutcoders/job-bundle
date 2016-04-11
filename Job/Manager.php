@@ -259,8 +259,7 @@ class Manager implements ManagerInterface
             $response = new ExceptionResponse($e->getMessage(), $e->getCode());
             $status   = Status::ERROR();
         }
-
-        //release job lock
+        
         $this->releaseLock($job);
 
         $processingTime = $this->helper->calculateProcessingTime($executionStart);
