@@ -97,6 +97,9 @@ yz_supervisor:
                 password: ""
                 port:
 
+abc_resource_lock:
+    db_driver: orm
+
 abc_scheduler:
     db_driver: orm
 

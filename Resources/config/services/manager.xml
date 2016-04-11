@@ -14,6 +14,7 @@
             <argument type="service" id="abc.job.log_manager"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="abc.job.helper"/>
+            <argument type="service" id="abc.job.lock_manager"/>
             <argument type="service" id="logger" on-invalid="null"/>
             <call method="setQueueEngine">
                 <argument type="service" id="abc.job.queue_engine"/>

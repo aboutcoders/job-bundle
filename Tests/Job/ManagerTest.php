@@ -27,12 +27,15 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\ResourceLockBundle\Exception\LockException;
+use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ * @author Wojciech Ciolko <wojciech.ciolko@aboutcoders.com>
  */
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +53,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     private $dispatcher;
     /** @var JobHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $helper;
+    /** @var LockManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $locker;
     /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $logger;
     /** @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -67,6 +72,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->logManager    = $this->getMock('Abc\Bundle\JobBundle\Job\LogManagerInterface');
         $this->dispatcher    = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->helper        = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobHelper')->disableOriginalConstructor()->getMock();
+        $this->locker        = $this->getMock('Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface');
         $this->logger        = $this->getMock('Psr\Log\LoggerInterface');
         $this->queueEngine   = $this->getMock('Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface');
 
@@ -81,6 +87,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $this->logManager,
             $this->dispatcher,
             $this->helper,
+            $this->locker,
             $this->logger
         );
 
@@ -100,8 +107,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job->setType($type);
         $job->setParameters($parameters);
 
-        if(!is_null($schedule))
-        {
+        if (!is_null($schedule)) {
             $job->addSchedule($schedule);
         }
 
@@ -167,8 +173,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('updateJob')
             ->with($job, Status::CANCELLED())
             ->willReturnCallback(
-                function (JobInterface $job, Status $status)
-                {
+                function (JobInterface $job, Status $status) {
                     $job->setStatus($status);
                 }
             );
@@ -177,8 +182,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function ($arg) use ($job)
-                    {
+                    function ($arg) use ($job) {
                         return $arg === $job && $job->getStatus() == Status::CANCELLED();
                     }
                 )
@@ -196,19 +200,18 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setTicket('ticket');
 
-        $terminationEvent = new TerminationEvent($job);
-
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
             ->with($job->getTicket())
             ->willReturn($job);
 
+        $terminationEvent = new TerminationEvent($job);
+
         $this->helper->expects($this->once())
             ->method('updateJob')
             ->with($job, Status::CANCELLED())
             ->willReturnCallback(
-                function (JobInterface $job, Status $status)
-                {
+                function (JobInterface $job, Status $status) {
                     $job->setStatus($status);
                 }
             );
@@ -217,8 +220,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function ($arg) use ($job)
-                    {
+                    function ($arg) use ($job) {
                         return $arg === $job && $job->getStatus() == Status::CANCELLED();
                     }
                 )
@@ -304,8 +306,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 JobEvents::JOB_PRE_EXECUTE,
                 $this->callback(
-                    function (ExecutionEvent $event) use ($job)
-                    {
+                    function (ExecutionEvent $event) use ($job) {
                         return $job === $event->getJob();
                     }
                 )
@@ -317,8 +318,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->anything(),
                 $this->callback(
-                    function (ContextInterface $context)
-                    {
+                    function (ContextInterface $context) {
                         $context->set('name', 'foobar');
 
                         return true;
@@ -331,8 +331,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 JobEvents::JOB_POST_EXECUTE,
                 $this->callback(
-                    function (ExecutionEvent $event) use ($job)
-                    {
+                    function (ExecutionEvent $event) use ($job) {
                         return $job === $event->getJob() && $event->getContext()->has('name') && 'foobar' == $event->getContext()->get('name');
                     }
                 )
@@ -355,8 +354,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function ($arg) use ($job)
-                    {
+                    function ($arg) use ($job) {
                         return $arg === $job && $job->getStatus() == Status::PROCESSING();
                     }
                 )
@@ -366,12 +364,58 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('invoke')
             ->with(
                 $this->callback(
-                    function (\Abc\Bundle\JobBundle\Job\JobInterface $job)
-                    {
+                    function (\Abc\Bundle\JobBundle\Job\JobInterface $job) {
                         return Status::PROCESSING() == $job->getStatus();
                     }
                 )
             );
+
+        $this->subject->onMessage($message);
+    }
+
+    public function testOnMessageLockAndUnlockJob()
+    {
+        $job     = new Job();
+        $message = new Message('type', 'ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($message->getTicket())
+            ->willReturn($job);
+
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
+
+        $this->locker->expects($this->once())
+            ->method('release')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
+        $this->subject->onMessage($message);
+    }
+
+    public function testOnMessageSkipInvocationIfJobIsLocked()
+    {
+        $job     = new Job();
+        $message = new Message('type', 'ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($message->getTicket())
+            ->willReturn($job);
+
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket())
+            ->willThrowException(new LockException());
+
+        $this->invoker->expects($this->never())
+            ->method('invoke');
+
+        $this->dispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->locker->expects($this->never())
+            ->method('release');
 
         $this->subject->onMessage($message);
     }
@@ -395,6 +439,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($message->getTicket())
             ->willReturn($job);
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
+
         $this->invoker->expects($this->once())
             ->method('invoke')
             ->with($job, $this->isInstanceOf('Abc\Bundle\JobBundle\Job\Context\Context'))
@@ -411,8 +459,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function (JobInterface $job)
-                    {
+                    function (JobInterface $job) {
                         return $job->getStatus() == Status::PROCESSED();
                     }
                 )
@@ -434,6 +481,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($message->getTicket())
             ->willReturn($job);
 
+        $this->locker->expects($this->once())
+            ->method('lock')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
+
         $this->expectsCallsUpdateJob($job, Status::SLEEPING());
 
         $this->expectEventNeverDispatched(JobEvents::JOB_TERMINATED);
@@ -452,13 +503,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $microTime = microtime(true);
         $message   = new Message('type', 'ticket');
 
-        if($logger != null)
-        {
+        if ($logger != null) {
             $this->dispatcher->expects($this->at(0))
                 ->method('dispatch')
                 ->willReturnCallback(
-                    function ($eventName, ExecutionEvent $event) use ($logger)
-                    {
+                    function ($eventName, ExecutionEvent $event) use ($logger) {
                         $event->getContext()->set('logger', $logger);
                     }
                 );
@@ -485,13 +534,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function (JobInterface $job)
-                    {
+                    function (JobInterface $job) {
                         return
                             $job->getStatus() == Status::ERROR();
                     }
                 )
             );
+
+        $this->locker->expects($this->once())
+            ->method('release')
+            ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
 
         $this->subject->onMessage($message);
     }
@@ -508,6 +560,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findByTicket')
             ->with($ticket)
             ->willReturn(null);
+
+        $this->locker->expects($this->never())
+            ->method('lock');
 
         $this->subject->onMessage($message);
     }
@@ -531,6 +586,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
+
+        $this->locker->expects($this->never())
+            ->method('lock');
 
         $this->subject->onMessage($message);
     }
@@ -570,39 +628,32 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates an expectation that $helper->updateJob is called.
      *
-     * @param JobInterface $expectedJob The expected first argument passed to updateJob
-     * @param Status       $status The expected second argument passed to updateJob
+     * @param JobInterface $expectedJob    The expected first argument passed to updateJob
+     * @param Status       $status         The expected second argument passed to updateJob
      * @param mixed|null   $processingTime The optional expected third argument passed to updateJob
      */
     protected function expectsCallsUpdateJob(JobInterface $expectedJob, Status $status, $processingTime = null, $response = null)
     {
-        if(null == $response)
-        {
+        if (null == $response) {
             $this->helper->expects($this->once())
                 ->method('updateJob')
                 ->with($expectedJob, $this->equalTo($status), $processingTime)
                 ->willReturnCallback(
-                    function (JobInterface $job) use ($status, $processingTime)
-                    {
+                    function (JobInterface $job) use ($status, $processingTime) {
                         $job->setStatus($status);
-                        if($processingTime != null)
-                        {
+                        if ($processingTime != null) {
                             $job->setProcessingTime($processingTime);
                         }
                     }
                 );
-        }
-        else
-        {
+        } else {
             $this->helper->expects($this->once())
                 ->method('updateJob')
                 ->with($expectedJob, $this->equalTo($status), $processingTime, $response)
                 ->willReturnCallback(
-                    function (JobInterface $job) use ($status, $processingTime)
-                    {
+                    function (JobInterface $job) use ($status, $processingTime) {
                         $job->setStatus($status);
-                        if($processingTime != null)
-                        {
+                        if ($processingTime != null) {
                             $job->setProcessingTime($processingTime);
                         }
                     }
@@ -622,11 +673,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function ($name) use ($expectedEventName)
-                    {
+                    function ($name) use ($expectedEventName) {
                         return $expectedEventName != JobEvents::JOB_TERMINATED;
                     }
                 )
             );
     }
+
 }

@@ -77,6 +77,7 @@ class ServiceConfigurationTest extends KernelTestCase
             ['abc.job.schedule_manager', 'Abc\Bundle\JobBundle\Doctrine\ScheduleManager'],
             ['abc.job.serializer.generic_array_handler', 'Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler'],
             ['abc.job.sonata.notification.manager.message', 'Abc\Bundle\JobBundle\Sonata\ControlledMessageManager'],
+            ['abc.job.lock_manager', 'Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface'],
         ];
     }
 

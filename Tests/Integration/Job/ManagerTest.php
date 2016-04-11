@@ -44,7 +44,7 @@ class ManagerTest extends DatabaseTestCase
     public function testJobCanSetResponse()
     {
         $expectedResponse = new TestResponse('foobar');
-        $ticket = $this->getJobManager()->addJob('set_response', array($expectedResponse));
+        $ticket           = $this->getJobManager()->addJob('set_response', array($expectedResponse));
 
         $response = $this->getJobManager()->get($ticket)->getResponse();
 
