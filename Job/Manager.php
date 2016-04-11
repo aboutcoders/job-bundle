@@ -158,8 +158,6 @@ class Manager implements ManagerInterface
         /** @var \Abc\Bundle\JobBundle\Model\JobInterface $job */
         $this->helper->updateJob($job, Status::CANCELLED());
         $this->jobManager->save($job);
-        //release job lock
-        $this->releaseLock($job);
         $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
 
         return $job;
@@ -215,6 +213,13 @@ class Manager implements ManagerInterface
 
             return;
         }
+        try {
+            //check if job is not running
+            $this->locker->lock($this->getLockName($job));
+        } catch (LockException $e) {
+            $this->logger->warning('Job {job} is already running: {exception}', array('job' => $job, 'exception' => $e));
+            return;
+        }
 
         $event = new ExecutionEvent($job, new Context());
 
@@ -236,8 +241,6 @@ class Manager implements ManagerInterface
                 )
             );
 
-            //check if job is not running
-            $this->locker->lock($this->getLockName($job));
             // invoke the job
             $response = $this->invoker->invoke($job, $event->getContext());
 
@@ -246,9 +249,6 @@ class Manager implements ManagerInterface
             $status = $job->hasSchedules() ? Status::SLEEPING() : Status::PROCESSED();
 
             $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
-        } catch (LockException $e) {
-            $this->logger->error('Job {job} is already running: {exception}', array('job' => $job, 'exception' => $e));
-            throw $e;
         } catch (\Exception $e) {
             $this->logger->warning('Job execution {job} failed with the exception {exception}', array('job' => $job, 'exception' => $e));
 
@@ -260,14 +260,15 @@ class Manager implements ManagerInterface
             $status   = Status::ERROR();
         }
 
+        //release job lock
+        $this->releaseLock($job);
+
         $processingTime = $this->helper->calculateProcessingTime($executionStart);
 
         $this->helper->updateJob($job, $status, $processingTime, $response);
         $this->jobManager->save($job);
 
         if (in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues())) {
-            //release job lock
-            $this->releaseLock($job);
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
         }
     }

@@ -50,6 +50,7 @@ Finally follow the installation instructions of the required third party bundles
 
 * [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
 * [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
+* [AbcResourceLockBundle](https://github.com/aboutcoders/resource-lock-bundle)
 * [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
 * [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
 * [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
