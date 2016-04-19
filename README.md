@@ -138,7 +138,7 @@ class MyJob
 
 Please note the two annotations __@JobParameters__ and __@JobResponse__. They are used to specify the type of parameters the job must be invoked with as well as the type of response that is returned by the job. Since jobs are executed in the background both parameters and response must be serializable in order to persist them. However there is special parameter type called [runtime parameter](./docs/howto-inject-runtime-parameters.md), that are specified with the `@` character. Runtime parameters can be of type, since they are provided at runtime by event listeners. The `@logger` in the previous example is such a runtime parameter. The `@logger` is a runtime parameters that is available for every job. It provides a dedicated PSR compliant logger for each job.
 
-Both parameters and response (return value) of are serialized/deserialized using the [JMS Serializer](http://jmsyst.com/libs/serializer).
+Both parameters and response (return value of a job) are serialized/deserialized using the [JMS Serializer](http://jmsyst.com/libs/serializer).
 
 __Note:__ You only have to provide the __@JobParameters__ or __@JobResponse__ in case your job requires parameters or returns a response.
 
@@ -216,7 +216,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 - [How-to work with the manager](./docs/howto-manager.md)
 - [How-to modify a job at runtime](./docs/howto-modify-job.md)
-- [How-to manage jobs at runtime](./docs/howto-manage-jobs-at--runtime.md)
+- [How-to manage jobs at runtime](./docs/howto-manage-jobs-at-runtime.md)
 - [How-to inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
 - [How-to work with the job status](./docs/howto-status.md)
 
@@ -233,7 +233,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - Finalize the REST-API
 - Add option to update a job
 - Add option to resume a canceled job
-- Consider maintenance job to delete old jobs
+- Consider providing a maintenance job to delete old jobs
 - Utilize stopwatch to detect bottle necks
 - Improve configurability
 - Provide statistics
