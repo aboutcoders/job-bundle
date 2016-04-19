@@ -10,23 +10,39 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Fixtures\Job;
 
-
-use Abc\Bundle\JobBundle\Job\Job;
 use Abc\Bundle\JobBundle\Job\JobAwareInterface;
 use Abc\Bundle\JobBundle\Job\JobInterface;
+use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
+use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Annotation\JobParameters;
 use Abc\Bundle\JobBundle\Annotation\JobResponse;
 use Psr\Log\LoggerInterface;
 
-class TestCallable implements JobAwareInterface
+class TestCallable implements JobAwareInterface, ManagerAwareInterface
 {
     /** @var JobInterface */
     protected $job;
 
+    /**
+     * @var ManagerInterface
+     */
+    private $manager;
+
+    /**
+     * {@inheritdoc}
+     */
     public function setJob(JobInterface $job)
     {
         $this->job = $job;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setManager(ManagerInterface $manager)
+    {
+        $this->manager = $manager;
     }
 
     /**
@@ -107,6 +123,19 @@ class TestCallable implements JobAwareInterface
     public function setResponse(TestResponse $response)
     {
         return $response;
+    }
+
+    /**
+     * @param ManagerInterface $manager
+     * @JobParameters("@manager")
+     * @JobResponse("string")
+     * @return null|string
+     */
+    public function manageJob(ManagerInterface $manager)
+    {
+        $job = $manager->addJob('log', ['addedJob']);
+
+        return $job->getTicket();
     }
 
     /**

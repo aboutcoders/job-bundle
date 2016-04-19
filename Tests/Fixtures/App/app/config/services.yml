@@ -10,7 +10,6 @@ services:
     abc.job.callable:
         class: Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable
         tags:
-
             - { name: abc.job, type: log, method: log }
             - { name: abc.job, type: throw_exception, method: throwException }
             - { name: abc.job, type: set_response, method: setResponse }
@@ -18,7 +17,7 @@ services:
             - { name: abc.job, type: create_schedule, method: createSchedule }
             - { name: abc.job, type: remove_schedule, method: removeSchedule }
             - { name: abc.job, type: update_schedule, method: updateSchedule }
-
+            - { name: abc.job, type: manage_job, method: manageJob }
 
     abc.job.log.processor:
         class: Monolog\Processor\PsrLogMessageProcessor

@@ -15,7 +15,7 @@ class MyJob
      */
     public function doSomething(Psr\Log\LoggerInterface $logger)
     {
-        $this->job->getLogger()->info('Hello World');
+        $logger->info('Hello World');
     }
 }
 ```

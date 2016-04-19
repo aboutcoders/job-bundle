@@ -25,11 +25,24 @@ class Invoker
     private $registry;
 
     /**
+     * @var ManagerInterface
+     */
+    private $manager;
+
+    /**
      * @param JobTypeRegistry $registry
      */
     function __construct(JobTypeRegistry $registry)
     {
         $this->registry = $registry;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setManager(ManagerInterface $manager)
+    {
+        $this->manager = $manager;
     }
 
     /**
@@ -43,18 +56,24 @@ class Invoker
     public function invoke(JobInterface $job, ContextInterface $context)
     {
         $jobType  = $this->registry->get($job->getType());
-        $callable = $jobType->getCallable();
+        $callableArray = $jobType->getCallable();
 
         $arguments = $this->resolveArguments($jobType, $context, $job->getParameters());
 
-        if(is_array($callable) && $callable[0] instanceof JobAwareInterface)
+        if(is_array($callableArray) && $callable = $callableArray[0])
         {
-            /** @var JobAwareInterface $jobAwareCallable */
-            $jobAwareCallable = $callable[0];
-            $jobAwareCallable->setJob($job);
+            if($callable instanceof JobAwareInterface)
+            {
+                $callable->setJob($job);
+            }
+
+            if($callable instanceof ManagerAwareInterface)
+            {
+                $callable->setManager($this->manager);
+            }
         }
 
-        return call_user_func_array($callable, $arguments);
+        return call_user_func_array($callableArray, $arguments);
     }
 
     /**

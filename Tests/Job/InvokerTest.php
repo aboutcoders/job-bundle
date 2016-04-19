@@ -14,8 +14,10 @@ use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Invoker;
+use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestManagerAwareCallable;
 use Metadata\MetadataFactoryInterface;
 
 /**
@@ -28,9 +30,19 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
      */
     private $metadataFactory;
 
-    /** @var JobTypeRegistry */
+    /**
+     * @var JobTypeRegistry
+     */
     private $registry;
-    /** @var Invoker */
+
+    /**
+     * @var ManagerInterface
+     */
+    private $manager;
+
+    /**
+     * @var Invoker
+     */
     private $subject;
 
     /**
@@ -40,11 +52,19 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         $this->metadataFactory = $this->getMock('Metadata\MetadataFactoryInterface');
         $this->registry        = new JobTypeRegistry($this->metadataFactory);
+        $this->manager         = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
         $this->subject         = new Invoker($this->registry);
+
+        $this->subject->setManager($this->manager);
     }
 
     /**
      * @dataProvider provideInvokeData
+     * @param       $callable
+     * @param       $expectedResponse
+     * @param null  $parameters
+     * @param array $parameterTypes
+     * @param array $contextParameters
      */
     public function testInvoke($callable, $expectedResponse, $parameters = null, $parameterTypes = [], $contextParameters = [])
     {
@@ -53,7 +73,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         $type      = 'JobType';
         $job       = new Job($type, $parameters);
 
-        $jobType   = new JobType($serviceId, $type, $callable);
+        $jobType = new JobType($serviceId, $type, $callable);
         $jobType->setParameterTypes($parameterTypes);
 
         $this->registry->register($jobType);
@@ -76,6 +96,21 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($job, $callable->getJob());
     }
 
+    public function testInvokeHandlesManagerAwareJobs()
+    {
+        $serviceId = 'serviceId';
+        $type      = 'callable-type';
+        $callable  = new TestManagerAwareCallable();
+        $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
+
+        $job = new Job($type);
+
+        $this->registry->register($jobType);
+
+        $this->assertEquals('foobar', $this->subject->invoke($job, new Context()));
+        $this->assertEquals($this->manager, $callable->getManager());
+    }
+
     /**
      * @return array
      */
@@ -83,12 +118,12 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             //[$callable, $expectedResponse, $parameters, $parameterTypes, $contextParameters],
-            [function(){return 'foobar';}, 'foobar'],
-            [function($argument) {return $argument; }, 'foobar', ['foobar'], ['string']],
-            [function($contextParameter) {return $contextParameter; }, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
-            [function($parameter, $contextParameter) {return $parameter.$contextParameter; }, 'foobar', ['foo'], ['string', '@contextParameter'], ['contextParameter' => 'bar']],
-            [function($parameter, $contextParameter) {return [$parameter,$contextParameter]; }, ['foo', null], ['foo'], ['string', '@contextParameter'], []],
-            [function($parameter1, $contextParameter2, $parameter3) {return [$parameter1, $contextParameter2, $parameter3];}, ['foo', null, 'bar'], ['foo', 'bar'], ['string', '@contextParameter', 'string'], []],
+            [function () { return 'foobar';}, 'foobar'],
+            [function ($argument) { return $argument; }, 'foobar', ['foobar'], ['string']],
+            [function ($contextParameter) { return $contextParameter; }, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
+            [function ($parameter, $contextParameter) { return $parameter . $contextParameter; }, 'foobar', ['foo'], ['string', '@contextParameter'], ['contextParameter' => 'bar']],
+            [function ($parameter, $contextParameter) { return [$parameter, $contextParameter]; }, ['foo', null], ['foo'], ['string', '@contextParameter'], []],
+            [function ($parameter1, $contextParameter2, $parameter3) { return [$parameter1, $contextParameter2, $parameter3]; }, ['foo', null, 'bar'], ['foo', 'bar'], ['string', '@contextParameter', 'string'], []],
         ];
     }
 }

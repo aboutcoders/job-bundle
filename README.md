@@ -216,6 +216,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 - [How-to work with the manager](./docs/howto-manager.md)
 - [How-to modify a job at runtime](./docs/howto-modify-job.md)
+- [How-to manage jobs at runtime](./docs/howto-manage-jobs-at--runtime.md)
 - [How-to inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
 - [How-to work with the job status](./docs/howto-status.md)
 
@@ -230,6 +231,9 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 - Finalize the REST-API
+- Add option to update a job
+- Add option to resume a canceled job
+- Consider maintenance job to delete old jobs
 - Utilize stopwatch to detect bottle necks
 - Improve configurability
 - Provide statistics

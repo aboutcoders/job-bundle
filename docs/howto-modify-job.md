@@ -16,7 +16,7 @@ interface JobAwareInterface
 }
 ```
 
-If this is the case the job will be set before each invocation of the job. With this you have access to the parameters, schedules and response of the job.
+If this is the case the job will be injected before each invocation of the job. With this you have access to the parameters, schedules and response of the job.
 
 __Example:__
 

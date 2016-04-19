@@ -144,6 +144,17 @@ class ManagerTest extends DatabaseTestCase
         $this->assertCount(0, $schedules);
     }
 
+    public function testJobCanManageJobs()
+    {
+        $job = $this->getJobManager()->addJob('manage_job');
+
+        $ticket = $job->getResponse();
+
+        $logs = $this->getJobManager()->getJobLogs($ticket);
+
+        $this->assertContains('addedJob', $logs);
+    }
+
     /**
      * @return ManagerInterface
      */

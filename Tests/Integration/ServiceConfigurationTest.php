@@ -66,7 +66,7 @@ class ServiceConfigurationTest extends KernelTestCase
             ['abc.job.form.type.job', 'Abc\Bundle\JobBundle\Form\Type\JobType'],
             ['abc.job.form.type.message', 'Abc\Bundle\JobBundle\Form\Type\MessageType'],
             ['abc.job.job_manager', 'Abc\Bundle\JobBundle\Model\JobManagerInterface'],
-            ['abc.job.listener.job', 'Abc\Bundle\JobBundle\Listener\LoggerProviderJobListener'],
+            ['abc.job.listener.job', 'Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener'],
             ['abc.job.listener.schedule', 'Abc\Bundle\JobBundle\Listener\ScheduleListener'],
             ['abc.job.logger.factory', 'Abc\Bundle\JobBundle\Job\Logger\FactoryInterface'],
             ['abc.job.log_manager', 'Abc\Bundle\JobBundle\Job\LogManagerInterface'],
@@ -85,8 +85,8 @@ class ServiceConfigurationTest extends KernelTestCase
     {
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\LoggerProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $listener = $this->getMockBuilder('Abc\Bundle\JobBundle\Listener\LoggerProviderJobListener')->disableOriginalConstructor()->getMock();
+        /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+        $listener = $this->getMockBuilder('Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener')->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
         $event = $this->getMockBuilder('Abc\Bundle\JobBundle\Event\ExecutionEvent')->disableOriginalConstructor()->getMock();
 
@@ -103,7 +103,7 @@ class ServiceConfigurationTest extends KernelTestCase
     {
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\LoggerProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+        /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
         $listener = $this->getMockBuilder('Abc\Bundle\JobBundle\Listener\ScheduleListener')->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
         $event = $this->getMockBuilder('Abc\Bundle\SchedulerBundle\Event\SchedulerEvent')->disableOriginalConstructor()->getMock();

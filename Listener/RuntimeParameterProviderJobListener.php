@@ -12,20 +12,30 @@ namespace Abc\Bundle\JobBundle\Listener;
 
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
+use Abc\Bundle\JobBundle\Job\ManagerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LoggerProviderJobListener
+class RuntimeParameterProviderJobListener
 {
-    /** @var FactoryInterface */
+    /**
+     * @var ManagerInterface
+     */
+    private $manager;
+
+    /**
+     * @var FactoryInterface
+     */
     private $factory;
 
     /**
+     * @param ManagerInterface $manager
      * @param FactoryInterface $factory
      */
-    function __construct(FactoryInterface $factory)
+    function __construct(ManagerInterface $manager, FactoryInterface $factory)
     {
+        $this->manager = $manager;
         $this->factory    = $factory;
     }
 
@@ -35,6 +45,7 @@ class LoggerProviderJobListener
      */
     public function onPreExecute(ExecutionEvent $event)
     {
+        $event->getContext()->set('manager', $this->manager);
         $event->getContext()->set('logger', $this->factory->create($event->getJob()));
     }
 }

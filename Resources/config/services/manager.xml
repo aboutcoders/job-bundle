@@ -34,6 +34,9 @@
 
         <service id="abc.job.invoker" class="Abc\Bundle\JobBundle\Job\Invoker" public="false">
             <argument type="service" id="abc.job.registry"/>
+            <call method="setManager">
+                <argument type="service" id="abc.job.manager"/>
+            </call>
         </service>
 
         <service id="abc.job.helper" class="Abc\Bundle\JobBundle\Job\JobHelper" public="false">
