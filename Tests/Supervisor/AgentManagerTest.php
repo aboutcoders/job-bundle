@@ -1,7 +1,7 @@
 <?php
 
 /*
-* This file is part of the job-bundle-annotations package.
+* This file is part of the job-bundle package.
 *
 * (c) Hannes Schulz <hannes.schulz@aboutcoders.com>
 *

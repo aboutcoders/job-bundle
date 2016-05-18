@@ -2,7 +2,7 @@
     "name": "aboutcoders/job-bundle",
     "type": "symfony-bundle",
     "description": "A symfony bundle for asynchronous job processing.",
-    "keywords": ["job", "schedule", "scheduler", "cron", "bundle", "queue", "task", "background", "rest", "asynchronous"],
+    "keywords": ["job", "jobs", "schedule", "scheduler", "cron", "cronjob", "bundle", "queue", "task", "background", "rest", "rest-api" , "asynchronous"],
     "homepage": "http://aboutcoders.com",
     "license": "MIT",
     "authors": [

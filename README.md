@@ -22,6 +22,18 @@ We appreciate if you decide to use this bundle and we appreciate your feedback, 
 
 ## Installation
 
+Follow the installation instructions of the required third party bundles:
+
+* [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
+* [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
+* [AbcResourceLockBundle](https://github.com/aboutcoders/resource-lock-bundle)
+* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
+* [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
+* [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
+* [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle)
+* [SensioFrameworkExtraBundle](http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle)
+* [YZSupervisorBundle](https://github.com/yzalis/SupervisorBundle)
+
 Add the AbcJobBundle to your `composer.json` file
 
 ```json
@@ -32,7 +44,7 @@ Add the AbcJobBundle to your `composer.json` file
 }
 ```
 
-Then include the bundle in the AppKernel.php class
+Include the bundle in the AppKernel.php class
 
 ```php
 public function registerBundles()
@@ -46,18 +58,6 @@ public function registerBundles()
 }
 ```
 
-Finally follow the installation instructions of the required third party bundles:
-
-* [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
-* [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
-* [AbcResourceLockBundle](https://github.com/aboutcoders/resource-lock-bundle)
-* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
-* [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
-* [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
-* [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle)
-* [SensioFrameworkExtraBundle](http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle)
-* [YZSupervisorBundle](https://github.com/yzalis/SupervisorBundle)
-
 ## Configuration
 
 __Configure doctrine orm__
@@ -65,7 +65,8 @@ __Configure doctrine orm__
 At the current point only doctrine is supported as ORM. However by changing the configuration you can use a different persistence layer.
 
 ```yaml
-abc_job:
+abc_job:FiceMen00
+
   db_driver: orm
 ```
 

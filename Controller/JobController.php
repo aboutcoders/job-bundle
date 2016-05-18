@@ -98,8 +98,7 @@ class JobController extends FOSRestController
         $offset     = ($page > 0) ? ($page) * $limit : 0;
         $criteria   = $paramFetcher->get('criteria');
 
-        if(!$criteria)
-        {
+        if (!$criteria) {
             $criteria = [];
         }
 
@@ -119,6 +118,30 @@ class JobController extends FOSRestController
     }
 
     /**
+     * @param string $ticket
+     * @return JobInterface
+     *
+     * @ApiDoc(
+     * description="Returns a job with the given ticket",
+     * section="AbcJobBundle",
+     * output="Abc\Bundle\JobBundle\Model\Job",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when node not found",
+     *   }
+     * )
+     */
+    public function getAction($ticket)
+    {
+        try {
+            return $this->getJobManager()->get($ticket);
+        } catch (TicketNotFoundException $e) {
+            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+        }
+    }
+
+
+    /**
      * Create an entity
      *
      * @ApiDoc(
@@ -136,8 +159,7 @@ class JobController extends FOSRestController
     public function postAction(Request $request)
     {
         $type = $request->get('type');
-        if(!$this->getRegistry()->has($type))
-        {
+        if (!$this->getRegistry()->has($type)) {
             throw $this->createNotFoundException(sprintf('A job of type "%s" not found', $type));
         }
 
@@ -167,12 +189,9 @@ class JobController extends FOSRestController
      */
     public function cancelAction($ticket)
     {
-        try
-        {
+        try {
             return $this->getJobManager()->cancelJob($ticket);
-        }
-        catch(TicketNotFoundException $e)
-        {
+        } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
     }
@@ -186,12 +205,9 @@ class JobController extends FOSRestController
     {
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             return $this->getJobManager()->add($form->getData());
-        }
-        else
-        {
+        } else {
             return $form;
         }
     }
@@ -202,15 +218,12 @@ class JobController extends FOSRestController
      */
     protected function filterCriteria($criteria)
     {
-        if(!is_array($criteria))
-        {
+        if (!is_array($criteria)) {
             throw new HttpException(400, 'Invalid search criteria');
         }
 
-        foreach($criteria as $key => $value)
-        {
-            if($criteria[$key] == '')
-            {
+        foreach ($criteria as $key => $value) {
+            if ($criteria[$key] == '') {
                 unset ($criteria[$key]);
             }
         }
