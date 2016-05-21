@@ -78,7 +78,7 @@ class AgentController extends FOSRestController
      * @param boolean $wait Whether to wait until agent is started (optional, true by default)
      * @return AgentInterface
      *
-     * @Put
+     * @Post
      *
      * @ApiDoc(
      * description="Starts an agent",
@@ -115,7 +115,7 @@ class AgentController extends FOSRestController
      * @param boolean $wait Whether to wait until agent is stopped (optional, true by default)
      * @return void
      *
-     * @Put
+     * @Post
      *
      * @ApiDoc(
      * description="Stops an agent",
