@@ -36,25 +36,55 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Manager implements ManagerInterface
 {
     const JOB_LOCK_PREFIX = 'job-';
-    /** @var JobTypeRegistry */
+
+    /**
+     * @var JobTypeRegistry
+     */
     protected $registry;
-    /** @var QueueEngine */
+    
+    /**
+     * @var QueueEngine
+     */
     protected $queueEngine;
-    /** @var JobManagerInterface */
+    
+    /**
+     * @var JobManagerInterface
+     */
     protected $jobManager;
-    /** @var Invoker */
+    
+    /**
+     * @var Invoker
+     */
     protected $invoker;
-    /** @var LoggerFactoryInterface */
+    
+    /**
+     * @var LoggerFactoryInterface
+     */
     protected $loggerFactory;
-    /** @var LogManagerInterface */
+    
+    /**
+     * @var LogManagerInterface
+     */
     protected $logManager;
-    /** @var EventDispatcherInterface */
+    
+    /**
+     * @var EventDispatcherInterface
+     */
     protected $dispatcher;
-    /** @var JobHelper */
+    
+    /**
+     * @var JobHelper
+     */
     protected $helper;
-    /** @var LockManagerInterface */
+    
+    /**
+     * @var LockManagerInterface
+     */
     protected $locker;
-    /** @var LoggerInterface */
+    
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
     /**
@@ -207,6 +237,7 @@ class Manager implements ManagerInterface
         $job = $this->findJob($message->getTicket());
 
         if ($job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::PROCESSING()) {
+
             $this->logger->debug('Skipped execution of job {ticket} because status is {status}', [
                 'ticket' => $job->getType(),
                 'status' => $job->getStatus()]);
@@ -218,6 +249,7 @@ class Manager implements ManagerInterface
             $this->locker->lock($this->getLockName($job));
         } catch (LockException $e) {
             $this->logger->warning('Job {job} is already running: {exception}', array('job' => $job, 'exception' => $e));
+
             return;
         }
 
@@ -233,12 +265,11 @@ class Manager implements ManagerInterface
 
         try {
             $this->logger->debug(
-                'Execute job of type {type} with ticket {ticket} and parameters {parameters}',
-                array(
+                'Execute job of type {type} with ticket {ticket} and parameters {parameters}', [
                     'type'       => $job->getType(),
                     'ticket'     => $job->getTicket(),
                     'parameters' => $job->getParameters()
-                )
+                ]
             );
 
             // invoke the job
@@ -259,7 +290,7 @@ class Manager implements ManagerInterface
             $response = new ExceptionResponse($e->getMessage(), $e->getCode());
             $status   = Status::ERROR();
         }
-        
+
         $this->releaseLock($job);
 
         $processingTime = $this->helper->calculateProcessingTime($executionStart);
@@ -286,17 +317,16 @@ class Manager implements ManagerInterface
 
         try {
             $this->logger->debug(
-                'Published message with ticket {ticket} type {type} callerTicket {callerTicket} to queue backed',
-                array(
+                'Published message with ticket {ticket} type {type} callerTicket {callerTicket} to queue backed', [
                     'ticket'       => $ticket,
                     'type'         => $type,
                     'callerTicket' => $callerTicket
-                )
+                ]
             );
 
             $this->queueEngine->publish($message);
         } catch (\Exception $e) {
-            $this->logger->critical('Failed to publish message to queue backend: {exception}', array('exception' => $e));
+            $this->logger->critical('Failed to publish message to queue backend: {exception}', ['exception' => $e]);
 
             throw $e;
         }
@@ -313,7 +343,7 @@ class Manager implements ManagerInterface
             return $job;
         }
 
-        $this->logger->error('Job with ticket {ticket} not found', array('ticket' => $ticket));
+        $this->logger->error('Job with ticket {ticket} not found', ['ticket' => $ticket]);
 
         throw new TicketNotFoundException($ticket);
     }
@@ -345,11 +375,11 @@ class Manager implements ManagerInterface
     private function dispatchExecutionEvent($eventName, ExecutionEvent $event)
     {
         try {
-            $this->logger->debug('Dispatch event {event} for job with ticket {ticket}', array('event' => $eventName, 'ticket' => $event->getJob()->getTicket()));
+            $this->logger->debug('Dispatch event {event} for job with ticket {ticket}', ['event' => $eventName, 'ticket' => $event->getJob()->getTicket()]);
 
             $this->dispatcher->dispatch($eventName, $event);
         } catch (\Exception $e) {
-            $this->logger->critical('Event listener for {event} failed with exception {exception}', array('event' => JobEvents::JOB_PRE_EXECUTE, 'exception' => $e));
+            $this->logger->critical('Event listener for {event} failed with exception {exception}', ['event' => JobEvents::JOB_PRE_EXECUTE, 'exception' => $e]);
         }
     }
 
@@ -372,6 +402,7 @@ class Manager implements ManagerInterface
     {
         $result = $this->locker->release($this->getLockName($job));
         $this->logger->info('Job {job} lock released', ['job' => $job]);
+
         return $result;
     }
 }

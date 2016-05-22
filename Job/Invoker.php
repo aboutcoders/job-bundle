@@ -11,6 +11,8 @@
 namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Job\Context\ContextInterface;
+use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
+use Abc\ProcessControl\ControllerAwareInterface;
 
 /**
  * Invokes the callable registered for a certain job type
@@ -30,6 +32,11 @@ class Invoker
     private $manager;
 
     /**
+     * @var Factory
+     */
+    private $controllerFactory;
+
+    /**
      * @param JobTypeRegistry $registry
      */
     function __construct(JobTypeRegistry $registry)
@@ -38,11 +45,26 @@ class Invoker
     }
 
     /**
-     * {@inheritdoc}
+     * Register the manager that is passed to jobs implementing the ManagerAwareInterface
+     *
+     * @param ManagerInterface $manager
+     * @return void
+     * @see ManagerAwareInterface
      */
     public function setManager(ManagerInterface $manager)
     {
         $this->manager = $manager;
+    }
+
+    /**
+     * Register the process controller that is passed to jobs implementing the ControllerAwareInterface
+     *
+     * @param Factory $controllerFactory
+     * @see Abc\ProcessControl\ControllerAwareInterface\ControllerAwareInterface
+     */
+    public function setControllerFactory(Factory $controllerFactory)
+    {
+        $this->controllerFactory = $controllerFactory;
     }
 
     /**
@@ -70,6 +92,11 @@ class Invoker
             if($callable instanceof ManagerAwareInterface)
             {
                 $callable->setManager($this->manager);
+            }
+            
+            if($callable instanceof ControllerAwareInterface)
+            {
+                $callable->setController($this->controllerFactory);
             }
         }
 

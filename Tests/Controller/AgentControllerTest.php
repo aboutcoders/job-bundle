@@ -130,7 +130,7 @@ class AgentControllerTest extends WebTestCase
             ->method('refresh')
             ->with($agent);
 
-        $client->request('PUT', '/api/agents/12345/start');
+        $client->request('POST', '/api/agents/12345/start');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
@@ -167,7 +167,7 @@ class AgentControllerTest extends WebTestCase
             ->method('refresh')
             ->with($agent);
 
-        $client->request('PUT', '/api/agents/12345/stop');
+        $client->request('POST', '/api/agents/12345/stop');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
