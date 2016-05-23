@@ -220,6 +220,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - [How-to manage jobs at runtime](./docs/howto-manage-jobs-at-runtime.md)
 - [How-to inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
 - [How-to work with the job status](./docs/howto-status.md)
+- [How-to make a job cancellable at runtime](./docs/howto-make-a-job-cancellable-at-runtime.md)
 
 ## Further Documentation
 

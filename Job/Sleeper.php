@@ -42,9 +42,17 @@ class Sleeper implements ControllerAwareInterface
      */
     public function sleep($seconds, LoggerInterface $logger)
     {
+        $logger->info('start sleeping for {seconds}', ['seconds' => $seconds]);
+
+        $start = time();
+
         do {
+
             sleep(1);
             $seconds--;
+
         } while ($seconds > 0 && !$this->controller->doExit());
+
+        $logger->info('stopped sleeping after {seconds}', ['seconds' => time() - $start]);
     }
 }
