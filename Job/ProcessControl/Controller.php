@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Job\ProcessControl;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\ProcessControl\Controller as ControllerInterface;
+use Abc\ProcessControl\ControllerInterface;
 
 /**
  * The default job process controller.

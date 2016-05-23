@@ -126,7 +126,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         $type      = 'callable-type';
         $callable  = new TestControllerAwareCallable();
         $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
-        $controller = $this->getMock('Abc\ProcessControl\Controller');
+        $controller = $this->getMock('Abc\ProcessControl\ControllerInterface');
 
         $job       = new Job($type);
 

@@ -19,8 +19,7 @@
         "jms/serializer-bundle": "~1.0",
         "nelmio/api-doc-bundle": "~2",
         "doctrine/annotations": "1.*",
-        "aboutcoders/process-control": "~1.1",
-        "aboutcoders/scheduler-bundle": "~1.0",
+        "aboutcoders/scheduler-bundle": "~1.1",
         "aboutcoders/resource-lock-bundle": "dev-master"
     },
     "require-dev": {

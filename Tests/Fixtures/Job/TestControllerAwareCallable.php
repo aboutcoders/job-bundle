@@ -10,8 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Fixtures\Job;
 
-use Abc\ProcessControl\Controller;
 use Abc\ProcessControl\ControllerAwareInterface;
+use Abc\ProcessControl\ControllerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -19,20 +19,20 @@ use Abc\ProcessControl\ControllerAwareInterface;
 class TestControllerAwareCallable implements ControllerAwareInterface
 {
     /**
-     * @var Controller
+     * @var ControllerInterface
      */
     private $controller;
 
     /**
      * {@inheritdoc}
      */
-    public function setController(Controller $controller)
+    public function setController(ControllerInterface $controller)
     {
         $this->controller = $controller;
     }
 
     /**
-     * @return Controller
+     * @return ControllerInterface
      */
     public function getController()
     {

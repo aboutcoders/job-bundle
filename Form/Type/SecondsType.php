@@ -14,6 +14,7 @@ use Abc\Bundle\JobBundle\Form\Transformer\ParamArrayToFormDataTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -35,6 +36,18 @@ class SecondsType extends AbstractType
         $transformer->mapField('seconds', 0);
 
         $builder->addModelTransformer($transformer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'data_class' => null
+            )
+        );
     }
 
     /**

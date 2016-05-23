@@ -199,6 +199,29 @@ class JobControllerTest extends DatabaseWebTestCase
         }
     }
 
+    public function testGetLogsAction()
+    {
+        $job = new Job();
+        $job->setTicket('12345');
+
+        $client = static::createClient();
+
+        $this->mockManager();
+
+        $this->manager->expects($this->once())
+            ->method('getJobLogs')
+            ->with($job->getTicket())
+            ->willReturn('LogMessage');
+
+        $client->request('get', '/api/jobs/12345/logs');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        $data = $client->getResponse()->getContent();
+
+        $this->assertEquals('"LogMessage"', $data);
+    }
+
     public function testCancelAction()
     {
         $job = new Job();

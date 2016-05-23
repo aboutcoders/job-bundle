@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Sonata;
 
-use Abc\ProcessControl\Controller;
+use Abc\ProcessControl\ControllerInterface;
 use Sonata\NotificationBundle\Model\MessageInterface;
 use Sonata\NotificationBundle\Model\MessageManagerInterface;
 
@@ -19,16 +19,16 @@ use Sonata\NotificationBundle\Model\MessageManagerInterface;
  */
 class ControlledMessageManager implements MessageManagerInterface
 {
-    /** @var Controller */
+    /** @var ControllerInterface */
     protected $controller;
     /** @var MessageManagerInterface */
     protected $manager;
 
     /**
-     * @param Controller              $controller
+     * @param ControllerInterface     $controller
      * @param MessageManagerInterface $manager
      */
-    public function __construct(Controller $controller, MessageManagerInterface $manager)
+    public function __construct(ControllerInterface $controller, MessageManagerInterface $manager)
     {
         $this->controller = $controller;
         $this->manager    = $manager;
@@ -39,8 +39,7 @@ class ControlledMessageManager implements MessageManagerInterface
      */
     public function findByTypes(array $types, $state, $batchSize)
     {
-        if($this->controller != null && $this->controller->doExit())
-        {
+        if ($this->controller != null && $this->controller->doExit()) {
             throw new IterationStoppedException();
         }
 

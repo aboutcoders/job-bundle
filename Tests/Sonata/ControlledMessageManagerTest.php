@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Sonata;
 
 use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
-use Abc\ProcessControl\Controller;
+use Abc\ProcessControl\ControllerInterface;
 use Sonata\NotificationBundle\Model\MessageManagerInterface;
 
 /**
@@ -19,7 +19,7 @@ use Sonata\NotificationBundle\Model\MessageManagerInterface;
  */
 class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Controller|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $controller;
     /** @var MessageManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
@@ -28,7 +28,7 @@ class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->controller = $this->getMock('Abc\ProcessControl\Controller');
+        $this->controller = $this->getMock('Abc\ProcessControl\ControllerInterface');
         $this->manager    = $this->getMock('Sonata\NotificationBundle\Model\MessageManagerInterface');
         $this->subject    = new ControlledMessageManager($this->controller, $this->manager);
     }

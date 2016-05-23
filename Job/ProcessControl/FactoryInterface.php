@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Job\ProcessControl;
 
 use Abc\Bundle\JobBundle\Job\JobAwareInterface;
 use Abc\Bundle\JobBundle\Job\JobInterface;
-use Abc\ProcessControl\Controller as ControllerInterface;
+use Abc\ProcessControl\ControllerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>

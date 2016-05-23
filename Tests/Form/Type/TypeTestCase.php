@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 use Abc\Bundle\JobBundle\Form\Type\JobType as FormJobType;
 use Abc\Bundle\JobBundle\Form\Type\MessageType;
 use Abc\Bundle\JobBundle\Form\Type\ScheduleType;
+use Abc\Bundle\JobBundle\Form\Type\SecondsType;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Entity\Job;
@@ -154,6 +155,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
                 'abc_job'          => $form,
                 'abc_job_schedule' => new ScheduleType,
                 'abc_job_message'  => new MessageType,
+                'abc_job_seconds'  => new SecondsType,
             ];
         }
 

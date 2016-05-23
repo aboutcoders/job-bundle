@@ -17,8 +17,8 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Annotation\JobParameters;
 use Abc\Bundle\JobBundle\Annotation\JobResponse;
-use Abc\ProcessControl\Controller;
 use Abc\ProcessControl\ControllerAwareInterface;
+use Abc\ProcessControl\ControllerInterface;
 use Psr\Log\LoggerInterface;
 
 class TestCallable implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface
@@ -34,7 +34,7 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
     private $manager;
 
     /**
-     * @var Controller
+     * @var ControllerInterface
      */
     private $controller;
 
@@ -57,7 +57,7 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
     /**
      * {@inheritdoc}
      */
-    public function setController(Controller $controller)
+    public function setController(ControllerInterface $controller)
     {
         $this->controller = $controller;
     }

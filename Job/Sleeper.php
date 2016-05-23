@@ -11,8 +11,8 @@
 namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Annotation\JobParameters;
-use Abc\ProcessControl\Controller;
 use Abc\ProcessControl\ControllerAwareInterface;
+use Abc\ProcessControl\ControllerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,14 +23,14 @@ use Psr\Log\LoggerInterface;
 class Sleeper implements ControllerAwareInterface
 {
     /**
-     * @var Controller
+     * @var ControllerInterface
      */
     private $controller;
 
     /**
      * {@inheritdoc}
      */
-    public function setController(Controller $controller)
+    public function setController(ControllerInterface $controller)
     {
         $this->controller = $controller;
     }

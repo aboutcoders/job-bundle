@@ -30,7 +30,7 @@ class SecondsTypeTest extends TypeTestCase
      */
     public function getFormType()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_message';
+        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds';
     }
 
     /**

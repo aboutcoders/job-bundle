@@ -197,6 +197,32 @@ class JobController extends FOSRestController
     }
 
     /**
+     * @param string $ticket
+     * @return string
+     *
+     * @Get
+     *
+     * @ApiDoc(
+     * description="Returns the logs of a job",
+     * section="AbcJobBundle",
+     * output="string",
+     * parameters={},
+     * statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when job not found",
+     *   }
+     * )
+     */
+    public function getLogsAction($ticket)
+    {
+        try {
+            return $this->getJobManager()->getJobLogs($ticket);
+        } catch (TicketNotFoundException $e) {
+            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+        }
+    }
+
+    /**
      * @param Form    $form
      * @param Request $request
      * @return object Entity
