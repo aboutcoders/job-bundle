@@ -17,17 +17,26 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Annotation\JobParameters;
 use Abc\Bundle\JobBundle\Annotation\JobResponse;
+use Abc\ProcessControl\Controller;
+use Abc\ProcessControl\ControllerAwareInterface;
 use Psr\Log\LoggerInterface;
 
-class TestCallable implements JobAwareInterface, ManagerAwareInterface
+class TestCallable implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface
 {
-    /** @var JobInterface */
+    /**
+     * @var JobInterface
+     */
     protected $job;
 
     /**
      * @var ManagerInterface
      */
     private $manager;
+
+    /**
+     * @var Controller
+     */
+    private $controller;
 
     /**
      * {@inheritdoc}
@@ -43,6 +52,14 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface
     public function setManager(ManagerInterface $manager)
     {
         $this->manager = $manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setController(Controller $controller)
+    {
+        $this->controller = $controller;
     }
 
     /**
@@ -136,6 +153,21 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface
         $job = $manager->addJob('log', ['addedJob']);
 
         return $job->getTicket();
+    }
+
+    /**
+     * @JobResponse("string")
+     * @return string|null
+     */
+    public function invokeController()
+    {
+        $doExit = $this->controller->doExit();
+
+        if(is_bool($doExit)) {
+            return 'can invoke controller';
+        }
+
+        return null;
     }
 
     /**

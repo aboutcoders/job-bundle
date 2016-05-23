@@ -15,7 +15,9 @@ use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Model\Job;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestControllerAwareCallable;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestManagerAwareCallable;
 use Metadata\MetadataFactoryInterface;
@@ -26,7 +28,7 @@ use Metadata\MetadataFactoryInterface;
 class InvokerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MetadataFactoryInterface
+     * @var MetadataFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $metadataFactory;
 
@@ -36,9 +38,14 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     private $registry;
 
     /**
-     * @var ManagerInterface
+     * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $manager;
+
+    /**
+     * @var Factory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $controllerFactory;
 
     /**
      * @var Invoker
@@ -50,12 +57,14 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->metadataFactory = $this->getMock('Metadata\MetadataFactoryInterface');
-        $this->registry        = new JobTypeRegistry($this->metadataFactory);
-        $this->manager         = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
-        $this->subject         = new Invoker($this->registry);
+        $this->metadataFactory   = $this->getMock('Metadata\MetadataFactoryInterface');
+        $this->registry          = new JobTypeRegistry($this->metadataFactory);
+        $this->manager           = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
+        $this->controllerFactory = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\ProcessControl\Factory')->disableOriginalConstructor()->getMock();
+        $this->subject           = new Invoker($this->registry);
 
         $this->subject->setManager($this->manager);
+        $this->subject->setControllerFactory($this->controllerFactory);
     }
 
     /**
@@ -109,6 +118,27 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foobar', $this->subject->invoke($job, new Context()));
         $this->assertEquals($this->manager, $callable->getManager());
+    }
+
+    public function testInvokeHandlesControllerAwareJobs()
+    {
+        $serviceId = 'serviceId';
+        $type      = 'callable-type';
+        $callable  = new TestControllerAwareCallable();
+        $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
+        $controller = $this->getMock('Abc\ProcessControl\Controller');
+
+        $job       = new Job($type);
+
+        $this->registry->register($jobType);
+
+        $this->controllerFactory->expects($this->once())
+            ->method('create')
+            ->with($job)
+            ->willReturn($controller);
+
+        $this->assertEquals('foobar', $this->subject->invoke($job, new Context()));
+        $this->assertEquals($controller, $callable->getController());
     }
 
     /**

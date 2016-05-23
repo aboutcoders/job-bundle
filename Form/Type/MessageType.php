@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Form\Type;
 
-use Abc\Bundle\JobBundle\Form\Transformer\SingleParameterTransformer;
+use Abc\Bundle\JobBundle\Form\Transformer\ParamArrayToFormDataTransformer;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -39,18 +39,17 @@ class MessageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if(!isset($options['data']))
-        {
+        if (!isset($options['data'])) {
             $options['data'] = new Message();
         }
 
         $builder->add('to', $this->methodBlockPrefixExists() ? EmailType::class : 'email');
         $builder->add('from', $this->methodBlockPrefixExists() ? EmailType::class : 'email');
         $builder->add('subject', $this->methodBlockPrefixExists() ? TextType::class : 'text');
-        $builder->add('message', $this->methodBlockPrefixExists() ? TextAreaType::class : 'textarea');
+        $builder->add('message', $this->methodBlockPrefixExists() ? TextareaType::class : 'textarea');
 
         // transform Abc\Bundle\JobBundle\Job\Mailer\Message to array for model
-        $builder->addModelTransformer(new SingleParameterTransformer);
+        $builder->addModelTransformer(new ParamArrayToFormDataTransformer);
     }
 
     /**

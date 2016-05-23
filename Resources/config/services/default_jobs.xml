@@ -11,6 +11,10 @@
             <tag name="abc.job" type="mailer" method="send" formType="%abc.job.form_type_message%"/>
         </service>
 
+        <service id="abc.job.sleeper" class="Abc\Bundle\JobBundle\Job\Sleeper">
+            <tag name="abc.job" type="sleeper" method="sleep" formType="%abc.job.form_type_seconds%"/>
+        </service>
+
     </services>
 
 </container>

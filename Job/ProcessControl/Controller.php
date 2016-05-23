@@ -48,7 +48,7 @@ class Controller implements ControllerInterface
     /**
      * @param JobInterface        $job
      * @param JobManagerInterface $manager
-     * @param integer             $interval
+     * @param integer             $interval The minimum number of seconds that must have been passed between two refresh operations
      * @throws \InvalidArgumentException If interval is not greater than of equal to zero
      */
     public function __construct(JobInterface $job, JobManagerInterface $manager, $interval)

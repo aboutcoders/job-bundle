@@ -155,6 +155,13 @@ class ManagerTest extends DatabaseTestCase
         $this->assertContains('addedJob', $logs);
     }
 
+    public function testJobCanInvokeController()
+    {
+        $job = $this->getJobManager()->addJob('invoke_controller');
+
+        $this->assertContains('can invoke controller', $job->getResponse());
+    }
+
     /**
      * @return ManagerInterface
      */

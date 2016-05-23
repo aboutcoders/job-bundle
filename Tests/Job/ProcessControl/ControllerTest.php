@@ -16,6 +16,10 @@ use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Controller;
 use phpmock\phpunit\PHPMock;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ */
 class ControllerTest extends \PHPUnit_Framework_TestCase
 {
     use PHPMock;
@@ -69,7 +73,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testDoExitRefreshesOnFirstInvocation()
     {
-
         $this->manager->expects($this->once())
             ->method('refresh')
             ->with($this->job);
@@ -86,7 +89,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testDoExitReturnsTrueIfJobIsCancelled()
     {
-
         $this->manager->expects($this->once())
             ->method('refresh')
             ->with($this->job);
@@ -103,7 +105,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testDoExitReturnsFalseIfJobIsNotCancelled()
     {
-
         $this->manager->expects($this->once())
             ->method('refresh')
             ->with($this->job);
@@ -124,7 +125,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDoExitRefreshesIfIntervalExceeded($secondsPassed)
     {
-
         $this->manager->expects($this->exactly(2))
             ->method('refresh')
             ->with($this->job);
@@ -149,7 +149,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDoExitSkipsRefreshingIfIntervalNotExceeded($secondsPassed)
     {
-
         $this->manager->expects($this->exactly(1))
             ->method('refresh')
             ->with($this->job);
@@ -167,7 +166,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         // second invocation
         $this->subject->doExit();
     }
-    
+
     public static function provideSecondsGreaterOrEqualToInterval()
     {
         return [

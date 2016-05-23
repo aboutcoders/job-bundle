@@ -96,7 +96,7 @@ class Invoker
             
             if($callable instanceof ControllerAwareInterface)
             {
-                $callable->setController($this->controllerFactory);
+                $callable->setController($this->controllerFactory->create($job));
             }
         }
 

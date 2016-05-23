@@ -92,7 +92,7 @@ abstract class TypeTestCase extends BaseTypeTestCase
     {
         // prepare formData
         $formData = [
-            'type' => $this->getType(),
+            'type'       => $this->getType(),
             'parameters' => $formData
         ];
 
@@ -118,12 +118,27 @@ abstract class TypeTestCase extends BaseTypeTestCase
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedJob, $form->getData());
 
-        $view = $form->createView();
+        $view     = $form->createView();
         $children = $view->children;
 
-        foreach(array_keys($formData) as $key)
-        {
+        foreach (array_keys($formData) as $key) {
             $this->assertArrayHasKey($key, $children);
+        }
+    }
+
+    /**
+     * @param array $formData
+     * @param array $expectedParameters
+     * @dataProvider provideTestData
+     */
+    public function testPopulateFormWithParameters($formData, $expectedParameters)
+    {
+        $form = $this->factory->create($this->getFormType(), $expectedParameters);
+
+        $view     = $form->createView();
+
+        foreach ($formData as $field => $value) {
+            $this->assertEquals($value, $view->offsetGet($field)->vars['value']);
         }
     }
 
@@ -132,19 +147,17 @@ abstract class TypeTestCase extends BaseTypeTestCase
         // create a type instance with the mocked dependencies
         $form = new FormJobType($this->registry);
 
-        if($this->methodBlockPrefixExists())
-        {
+        if ($this->methodBlockPrefixExists()) {
             $forms = [$form];
-        }
-        else{
+        } else {
             $forms = [
-                'abc_job' => $form,
+                'abc_job'          => $form,
                 'abc_job_schedule' => new ScheduleType,
-                'abc_job_message' => new MessageType,
+                'abc_job_message'  => new MessageType,
             ];
         }
 
-        $validator = $this->getMock('\Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator       = $this->getMock('\Symfony\Component\Validator\Validator\ValidatorInterface');
         $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $validator->expects($this->any())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
         $validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));

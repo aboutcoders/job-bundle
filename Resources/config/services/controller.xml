@@ -8,7 +8,8 @@
 
         <service id="abc.job.controller_factory.default" class="Abc\Bundle\JobBundle\Job\ProcessControl\Factory" public="true">
             <argument type="service" id="abc.job.job_manager"/>
-            <argument>2</argument>
+            <argument>%abc.job.controller.refresh_interval%</argument>
+
         </service>
 
     </services>

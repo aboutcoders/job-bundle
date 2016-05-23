@@ -37,6 +37,9 @@
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>
             </call>
+            <call method="setControllerFactory">
+                <argument type="service" id="abc.job.controller_factory"/>
+            </call>
         </service>
 
         <service id="abc.job.helper" class="Abc\Bundle\JobBundle\Job\JobHelper" public="false">

@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\DependencyInjection;
 
 use Abc\Bundle\JobBundle\Form\Type\MessageType;
+use Abc\Bundle\JobBundle\Form\Type\SecondsType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -43,6 +44,7 @@ class AbcJobExtension extends Extension
         $container->setAlias('abc.job.schedule_iterator', $config['service']['schedule_iterator']);
         $container->setAlias('abc.job.controller_factory', $config['service']['controller_factory']);
         $container->setParameter('abc.job.form_type_message', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
+        $container->setParameter('abc.job.form_type_seconds', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
 
         if('custom' !== $config['db_driver'])
         {
@@ -66,6 +68,16 @@ class AbcJobExtension extends Extension
             array(
                 'logging' => array(
                     'directory' => self::NAMESPACE_PREFIX . 'logging.directory',
+                )
+            )
+        );
+
+        $this->remapParametersNamespaces(
+            $config,
+            $container,
+            array(
+                'controller' => array(
+                    'refresh_interval' => self::NAMESPACE_PREFIX . 'controller.refresh_interval'
                 )
             )
         );

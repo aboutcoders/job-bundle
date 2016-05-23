@@ -9,8 +9,9 @@
 */
 
 namespace Abc\Bundle\JobBundle\Job\ProcessControl;
+
 use Abc\Bundle\JobBundle\Job\JobAwareInterface;
-use Abc\Bundle\JobBundle\Model\JobInterface;
+use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\ProcessControl\Controller as ControllerInterface;
 
 /**
