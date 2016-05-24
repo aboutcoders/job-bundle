@@ -57,8 +57,7 @@ interface ManagerInterface
      * Cancels execution of a job.
      *
      * @param JobInterface $job
-     * @return JobInterface The job
-     * @throws TicketNotFoundException
+     * @return JobInterface|null The cancelled job, or null if given job is already terminated
      * @throws \RuntimeException
      */
     public function cancel(JobInterface $job);
@@ -67,7 +66,7 @@ interface ManagerInterface
      * Cancels execution of a job.
      *
      * @param string $ticket The ticket of the job
-     * @return JobInterface The job
+     * @return JobInterface|null The cancelled job, or null if given job is already terminated
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */

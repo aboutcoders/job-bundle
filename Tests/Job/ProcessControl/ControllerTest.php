@@ -60,6 +60,10 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->job     = $this->getMock('Abc\Bundle\JobBundle\Model\JobInterface');
         $this->time    = $this->getFunctionMock(ControllerTest::TEST_SUBJECT_NAMESPACE, 'time');
 
+        $this->manager->expects($this->any())
+            ->method('getClass')
+            ->willReturn('Abc\Bundle\JobBundle\Model\JobInterface');
+
         $this->subject = new Controller($this->job, $this->manager, static::$interval);
     }
 
@@ -69,6 +73,16 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     public function testConstructValidatesInterval()
     {
         new Controller($this->job, $this->manager, -1);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConstructValidatesJob()
+    {
+        $job = $this->getMock('Abc\Bundle\JobBundle\Job\JobInterface');
+
+        new Controller($job, $this->manager, -1);
     }
 
     public function testDoExitRefreshesOnFirstInvocation()

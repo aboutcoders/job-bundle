@@ -12,8 +12,11 @@ namespace Abc\Bundle\JobBundle\Tests\Integration;
 
 use Abc\Bundle\JobBundle\Event\JobEvents;
 
+use Abc\Bundle\JobBundle\Job\JobInterface;
+use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvents;
 use Abc\Bundle\SchedulerBundle\Iterator\IteratorRegistryInterface;
+use Abc\ProcessControl\ChainController;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -124,5 +127,22 @@ class ServiceConfigurationTest extends KernelTestCase
         $registry = $this->container->get('abc.scheduler.iterator_registry');
 
         $this->assertCount(1, $registry->all());
+    }
+
+    public function testControllerFactoryReturnsChainedController()
+    {
+        /**
+         * @var Factory $factory
+         */
+        $factory = $this->container->get('abc.job.controller_factory');
+
+        /**
+         * @var JobInterface $job
+         */
+        $job     = $this->getMock('Abc\Bundle\JobBundle\Entity\Job');
+
+        $controller = $factory->create($job);
+
+        $this->assertInstanceOf(ChainController::class, $controller);
     }
 }

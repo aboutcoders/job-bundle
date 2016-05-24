@@ -46,18 +46,23 @@ class Controller implements ControllerInterface
     private $lastCheck;
 
     /**
-     * @param JobInterface        $job
-     * @param JobManagerInterface $manager
-     * @param integer             $interval The minimum number of seconds that must have been passed between two refresh operations
+     * @param \Abc\Bundle\JobBundle\Job\JobInterface $job
+     * @param JobManagerInterface                    $manager
+     * @param integer                                $interval The minimum number of seconds that must have been passed between two refresh operations
      * @throws \InvalidArgumentException If interval is not greater than of equal to zero
      */
-    public function __construct(JobInterface $job, JobManagerInterface $manager, $interval)
+    public function __construct(\Abc\Bundle\JobBundle\Job\JobInterface $job, JobManagerInterface $manager, $interval)
     {
-        if((int) $interval < 0) {
+        if ((int)$interval < 0) {
             throw new \InvalidArgumentException('$interval must be greater than or equal to zero');
         }
 
-        $this->job = $job;
+        $class = $manager->getClass();
+        if (!$job instanceof $class) {
+            throw new \InvalidArgumentException('The given $job is not managed by the given $manager, $job must be an instance of' . $class);
+        }
+
+        $this->job      = $job;
         $this->manager  = $manager;
         $this->interval = $interval;
     }
@@ -68,8 +73,7 @@ class Controller implements ControllerInterface
     public function doExit()
     {
         $time = time();
-        if(null === $this->lastCheck || (($this->lastCheck + $this->interval) <= $time))
-        {
+        if (null === $this->lastCheck || (($this->lastCheck + $this->interval) <= $time)) {
             $this->lastCheck = $time;
             $this->manager->refresh($this->job);
         }

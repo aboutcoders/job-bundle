@@ -195,6 +195,34 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->cancel($job);
     }
 
+    /**
+     * @param Status $status
+     * @dataProvider provideTerminatedStatus
+     */
+    public function testCancelWithTermintedJob(Status $status)
+    {
+
+        $job = new Job();
+        $job->setStatus($status);
+        $job->setTicket('ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('refresh')
+            ->with($job)
+            ->willReturn($job);
+
+        $this->helper->expects($this->never())
+            ->method('updateJob');
+
+        $this->jobManager->expects($this->never())
+            ->method('save');
+
+        $this->dispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->subject->cancel($job);
+    }
+
     public function testCancelJob()
     {
         $job = new Job();
@@ -231,6 +259,35 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
 
         $this->subject->cancelJob($job->getTicket());
+    }
+
+    /**
+     * @param Status $status
+     * @dataProvider provideTerminatedStatus
+     */
+    public function testCancelJobWithTermintedJob(Status $status)
+    {
+
+        $job = new Job();
+        $job->setStatus($status);
+        $job->setTicket('ticket');
+
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($job);
+
+        $this->helper->expects($this->never())
+            ->method('updateJob');
+
+        $this->jobManager->expects($this->never())
+            ->method('save');
+
+        $this->dispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->subject->cancelJob($job);
     }
 
     public function testGet()
@@ -609,6 +666,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [Status::PROCESSING()],
             [Status::CANCELLED()]
+        ];
+    }
+
+    public static function provideTerminatedStatus()
+    {
+        return [
+            [Status::CANCELLED()],
+            [Status::PROCESSED()],
+            [Status::ERROR()]
         ];
     }
 

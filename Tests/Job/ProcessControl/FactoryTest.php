@@ -10,9 +10,12 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Job\ProcessControl;
 
+use Abc\Bundle\JobBundle\Job\ProcessControl\Controller;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\ProcessControl\ChainController;
+use Abc\ProcessControl\ControllerInterface;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,9 +41,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager  = $this->getMock('Abc\Bundle\JobBundle\Model\JobManagerInterface');
-        $this->job      = $this->getMock('Abc\Bundle\JobBundle\Model\JobInterface');
+        $this->manager  = $this->getMock(JobManagerInterface::class);
+        $this->job      = $this->getMock(JobInterface::class);
         $this->interval = 250;
+
+        $this->manager->expects($this->any())
+            ->method('getClass')
+            ->willReturn(JobInterface::class);
 
         $this->subject = new Factory($this->manager, $this->interval);
     }
@@ -48,6 +55,31 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $controller = $this->subject->create($this->job);
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Job\ProcessControl\Controller', $controller);
+        $this->assertInstanceOf(Controller::class, $controller);
+    }
+
+    public function testCreateReturnsChainedController() {
+
+        /**
+         * @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject
+         */
+        $otherController = $this->getMock(ControllerInterface::class);
+
+        $this->subject->addController($otherController);
+
+        $controller = $this->subject->create($this->job);
+
+        $this->assertInstanceOf(ChainController::class, $controller);
+
+        // assert that default controller is in the chain
+        $this->manager->expects($this->once())
+            ->method('refresh')
+            ->with($this->job);
+
+        // assert that additional controllers are in the chain
+        $otherController->expects($this->once())
+            ->method('doExit');
+
+        $controller->doExit();
     }
 }

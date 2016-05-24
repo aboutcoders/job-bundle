@@ -41,47 +41,47 @@ class Manager implements ManagerInterface
      * @var JobTypeRegistry
      */
     protected $registry;
-    
+
     /**
      * @var QueueEngine
      */
     protected $queueEngine;
-    
+
     /**
      * @var JobManagerInterface
      */
     protected $jobManager;
-    
+
     /**
      * @var Invoker
      */
     protected $invoker;
-    
+
     /**
      * @var LoggerFactoryInterface
      */
     protected $loggerFactory;
-    
+
     /**
      * @var LogManagerInterface
      */
     protected $logManager;
-    
+
     /**
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
-    
+
     /**
      * @var JobHelper
      */
     protected $helper;
-    
+
     /**
      * @var LockManagerInterface
      */
     protected $locker;
-    
+
     /**
      * @var LoggerInterface
      */
@@ -181,8 +181,17 @@ class Manager implements ManagerInterface
         $this->logger->debug('Cancel job with ticket {ticket}', array('ticket' => $job->getTicket()));
 
         $class = $this->jobManager->getClass();
+
         if (!$job instanceof $class) {
             $this->jobManager->findByTicket($job->getTicket());
+        }
+        else {
+            $this->jobManager->refresh($job);
+        }
+
+        if(in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues()))
+        {
+            return null;
         }
 
         /** @var \Abc\Bundle\JobBundle\Model\JobInterface $job */
