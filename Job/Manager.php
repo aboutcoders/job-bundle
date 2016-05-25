@@ -181,23 +181,28 @@ class Manager implements ManagerInterface
         $this->logger->debug('Cancel job with ticket {ticket}', array('ticket' => $job->getTicket()));
 
         $class = $this->jobManager->getClass();
-
         if (!$job instanceof $class) {
             $this->jobManager->findByTicket($job->getTicket());
-        }
-        else {
+        } else {
+            /**
+             * @var \Abc\Bundle\JobBundle\Model\JobInterface $job
+             */
             $this->jobManager->refresh($job);
         }
 
-        if(in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues()))
-        {
+        if (in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues())) {
+            // should we throw an exception here?
             return null;
         }
 
-        /** @var \Abc\Bundle\JobBundle\Model\JobInterface $job */
+        $isRunning = $job->getStatus() == Status::PROCESSING();
+
         $this->helper->updateJob($job, Status::CANCELLED());
         $this->jobManager->save($job);
-        $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
+
+        if (!$isRunning) {
+            $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
+        }
 
         return $job;
     }
@@ -286,7 +291,11 @@ class Manager implements ManagerInterface
 
             $job->setResponse($response);
 
-            $status = $job->hasSchedules() ? Status::SLEEPING() : Status::PROCESSED();
+            if ($job->getStatus() != Status::CANCELLED()) {
+                $status = $job->hasSchedules() ? Status::SLEEPING() : Status::PROCESSED();
+            } else {
+                $status = Status::CANCELLED();
+            }
 
             $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
         } catch (\Exception $e) {

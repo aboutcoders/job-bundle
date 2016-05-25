@@ -39,28 +39,59 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $registry;
-    /** @var JobManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var JobManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $jobManager;
-    /** @var Invoker|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var Invoker|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $invoker;
-    /** @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $loggerFactory;
-    /** @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $logManager;
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $dispatcher;
-    /** @var JobHelper|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var JobHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $helper;
-    /** @var LockManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LockManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $locker;
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $logger;
-    /** @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $queueEngine;
 
-    /** @var Manager */
+    /**
+     * @var Manager
+     */
     private $subject;
 
     public function setUp()
@@ -162,10 +193,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->add($job);
     }
 
-    public function testCancel()
+    /**
+     * @param Status $status
+     * @dataProvider provideNonTerminatedStatus
+     */
+    public function testCancel(Status $status)
     {
         $job = new Job();
         $job->setTicket('ticket');
+        $job->setStatus($status);
 
         $terminationEvent = new TerminationEvent($job);
 
@@ -188,7 +224,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->dispatcher->expects($this->once())
+        $this->dispatcher->expects($job->getStatus() != Status::PROCESSING() ? $this->once() : $this->never())
             ->method('dispatch')
             ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
 
@@ -199,7 +235,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param Status $status
      * @dataProvider provideTerminatedStatus
      */
-    public function testCancelWithTermintedJob(Status $status)
+    public function testCancelWithTerminatedJob(Status $status)
     {
 
         $job = new Job();
@@ -225,69 +261,23 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCancelJob()
     {
-        $job = new Job();
-        $job->setTicket('ticket');
+        /**
+         * @var Manager|\PHPUnit_Framework_MockObject_MockObject $subject
+         */
+        $subject = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\Manager')
+            ->disableOriginalConstructor()
+            ->setMethods(['cancel', 'findJob'])
+            ->getMock();
 
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $subject->expects($this->once())
+            ->method('findJob')
             ->with($job->getTicket())
             ->willReturn($job);
 
-        $terminationEvent = new TerminationEvent($job);
-
-        $this->helper->expects($this->once())
-            ->method('updateJob')
-            ->with($job, Status::CANCELLED())
-            ->willReturnCallback(
-                function (JobInterface $job, Status $status) {
-                    $job->setStatus($status);
-                }
-            );
-
-        $this->jobManager->expects($this->once())
-            ->method('save')
-            ->with(
-                $this->callback(
-                    function ($arg) use ($job) {
-                        return $arg === $job && $job->getStatus() == Status::CANCELLED();
-                    }
-                )
-            );
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
-
-        $this->subject->cancelJob($job->getTicket());
-    }
-
-    /**
-     * @param Status $status
-     * @dataProvider provideTerminatedStatus
-     */
-    public function testCancelJobWithTermintedJob(Status $status)
-    {
-
-        $job = new Job();
-        $job->setStatus($status);
-        $job->setTicket('ticket');
-
-
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
-            ->with($job->getTicket())
-            ->willReturn($job);
-
-        $this->helper->expects($this->never())
-            ->method('updateJob');
-
-        $this->jobManager->expects($this->never())
-            ->method('save');
-
-        $this->dispatcher->expects($this->never())
-            ->method('dispatch');
-
-        $this->subject->cancelJob($job);
+        $subject->cancelJob($job->getTicket());
     }
 
     public function testGet()
@@ -605,6 +595,27 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
+    public function testOnMessageNotUpdatesStatusIfJobWasCancelled()
+    {
+        $job       = new Job();
+        $message   = new Message('type', 'ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($message->getTicket())
+            ->willReturn($job);
+
+        $this->invoker->expects($this->once())
+            ->method('invoke')
+            ->willReturnCallback(function (Job $job) {
+                $job->setStatus(Status::CANCELLED());
+            });
+
+        $this->expectsCallsUpdateJob($job, Status::CANCELLED());
+
+        $this->subject->onMessage($message);
+    }
+
     /**
      * @expectedException \Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException
      */
@@ -666,6 +677,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [Status::PROCESSING()],
             [Status::CANCELLED()]
+        ];
+    }
+
+    public static function provideNonTerminatedStatus()
+    {
+        return [
+            [Status::REQUESTED()],
+            [Status::SLEEPING()]
         ];
     }
 
