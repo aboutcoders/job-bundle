@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Model;
 
+use Abc\Bundle\JobBundle\Job\JobInterface as BaseJobInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 
 /**
@@ -46,5 +47,15 @@ abstract class JobManager implements JobManagerInterface
         $jobs = $this->findBy(array('ticket' => $ticket));
 
         return count($jobs) > 0 ? $jobs[0] : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isManagerOf(BaseJobInterface $job)
+    {
+        $class = $this->getClass();
+
+        return $job instanceof $class;
     }
 }

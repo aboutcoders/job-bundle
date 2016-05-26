@@ -232,12 +232,16 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## ToDo:
 
-- Finalize the REST-API
+### Stable release:
 - Add option to update a job
 - Add option to resume a canceled job
+- Finalize the REST-API
+- Improve configurability
+- Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?
+
+### Planned Features:
 - Consider providing a maintenance job to delete old jobs
 - Utilize stopwatch to detect bottle necks
-- Improve configurability
 - Provide statistics
 - Add option to set the name of the event that is notified for lifecycle events
 - Support alternative queue backends such as [qpush-bundle](https://www.google.de/webhp?q=qpushbundle) or [IronMQ](https://www.iron.io/platform/ironmq/)

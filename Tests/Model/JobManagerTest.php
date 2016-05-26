@@ -10,7 +10,10 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Model;
 
+use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
+use Abc\Bundle\JobBundle\Model\Job;
+use Abc\Bundle\JobBundle\Model\JobManager;
 use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
 
@@ -24,7 +27,7 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->subject = $this->getMockForAbstractClass('Abc\Bundle\JobBundle\Model\JobManager');
+        $this->subject = $this->getMockForAbstractClass(JobManager::class);
     }
 
     /**
@@ -37,11 +40,11 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->subject->expects($this->any())
             ->method('getClass')
-            ->willReturn('Abc\Bundle\JobBundle\Model\Job');
+            ->willReturn(Job::class);
 
         $entity = $this->subject->create($type, $parameters, $schedule);
 
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Model\Job', $entity);
+        $this->assertInstanceOf(Job::class, $entity);
         $this->assertEquals($type, $entity->getType());
         $this->assertEquals(Status::REQUESTED(), $entity->getStatus());
         $this->assertEquals(0, $entity->getProcessingTime());
@@ -61,6 +64,29 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
             ->with(array('ticket' => $ticket));
 
         $this->subject->findByTicket($ticket);
+    }
+
+    public function testIsManagerRecognizesManagedJobs() {
+
+        $this->subject->expects($this->any())
+            ->method('getClass')
+            ->willReturn(Job::class);
+        
+        $this->assertTrue($this->subject->isManagerOf(new Job()));
+    }
+
+    public function testIsManagerRejectsForeignJobs() {
+
+        $this->subject->expects($this->any())
+            ->method('getClass')
+            ->willReturn(Job::class);
+
+        /**
+         * @var JobInterface $foreignJob
+         */
+        $foreignJob = $this->getMock(JobInterface::class);
+
+        $this->assertFalse($this->subject->isManagerOf($foreignJob));
     }
 
     /**

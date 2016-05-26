@@ -179,9 +179,8 @@ class Manager implements ManagerInterface
     public function cancel(JobInterface $job)
     {
         $this->logger->debug('Cancel job with ticket {ticket}', array('ticket' => $job->getTicket()));
-
-        $class = $this->jobManager->getClass();
-        if (!$job instanceof $class) {
+        
+        if (!$this->jobManager->isManagerOf($job)) {
             $this->jobManager->findByTicket($job->getTicket());
         } else {
             /**
@@ -372,9 +371,7 @@ class Manager implements ManagerInterface
      */
     protected function castJobIfTypeIsWrong(JobInterface $job)
     {
-        $entityClass = $this->jobManager->getClass();
-
-        if (!$job instanceof $entityClass) {
+        if ($this->jobManager->isManagerOf($job)) {
             $newJob = $this->jobManager->create($job->getType(), $job->getParameters());
             foreach ($job->getSchedules() as $schedule) {
                 $newJob->addSchedule($schedule);
