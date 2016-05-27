@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -26,9 +27,11 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -241,6 +244,7 @@ class JobController extends FOSRestController
     /**
      * @param $criteria
      * @return array
+     * @throws BadRequestHttpException If invalid status value is set in $criteria
      */
     protected function filterCriteria($criteria)
     {
@@ -251,6 +255,15 @@ class JobController extends FOSRestController
         foreach ($criteria as $key => $value) {
             if ($criteria[$key] == '') {
                 unset ($criteria[$key]);
+            }
+        }
+
+        if(isset($criteria['status'])) {
+            try {
+                $criteria['status'] = $this->getSerializer()->deserialize(json_encode($criteria['status']), Status::class, 'json');
+            }
+            catch (\Exception $e) {
+                throw new BadRequestHttpException('Invalid status defined in criteria');
             }
         }
 
@@ -287,6 +300,13 @@ class JobController extends FOSRestController
     protected function getRegistry()
     {
         return $this->get('abc.job.registry');
+    }
+
+    /**
+     * @return SerializerInterface
+     */
+    protected function getSerializer() {
+        return $this->get('jms_serializer');
     }
 
     /**

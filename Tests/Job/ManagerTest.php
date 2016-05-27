@@ -13,11 +13,13 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Event\TerminationEvent;
+use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Context\ContextInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface as LoggerFactoryInterface;
+use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\LogManagerInterface;
 use Abc\Bundle\JobBundle\Job\Manager;
 use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
@@ -96,16 +98,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->registry      = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')->disableOriginalConstructor()->getMock();
-        $this->jobManager    = $this->getMock('Abc\Bundle\JobBundle\Model\JobManagerInterface');
-        $this->invoker       = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\Invoker')->disableOriginalConstructor()->getMock();
-        $this->loggerFactory = $this->getMock('Abc\Bundle\JobBundle\Job\Logger\FactoryInterface');
-        $this->logManager    = $this->getMock('Abc\Bundle\JobBundle\Job\LogManagerInterface');
-        $this->dispatcher    = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->helper        = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobHelper')->disableOriginalConstructor()->getMock();
-        $this->locker        = $this->getMock('Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface');
-        $this->logger        = $this->getMock('Psr\Log\LoggerInterface');
-        $this->queueEngine   = $this->getMock('Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface');
+        $this->registry      = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->jobManager    = $this->getMock(JobManagerInterface::class);
+        $this->invoker       = $this->getMockBuilder(Invoker::class)->disableOriginalConstructor()->getMock();
+        $this->loggerFactory = $this->getMock(FactoryInterface::class);
+        $this->logManager    = $this->getMock(LogManagerInterface::class);
+        $this->dispatcher    = $this->getMock(EventDispatcherInterface::class);
+        $this->helper        = $this->getMockBuilder(JobHelper::class)->disableOriginalConstructor()->getMock();
+        $this->locker        = $this->getMock(LockManagerInterface::class);
+        $this->logger        = $this->getMock(LoggerInterface::class);
+        $this->queueEngine   = $this->getMock(QueueEngineInterface::class);
 
         $this->jobManager->method('getClass')
             ->willReturn('Abc\Bundle\JobBundle\Model\Job');
@@ -141,6 +143,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         if (!is_null($schedule)) {
             $job->addSchedule($schedule);
         }
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
 
         $this->registry->expects($this->any())
             ->method('has')
@@ -181,6 +188,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $job = new Job();
         $job->setTicket('ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
 
         $this->registry->expects($this->any())
             ->method('has')
@@ -237,10 +249,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCancelWithTerminatedJob(Status $status)
     {
-
         $job = new Job();
         $job->setStatus($status);
         $job->setTicket('ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
 
         $this->jobManager->expects($this->once())
             ->method('refresh')
@@ -264,7 +280,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         /**
          * @var Manager|\PHPUnit_Framework_MockObject_MockObject $subject
          */
-        $subject = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\Manager')
+        $subject = $this->getMockBuilder(Manager::class)
             ->disableOriginalConstructor()
             ->setMethods(['cancel', 'findJob'])
             ->getMock();
@@ -492,7 +508,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->invoker->expects($this->once())
             ->method('invoke')
-            ->with($job, $this->isInstanceOf('Abc\Bundle\JobBundle\Job\Context\Context'))
+            ->with($job, $this->isInstanceOf(Context::class))
             ->willReturn($response);
 
         $this->helper->expects($this->once())
@@ -567,7 +583,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->invoker->expects($this->once())
             ->method('invoke')
-            ->with($job, $this->isInstanceOf('Abc\Bundle\JobBundle\Job\Context\Context'))
+            ->with($job, $this->isInstanceOf(Context::class))
             ->willThrowException($exception);
 
         $this->helper->expects($this->once())
@@ -764,5 +780,4 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
     }
-
 }

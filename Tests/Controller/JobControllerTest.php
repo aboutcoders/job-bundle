@@ -53,10 +53,11 @@ class JobControllerTest extends DatabaseWebTestCase
         $this->manager    = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
         $this->serializer = SerializerBuilder::create()->build();
 
-        // setup serializer (otherwise ->equalTo wil)
+        // setup serializer (otherwise ->equalTo will)
         if (!static::$initialized) {
             /** @var SerializerInterface $serializer */
-            $serializer = static::$kernel->getContainer()->get('jms_serializer');
+            $serializer       = static::$kernel->getContainer()->get('jms_serializer');
+            $this->serializer = $serializer;
             Job::setSerializer($this->serializer);
             static::$initialized = true;
         }
@@ -66,7 +67,7 @@ class JobControllerTest extends DatabaseWebTestCase
      * @param array $parameters
      * @param int   $expectedNumOfItems
      * @param int   $expectedTotalCount
-     * @dataProvider cgetDataProvider
+     * @dataProvider provideCgetData
      */
     public function testCgetAction($parameters = null, $expectedNumOfItems, $expectedTotalCount)
     {
@@ -97,9 +98,9 @@ class JobControllerTest extends DatabaseWebTestCase
         $client->request(
             'GET',
             $url,
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
             null,
             'json'
         );
@@ -109,10 +110,30 @@ class JobControllerTest extends DatabaseWebTestCase
         $data = $client->getResponse()->getContent();
 
         /** @var JobList $list */
-        $list = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\JobList', 'json');
+        // we need the initialized serializer here, since we have custom handlers initialized
+        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+        $list       = $serializer->deserialize($data, JobList::class, 'json');
 
         $this->assertCount($expectedNumOfItems, $list->getItems());
         $this->assertEquals($expectedTotalCount, $list->getTotalCount());
+    }
+
+    public function testCgetActionValidatesStatus()
+    {
+        $url = '/api/jobs?' . http_build_query(['criteria' => ['status' => 'foo']]);
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            $url,
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            null,
+            'json'
+        );
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 
     public function testGetAction()
@@ -123,6 +144,9 @@ class JobControllerTest extends DatabaseWebTestCase
         $job->setStatus(Status::PROCESSING());
 
         $client = static::createClient();
+
+        // get the (initialized) serializer before it is destroyed by this mockManager() call, otherwise we do not have custom handlers initialized
+        $serializer = static::$kernel->getContainer()->get('jms_serializer');
 
         $this->mockManager();
 
@@ -135,7 +159,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        $returnedJob = $this->serializer->deserialize($client->getResponse()->getContent(), 'Abc\Bundle\JobBundle\Model\Job', 'json');
+        $returnedJob = $serializer->deserialize($client->getResponse()->getContent(), 'Abc\Bundle\JobBundle\Model\Job', 'json');
 
         $this->assertEquals($job->getTicket(), $returnedJob->getTicket());
     }
@@ -230,6 +254,9 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
+        // get the (initialized) serializer before it is destroyed by this mockManager() call, otherwise we do not have custom handlers initialized
+        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+
         $this->mockManager();
 
         $this->manager->expects($this->once())
@@ -244,7 +271,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $data = $client->getResponse()->getContent();
 
         /** @var JobInterface $deserializedObject */
-        $deserializedObject = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\Job', 'json');
+        $deserializedObject = $serializer->deserialize($data, Job::class, 'json');
 
         $this->assertEquals($job->getStatus(), $deserializedObject->getStatus());
     }
@@ -306,7 +333,7 @@ class JobControllerTest extends DatabaseWebTestCase
     /**
      * @return array An array [parameters, expectedNumberOfItems, expectedTotalCount]
      */
-    public function cgetDataProvider()
+    public function provideCgetData()
     {
         return [
             [
@@ -321,6 +348,11 @@ class JobControllerTest extends DatabaseWebTestCase
             ],
             [
                 ['criteria' => ['type' => 'foo']],
+                1,
+                1
+            ],
+            [
+                ['criteria' => ['type' => 'foo', 'status' => 'REQUESTED']],
                 1,
                 1
             ],

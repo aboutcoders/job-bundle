@@ -28,7 +28,7 @@ class StatusType extends Type
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return $value == null ? null : new Status((int)$value);
+        return $value == null ? null : new Status((string)$value);
     }
 
     /**
@@ -36,7 +36,15 @@ class StatusType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        return $value->getValue();
+        if ($value instanceof Status) {
+            return $value->getValue();
+        } elseif (is_string($value)) {
+            try {
+                return call_user_func(Status::class.'::'.$value)->getValue();
+            } catch(\BadMethodCallException $e) {
+                throw new \InvalidArgumentException(sprintf('Could not convert given value to database value (value must instance of %s or a string matching the constant name)', Status::class));
+            }
+        }
     }
 
     /**
@@ -52,7 +60,12 @@ class StatusType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return $platform->getSmallIntTypeDeclarationSQL($fieldDeclaration);
+        if(!isset($fieldDeclaration['length']))
+        {
+            $fieldDeclaration['length'] = 25;
+        }
+
+        return $platform->getVarcharTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**

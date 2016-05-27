@@ -20,7 +20,8 @@
         "nelmio/api-doc-bundle": "~2",
         "doctrine/annotations": "1.*",
         "aboutcoders/scheduler-bundle": "~1.1",
-        "aboutcoders/resource-lock-bundle": "dev-master"
+        "aboutcoders/resource-lock-bundle": "dev-master",
+        "aboutcoders/enum-serializer-bundle": "~0.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~4",

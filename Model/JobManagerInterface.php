@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Model;
 
+use Abc\Bundle\JobBundle\Job\JobInterface as BaseJobInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 
 /**
@@ -99,6 +100,12 @@ interface JobManagerInterface
      * @return JobInterface[]
      */
     public function findByAgeAndTypes($days, array $tickets = array());
+    
+    /**
+     * @param BaseJobInterface $job
+     * @return boolean
+     */
+    public function isManagerOf(BaseJobInterface $job);
 
     /**
      * Returns the jobs's fully qualified class name.
