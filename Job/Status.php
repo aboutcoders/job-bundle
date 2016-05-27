@@ -26,17 +26,12 @@ use MyCLabs\Enum\Enum;
  */
 class Status extends Enum
 {
-    const REQUESTED  = 1;
-    const PROCESSING = 2;
-    const PROCESSED  = 3;
-    const CANCELLED  = 4;
-    const ERROR      = 5;
-    const SLEEPING   = 6;
-
-    /**
-     * @var array
-     */
-    private static $internal_constants = null;
+    const REQUESTED  = 'REQUESTED';
+    const PROCESSING = 'PROCESSING';
+    const PROCESSED  = 'PROCESSED';
+    const CANCELLED  = 'CANCELLED';
+    const ERROR      = 'ERROR';
+    const SLEEPING   = 'SLEEPING';
 
     /**
      * @var array
@@ -44,40 +39,10 @@ class Status extends Enum
     private static $terminated_status_values = array(self::PROCESSED, self::CANCELLED, self::ERROR);
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return array_search($this->getValue(), $this->getInternalConstants());
-    }
-
-    /**
      * @return array
      */
     public static function getTerminatedStatusValues()
     {
         return self::$terminated_status_values;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getName();
-    }
-
-    /**
-     * @return array
-     */
-    private static function getInternalConstants()
-    {
-        if(self::$internal_constants == null)
-        {
-            $reflection      = new \ReflectionClass(get_class());
-            self::$internal_constants = $reflection->getConstants();
-        }
-
-        return self::$internal_constants;
     }
 }

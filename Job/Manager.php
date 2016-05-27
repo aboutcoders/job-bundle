@@ -371,7 +371,7 @@ class Manager implements ManagerInterface
      */
     protected function castJobIfTypeIsWrong(JobInterface $job)
     {
-        if ($this->jobManager->isManagerOf($job)) {
+        if (!$this->jobManager->isManagerOf($job)) {
             $newJob = $this->jobManager->create($job->getType(), $job->getParameters());
             foreach ($job->getSchedules() as $schedule) {
                 $newJob->addSchedule($schedule);

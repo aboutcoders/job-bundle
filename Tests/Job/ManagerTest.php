@@ -144,6 +144,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $job->addSchedule($schedule);
         }
 
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
+
         $this->registry->expects($this->any())
             ->method('has')
             ->willReturn(true);
@@ -183,6 +188,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $job = new Job();
         $job->setTicket('ticket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
 
         $this->registry->expects($this->any())
             ->method('has')

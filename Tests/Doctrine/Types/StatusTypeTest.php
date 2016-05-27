@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Doctrine\Types;
 
 use Abc\Bundle\JobBundle\Doctrine\Types\StatusType;
 use Abc\Bundle\JobBundle\Job\Status;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -25,16 +26,23 @@ class StatusTypeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        if(Type::hasType(StatusType::NAME))
-        {
-            Type::overrideType(StatusType::NAME, 'Abc\Bundle\JobBundle\Doctrine\Types\StatusType');
-        }
-        else
-        {
-            Type::addType(StatusType::NAME, 'Abc\Bundle\JobBundle\Doctrine\Types\StatusType');
+        if (Type::hasType(StatusType::NAME)) {
+            Type::overrideType(StatusType::NAME, StatusType::class);
+        } else {
+            Type::addType(StatusType::NAME, StatusType::class);
         }
 
-        $this->platform = $this->getMockForAbstractClass('Doctrine\DBAL\Platforms\AbstractPlatform');
+        $this->platform = $this->getMockForAbstractClass(
+            AbstractPlatform::class,
+            [],
+            "",
+            true,
+            true,
+            true,
+            [
+                'getVarcharTypeDeclarationSQL'
+            ]
+        );
     }
 
     public function testGetName()
@@ -42,14 +50,26 @@ class StatusTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(StatusType::NAME, Type::getType(StatusType::NAME)->getName());
     }
 
-    public function testConvertToDatabaseValue()
+    /**
+     * @param mixed $value
+     * @param int   $expectedResult
+     * @throws \Doctrine\DBAL\DBALException
+     * @dataProvider provideConvertToDatabaseValues
+     */
+    public function testConvertToDatabaseValue($value, $expectedResult)
     {
-        $status = Status::PROCESSED();
-
         $this->assertEquals(
-            $status->getValue(),
-            Type::getType(StatusType::NAME)->convertToDatabaseValue($status, $this->platform)
+            $expectedResult,
+            Type::getType(StatusType::NAME)->convertToDatabaseValue($value, $this->platform)
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConvertToDatabaseValueThrowsInvalidArgumentException()
+    {
+        Type::getType(StatusType::NAME)->convertToDatabaseValue('foobar', $this->platform);
     }
 
     public function testConvertToPHPValue()
@@ -67,8 +87,10 @@ class StatusTypeTest extends \PHPUnit_Framework_TestCase
         $fieldDeclaration = array('foo');
 
         $this->platform->expects($this->once())
-            ->method('getSmallIntTypeDeclarationSQL')
-            ->with($fieldDeclaration)
+            ->method('getVarcharTypeDeclarationSQL')
+            ->with(array_merge($fieldDeclaration, [
+                'length' => 25
+            ]))
             ->willReturn('foobar');
 
         $this->assertEquals('foobar', Type::getType(StatusType::NAME)->getSQLDeclaration($fieldDeclaration, $this->platform));
@@ -78,5 +100,23 @@ class StatusTypeTest extends \PHPUnit_Framework_TestCase
     public function testRequiresSQLCommentHint()
     {
         $this->assertTrue(Type::getType(StatusType::NAME)->requiresSQLCommentHint($this->platform));
+    }
+
+    public static function provideConvertToDatabaseValues()
+    {
+        return [
+            [Status::REQUESTED(), Status::REQUESTED()->getValue()],
+            [Status::PROCESSING(), Status::PROCESSING()->getValue()],
+            [Status::PROCESSED(), Status::PROCESSED()->getValue()],
+            [Status::ERROR(), Status::ERROR()->getValue()],
+            [Status::CANCELLED(), Status::CANCELLED()->getValue()],
+            [Status::SLEEPING(), Status::SLEEPING()->getValue()],
+            ['REQUESTED', Status::REQUESTED()->getValue()],
+            ['PROCESSING', Status::PROCESSING()->getValue()],
+            ['PROCESSED', Status::PROCESSED()->getValue()],
+            ['ERROR', Status::ERROR()->getValue()],
+            ['CANCELLED', Status::CANCELLED()->getValue()],
+            ['SLEEPING', Status::SLEEPING()->getValue()]
+        ];
     }
 }

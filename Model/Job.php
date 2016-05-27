@@ -36,7 +36,7 @@ class Job implements JobInterface
 
     /**
      * @var Status
-     * @Type("string")
+     * @Type("Abc\Bundle\JobBundle\Job\Status")
      */
     protected $status;
 

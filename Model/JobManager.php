@@ -56,6 +56,6 @@ abstract class JobManager implements JobManagerInterface
     {
         $class = $this->getClass();
 
-        return $job instanceof $class;
+        return ($job instanceof $class);
     }
 }

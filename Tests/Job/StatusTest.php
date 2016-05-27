@@ -17,18 +17,6 @@ use Abc\Bundle\JobBundle\Job\Status;
  */
 class StatusTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testGetName()
-    {
-        $this->assertEquals('CANCELLED', Status::CANCELLED()->getName());
-    }
-
-    public function test__toString()
-    {
-        $this->assertEquals('CANCELLED',  (string) Status::CANCELLED());
-    }
-
-
     public function testUnterminatedStatusValues()
     {
         $unterminatedValues = Status::getTerminatedStatusValues();

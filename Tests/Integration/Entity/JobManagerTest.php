@@ -16,8 +16,6 @@ use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Entity\JobManager;
 use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
 use JMS\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Constraints\Uuid;
-use Symfony\Component\Validator\Constraints\UuidValidator;
 use Symfony\Component\Validator\ExecutionContext;
 
 /**
@@ -176,8 +174,8 @@ class JobManagerTest extends DatabaseTestCase
             [['type' => 'foo'], 1],
             [['type' => ['foo', 'bar']], 2],
             [['type' => 'undefined'], 0],
-            [['type' => 'foo', 'status' => 1], 1],
-            [['type' => 'foo', 'status' => 2], 0],
+            [['type' => 'foo', 'status' => 'REQUESTED'], 1],
+            [['type' => 'foo', 'status' => 'PROCESSING'], 0],
             [['type' => ['$match' => 'foo']], 2],
         ];
     }

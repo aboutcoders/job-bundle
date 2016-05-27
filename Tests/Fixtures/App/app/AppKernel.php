@@ -41,8 +41,9 @@ class AppKernel extends Kernel
             new YZ\SupervisorBundle\YZSupervisorBundle(),
             new Abc\Bundle\ProcessControlBundle\AbcProcessControlBundle(),
             new Abc\Bundle\SchedulerBundle\AbcSchedulerBundle(),
-            new Abc\Bundle\JobBundle\AbcJobBundle(),
-            new Abc\Bundle\ResourceLockBundle\AbcResourceLockBundle()
+            new Abc\Bundle\ResourceLockBundle\AbcResourceLockBundle(),
+            new Abc\Bundle\EnumSerializerBundle\AbcEnumSerializerBundle(),
+            new Abc\Bundle\JobBundle\AbcJobBundle()
         );
     }
 
