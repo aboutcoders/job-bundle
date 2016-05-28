@@ -66,7 +66,7 @@ __Configure doctrine orm__
 At the current point only doctrine is supported as ORM. However by changing the configuration you can use a different persistence layer.
 
 ```yaml
-abc_job:FiceMen00
+abc_job:
 
   db_driver: orm
 ```
@@ -94,6 +94,13 @@ abc-rest-job:
     type: rest
     resource: "@AbcJobBundle/Resources/config/routing/rest-job.yml"
     prefix: /api
+```
+
+__Disable registration of the process controller in all environments but the the one where you run the queue agents with__
+
+```yaml
+abc_process_control:
+    register_controller: false
 ```
 
 __Update the database schema__
@@ -234,6 +241,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 ### Stable release:
+- Explain in installation instructions that it is necessary to define a custom environment for the queue agents
 - Add option to update a job
 - Add option to resume a canceled job
 - Finalize the REST-API
