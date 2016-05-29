@@ -96,13 +96,6 @@ abc-rest-job:
     prefix: /api
 ```
 
-__Disable registration of the process controller in all environments but the the one where you run the queue agents with__
-
-```yaml
-abc_process_control:
-    register_controller: false
-```
-
 __Update the database schema__
 
 Finally you need to update your database schema in order to create the required tables.
