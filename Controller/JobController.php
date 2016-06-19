@@ -43,47 +43,18 @@ class JobController extends FOSRestController
 
     /**
      * @param ParamFetcherInterface $paramFetcher
-     * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
-     * @QueryParam(name="limit", requirements="\d+", default="10", description="Page size.")
-     * @QueryParam(name="sortCol", default="createdAt", description="Sort columns, valid values are (ticket|type|status|createdAt|terminatedAt)")
-     * @QueryParam(name="sortDir", default="DESC", description="Sort direction, valid values are (ASC|DESC)")
-     * @QueryParam(name="criteria", description="Search criteria, valid values are (ticket|type|status|createdAt|terminatedAt)")
+     * @QueryParam(name="page", requirements="\d+", default="1", description="Page number of the result set")
+     * @QueryParam(name="limit", requirements="\d+", default="10", description="Page size")
+     * @QueryParam(name="sortCol", default="createdAt", description="Sort columns, valid values are [ticket|type|status|createdAt|terminatedAt]")
+     * @QueryParam(name="sortDir", default="DESC", description="Sort direction, valid values are [ASC|DESC]")
+     * @QueryParam(name="criteria", description="Search criteria defined as array, valid array keys are [ticket|type|status|createdAt|terminatedAt]")
      * @return array
      *
      * @ApiDoc(
-     *  description="Returns a collection of Jobs",
+     *  description="Returns a collection of jobs",
      *  section="AbcJobBundle",
      *  requirements={},
-     *  filters={
-     *      {
-     *          "name"="page",
-     *          "dataType"="integer",
-     *          "requirement"="\d+",
-     *          "description"="Page of results"
-     *      },
-     *      {
-     *          "name"="limit",
-     *          "dataType"="integer",
-     *          "requirement"="\d+",
-     *          "description"="Page size"
-     *      },
-     *      {
-     *          "name"="sortCol",
-     *          "dataType"="string",
-     *          "description"="Sort columns, possible values are (ticket|type|status|createdAt|terminatedAt)"
-     *      },
-     *      {
-     *          "name"="sortDir",
-     *          "dataType"="string",
-     *          "description"="Sort direction, possible values are (ASC|DESC)"
-     *      },
-     *      {
-     *          "name"="criteria",
-     *          "dataType"="array",
-     *          "description"="Searching criteria defined as array, possible search fields are (ticket|type|status|createdAt|terminatedAt)"
-     *      }
-     *  },
-     * output="array<Abc\Bundle\JobBundle\Model\JobList>",
+     *  output="array<Abc\Bundle\JobBundle\Model\JobList>",
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     400 = "Returned when request is invalid",
@@ -145,9 +116,10 @@ class JobController extends FOSRestController
 
 
     /**
-     * Create an entity
+     * Adds a job
      *
      * @ApiDoc(
+     *   description="Adds a new job",
      *   section="AbcJobBundle",
      *   statusCodes = {
      *     200 = "Returned when successful",
