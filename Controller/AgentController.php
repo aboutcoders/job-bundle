@@ -113,7 +113,7 @@ class AgentController extends FOSRestController
     /**
      * @param int $id
      * @param boolean $wait Whether to wait until agent is stopped (optional, true by default)
-     * @return void
+     * @return AgentInterface
      *
      * @Post
      *
