@@ -179,7 +179,7 @@ class Manager implements ManagerInterface
     public function cancel(JobInterface $job)
     {
         $this->logger->debug('Cancel job with ticket {ticket}', array('ticket' => $job->getTicket()));
-        
+
         if (!$this->jobManager->isManagerOf($job)) {
             $this->jobManager->findByTicket($job->getTicket());
         } else {
@@ -249,7 +249,7 @@ class Manager implements ManagerInterface
     {
         $job = $this->findJob($message->getTicket());
 
-        if ($job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::PROCESSING()) {
+        if ($job->getStatus() == Status::PROCESSING() || $job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::ERROR()) {
 
             $this->logger->debug('Skipped execution of job {ticket} because status is {status}', [
                 'ticket' => $job->getType(),
@@ -318,6 +318,30 @@ class Manager implements ManagerInterface
         if (in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues())) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(JobInterface $job)
+    {
+        // TODO: Implement update() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resume(JobInterface $job)
+    {
+        // TODO: Implement resume() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resumeJob($ticket)
+    {
+        // TODO: Implement resumeJob() method.
     }
 
     /**
@@ -413,7 +437,7 @@ class Manager implements ManagerInterface
      * @param JobInterface $job
      * @return bool
      */
-    protected function releaseLock($job)
+    private function releaseLock($job)
     {
         $result = $this->locker->release($this->getLockName($job));
         $this->logger->info('Job {job} lock released', ['job' => $job]);

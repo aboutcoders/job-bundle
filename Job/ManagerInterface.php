@@ -109,4 +109,34 @@ interface ManagerInterface
      * @throws \RuntimeException
      */
     public function onMessage(Message $message);
+
+    /**
+     * Updates a job.
+     *
+     * @param JobInterface $job
+     * @return JobInterface|null The updated job
+     * @throws TicketNotFoundException
+     * @throws \RuntimeException
+     */
+    public function update(JobInterface $job);
+
+    /**
+     * Resumes a cancelled job.
+     *
+     * @param JobInterface $job
+     * @return JobInterface|null The updated job
+     * @throws TicketNotFoundException
+     * @throws \RuntimeException
+     */
+    public function resume(JobInterface $job);
+
+    /**
+     * Resumes a cancelled job.
+     *
+     * @param string $ticket
+     * @return JobInterface|null The updated job
+     * @throws TicketNotFoundException
+     * @throws \RuntimeException
+     */
+    public function resumeJob($ticket);
 }

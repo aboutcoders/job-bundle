@@ -54,11 +54,6 @@ doctrine:
 swiftmailer:
     disable_delivery: true
 
-sensio_framework_extra:
-    request: { converters: true }
-    view:
-        annotations: false
-
 fos_rest:
     param_fetcher_listener: true
     body_converter:
