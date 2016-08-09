@@ -48,13 +48,13 @@ class JobController extends FOSRestController
      * @QueryParam(name="sortCol", default="createdAt", description="Sort columns, valid values are [ticket|type|status|createdAt|terminatedAt]")
      * @QueryParam(name="sortDir", default="DESC", description="Sort direction, valid values are [ASC|DESC]")
      * @QueryParam(name="criteria", description="Search criteria defined as array, valid array keys are [ticket|type|status|createdAt|terminatedAt]")
-     * @return array
+     * @return JobList
      *
      * @ApiDoc(
      *  description="Returns a collection of jobs",
      *  section="AbcJobBundle",
      *  requirements={},
-     *  output="array<Abc\Bundle\JobBundle\Model\JobList>",
+     *  output="Abc\Bundle\JobBundle\Model\JobList",
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     400 = "Returned when request is invalid",

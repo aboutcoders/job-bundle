@@ -85,6 +85,9 @@ class JobType extends AbstractType
                             ]
                         );
                     }
+                    else {
+                        $form->add('parameters', $this->methodBlockPrefixExists() ? TextType::class : 'text');
+                    }
                 }
             }
         );

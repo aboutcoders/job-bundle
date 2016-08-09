@@ -76,8 +76,7 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
 
         $this->job->setParameters(array($maxIterations, $iterations));
 
-        if($iterations >= $maxIterations)
-        {
+        if ($iterations >= $maxIterations) {
             $this->job->removeSchedules();
 
             $logger->info('removed schedule');
@@ -163,7 +162,7 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
     {
         $doExit = $this->controller->doExit();
 
-        if(is_bool($doExit)) {
+        if (is_bool($doExit)) {
             return 'can invoke controller';
         }
 
@@ -194,5 +193,18 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
         $logger->warning($message);
         $logger->alert($message);
         $logger->critical($message);
+    }
+
+    /**
+     * Logs the info message 'invoked parameterless'.
+     *
+     * @JobParameters({"string", "@logger"})
+     *
+     * @param LoggerInterface $logger
+     * @return void
+     */
+    public function parameterless(LoggerInterface $logger)
+    {
+        $logger->debug('invoked parameterless');
     }
 }

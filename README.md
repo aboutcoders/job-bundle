@@ -242,6 +242,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?
 
 ### Planned Features:
+- Add option to configure job as public or not, public jobs a are returned over an API method
 - Consider providing a maintenance job to delete old jobs
 - Utilize stopwatch to detect bottle necks
 - Provide statistics

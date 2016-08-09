@@ -11,7 +11,6 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration;
 
 use Abc\Bundle\JobBundle\Event\JobEvents;
-
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvents;

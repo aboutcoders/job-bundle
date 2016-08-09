@@ -50,7 +50,7 @@ class JobControllerTest extends DatabaseWebTestCase
     {
         parent::setUp();
 
-        $this->manager    = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
+        $this->manager    = $this->getMock(ManagerInterface::class);
         $this->serializer = SerializerBuilder::create()->build();
 
         // setup serializer (otherwise ->equalTo will)
@@ -159,7 +159,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        $returnedJob = $serializer->deserialize($client->getResponse()->getContent(), 'Abc\Bundle\JobBundle\Model\Job', 'json');
+        $returnedJob = $serializer->deserialize($client->getResponse()->getContent(), \Abc\Bundle\JobBundle\Model\Job::class, 'json');
 
         $this->assertEquals($job->getTicket(), $returnedJob->getTicket());
     }
@@ -320,6 +320,19 @@ class JobControllerTest extends DatabaseWebTestCase
                     ]
                 ],
                 400
+            ],
+            [
+                [
+                    'type'       => 'parameterless'
+                ],
+                200
+            ],
+            [
+                [
+                    'type'       => 'parameterless',
+                    'parameters' => null
+                ],
+                200
             ],
             [
                 [

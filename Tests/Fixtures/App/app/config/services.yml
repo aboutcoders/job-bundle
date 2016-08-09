@@ -19,6 +19,7 @@ services:
             - { name: abc.job, type: update_schedule, method: updateSchedule }
             - { name: abc.job, type: manage_job, method: manageJob }
             - { name: abc.job, type: invoke_controller, method: invokeController }
+            - { name: abc.job, type: parameterless, method: invokeController }
 
     abc.job.log.processor:
         class: Monolog\Processor\PsrLogMessageProcessor
