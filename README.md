@@ -240,6 +240,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - Finalize the REST-API
 - Improve configurability
 - Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?
+- Introduce status cancelling and make sure, job status is only cancelled when no process is still processing the job
 
 ### Planned Features:
 - Add option to configure job as public or not, public jobs a are returned over an API method

@@ -17,10 +17,13 @@ use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Model\Job;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\LoggerAwareJob;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestControllerAwareCallable;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestManagerAwareCallable;
+use Abc\ProcessControl\ControllerInterface;
 use Metadata\MetadataFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -122,13 +125,13 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
 
     public function testInvokeHandlesControllerAwareJobs()
     {
-        $serviceId = 'serviceId';
-        $type      = 'callable-type';
-        $callable  = new TestControllerAwareCallable();
-        $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
-        $controller = $this->getMock('Abc\ProcessControl\ControllerInterface');
+        $serviceId  = 'serviceId';
+        $type       = 'callable-type';
+        $callable   = new TestControllerAwareCallable();
+        $jobType    = new JobType($serviceId, $type, array($callable, 'execute'));
+        $controller = $this->getMock(ControllerInterface::class);
 
-        $job       = new Job($type);
+        $job = new Job($type);
 
         $this->registry->register($jobType);
 
@@ -142,18 +145,64 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $withLogger
+     * @dataProvider provideTrueFalse
+     */
+    public function testInvokeHandlesLoggerAwareJobs($withLogger)
+    {
+        $serviceId = 'serviceId';
+        $type      = 'callable-type';
+        $callable  = new LoggerAwareJob();
+        $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
+        $logger    = $this->getMock(LoggerInterface::class);
+        $context   = new Context($withLogger ? ['logger' => $logger] : []);
+
+        $job = new Job($type);
+
+        $this->registry->register($jobType);
+
+        $this->assertEquals('foobar', $this->subject->invoke($job, $context));
+        if($withLogger) {
+            $this->assertSame($logger, $callable->getLogger());
+        }
+        else {
+            $this->assertNull($callable->getLogger());
+        }
+    }
+
+
+    /**
      * @return array
      */
     public static function provideInvokeData()
     {
         return [
             //[$callable, $expectedResponse, $parameters, $parameterTypes, $contextParameters],
-            [function () { return 'foobar';}, 'foobar'],
-            [function ($argument) { return $argument; }, 'foobar', ['foobar'], ['string']],
-            [function ($contextParameter) { return $contextParameter; }, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
-            [function ($parameter, $contextParameter) { return $parameter . $contextParameter; }, 'foobar', ['foo'], ['string', '@contextParameter'], ['contextParameter' => 'bar']],
-            [function ($parameter, $contextParameter) { return [$parameter, $contextParameter]; }, ['foo', null], ['foo'], ['string', '@contextParameter'], []],
-            [function ($parameter1, $contextParameter2, $parameter3) { return [$parameter1, $contextParameter2, $parameter3]; }, ['foo', null, 'bar'], ['foo', 'bar'], ['string', '@contextParameter', 'string'], []],
+            [function () {
+                return 'foobar';
+            }, 'foobar'],
+            [function ($argument) {
+                return $argument;
+            }, 'foobar', ['foobar'], ['string']],
+            [function ($contextParameter) {
+                return $contextParameter;
+            }, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
+            [function ($parameter, $contextParameter) {
+                return $parameter . $contextParameter;
+            }, 'foobar', ['foo'], ['string', '@contextParameter'], ['contextParameter' => 'bar']],
+            [function ($parameter, $contextParameter) {
+                return [$parameter, $contextParameter];
+            }, ['foo', null], ['foo'], ['string', '@contextParameter'], []],
+            [function ($parameter1, $contextParameter2, $parameter3) {
+                return [$parameter1, $contextParameter2, $parameter3];
+            }, ['foo', null, 'bar'], ['foo', 'bar'], ['string', '@contextParameter', 'string'], []],
+        ];
+    }
+
+    public static function provideTrueFalse(){
+        return [
+            [true],
+            [false]
         ];
     }
 }

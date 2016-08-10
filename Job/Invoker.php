@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Job;
 use Abc\Bundle\JobBundle\Job\Context\ContextInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\ProcessControl\ControllerAwareInterface;
+use Psr\Log\LoggerAwareInterface;
 
 /**
  * Invokes the callable registered for a certain job type
@@ -93,10 +94,14 @@ class Invoker
             {
                 $callable->setManager($this->manager);
             }
-            
+
             if($callable instanceof ControllerAwareInterface)
             {
                 $callable->setController($this->controllerFactory->create($job));
+            }
+
+            if($callable instanceof LoggerAwareInterface && $context->has('logger')) {
+                $callable->setLogger($context->get('logger'));
             }
         }
 

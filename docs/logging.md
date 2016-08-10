@@ -3,7 +3,11 @@ Logging
 
 During the execution of a job each job has access to it's own standard PSR logger.
 
-To access the logger of a job you simply have to specify the `@logger` in the `@JobParameters` annotation of your method and the logger will be injected.
+There are two ways to access the logger. First option is to inject the logger directly into the job method using runtime parameters. Second option is to make the job class implement the _Psr\Log\LoggerAwareInterface_. Which one you choose is up what you prefer.
+
+## Injecting the logger as a runtime parameter
+
+To inject the logger as a runtime parameter you simply have to specify the `@logger` in the `@JobParameters` annotation of your method and add the logger to the method signature:
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -16,6 +20,38 @@ class MyJob
     public function doSomething(Psr\Log\LoggerInterface $logger)
     {
         $logger->info('Hello World');
+    }
+}
+```
+
+## Injecting the logger using the LoggerAwareInterface
+
+To inject the logger using the LoggerInterface your job class must implement the interface _Psr\Log\LoggerAwareInterface_:
+
+```php
+namespace My\Bundle\ExampleBundle\Job\MyJob;
+
+use Psr\Log\LoggerAwareInterface;
+
+class MyJob implements LoggerAwareInterface
+{
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function doSomething()
+    {
+        $this->logger->info('Hello World');
     }
 }
 ```
