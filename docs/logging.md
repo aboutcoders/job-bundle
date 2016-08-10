@@ -32,6 +32,7 @@ To inject the logger using the LoggerInterface your job class must implement the
 namespace My\Bundle\ExampleBundle\Job\MyJob;
 
 use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 class MyJob implements LoggerAwareInterface
 {
