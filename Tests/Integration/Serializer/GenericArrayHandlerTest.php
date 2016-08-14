@@ -19,7 +19,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 class GenericArrayHandlerTest extends KernelTestCase
 {
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     private $serializer;
 
     /**

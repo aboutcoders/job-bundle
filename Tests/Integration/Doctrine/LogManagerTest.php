@@ -12,12 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Doctrine;
 
 use Abc\Bundle\JobBundle\Doctrine\LogManager;
 use Abc\Bundle\JobBundle\Entity\Log;
-use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LogManagerTest extends DatabaseTestCase
+class LogManagerTest extends DatabaseKernelTestCase
 {
     /** @var LogManager */
     private $subject;
@@ -37,7 +37,7 @@ class LogManagerTest extends DatabaseTestCase
 
     public function testIsExpectedInstance()
     {
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Doctrine\LogManager', $this->subject);
+        $this->assertInstanceOf(LogManager::class, $this->subject);
     }
 
     public function testCRUD()

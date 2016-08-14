@@ -21,7 +21,9 @@ use JMS\Serializer\SerializerInterface;
  */
 class ExceptionResponseTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     private $serializer;
 
     public function setUp()
@@ -53,7 +55,7 @@ class ExceptionResponseTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->serializer->serialize($subject, 'json');
 
-        $object = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Job\ExceptionResponse', 'json');
+        $object = $this->serializer->deserialize($data, ExceptionResponse::class, 'json');
 
         $this->assertEquals($subject, $object);
     }

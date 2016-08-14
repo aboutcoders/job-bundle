@@ -15,7 +15,9 @@ namespace Abc\Bundle\JobBundle\Tests;
  */
 class MockFactory
 {
-    /** @var \PHPUnit_Framework_MockObject_Generator */
+    /**
+     * @var \PHPUnit_Framework_MockObject_Generator
+     */
     protected static $mockGenerator;
 
     public static function getMockGenerator()

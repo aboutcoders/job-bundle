@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 
 use Abc\Bundle\JobBundle\Form\Type\SecondsType;
+use Symfony\Component\Form\AbstractType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -30,7 +31,7 @@ class SecondsTypeTest extends TypeTestCase
      */
     public function getFormType()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds';
+        return method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds';
     }
 
     /**

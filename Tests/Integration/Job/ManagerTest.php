@@ -10,17 +10,18 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Integration\Job;
 
+use Abc\Bundle\JobBundle\Job\ExceptionResponse;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\ScheduleManagerInterface;
-use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ManagerTest extends DatabaseTestCase
+class ManagerTest extends DatabaseKernelTestCase
 {
     public function testJobsCanLog()
     {
@@ -36,7 +37,7 @@ class ManagerTest extends DatabaseTestCase
         $job = $this->getJobManager()->addJob('throw_exception', array('message', 100));
 
         $this->assertEquals(Status::ERROR(), $job->getStatus());
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Job\ExceptionResponse', $job->getResponse());
+        $this->assertInstanceOf(ExceptionResponse::class, $job->getResponse());
         $this->assertEquals('message', $job->getResponse()->getMessage());
         $this->assertEquals(100, $job->getResponse()->getCode());
     }
@@ -160,6 +161,22 @@ class ManagerTest extends DatabaseTestCase
         $job = $this->getJobManager()->addJob('invoke_controller');
 
         $this->assertContains('can invoke controller', $job->getResponse());
+    }
+
+    /**
+     * @expectedException \Sonata\NotificationBundle\Exception\HandlingException
+     */
+    public function testRecoversFromDbalException() {
+        $job = $this->getJobManager()->addJob('throw_dbal_exception');
+
+        $this->markTestIncomplete('Handle DBALExceptions');
+
+        /**
+         * TODO Find a solution for the case where a DBALException leads to that job manager cannot terminate
+         * a job in a controlled way due to the fact that entity manager was closed
+         */
+
+        // $this->assertEquals(Status::ERROR(), $job->getStatus());
     }
 
     /**

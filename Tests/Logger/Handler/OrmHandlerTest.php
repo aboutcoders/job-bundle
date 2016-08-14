@@ -34,16 +34,16 @@ class OrmHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager = $this->getMock('Abc\Bundle\JobBundle\Model\LogManagerInterface');
+        $this->manager = $this->getMock(LogManagerInterface::class);
 
         /** @var FormatterInterface|\PHPUnit_Framework_MockObject_MockObject $formatter */
-        $formatter = $this->getMock('Monolog\Formatter\FormatterInterface');
+        $formatter = $this->getMock(FormatterInterface::class);
 
         $formatter->expects($this->any())
             ->method('format')
             ->willReturn(['FormatedString']);
 
-        $this->subject = $this->getMockBuilder('Abc\Bundle\JobBundle\Logger\Handler\OrmHandler')
+        $this->subject = $this->getMockBuilder(OrmHandler::class)
             ->setMethods(['isHandling', 'getFormatter', 'processRecord'])
             ->setConstructorArgs([$this->manager])->getMock();
 

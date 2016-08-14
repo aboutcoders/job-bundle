@@ -14,6 +14,8 @@ use Abc\Bundle\JobBundle\Entity\Log;
 use Abc\Bundle\JobBundle\Entity\LogManager;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\LogInterface;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -35,17 +37,17 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $class         = 'Abc\Bundle\JobBundle\Entity\Log';
-        $classMetaData = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $class         = Log::class;
+        $classMetaData = $this->getMock(ClassMetadata::class);
 
         $classMetaData->expects($this->any())
             ->method('getName')
             ->willReturn($class);
 
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->getMock(ObjectRepository::class);
 
         /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
@@ -57,7 +59,7 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = $entityManager;
 
-        $this->subject = $this->getMockBuilder('Abc\Bundle\JobBundle\Entity\LogManager')
+        $this->subject = $this->getMockBuilder(LogManager::class)
             ->setMethods(['findBy', 'deleteLogs', 'formatLogs'])
             ->setConstructorArgs([$entityManager, $class])
             ->getMock();

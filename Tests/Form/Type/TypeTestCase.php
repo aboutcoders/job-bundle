@@ -18,10 +18,14 @@ use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Entity\Job;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -67,12 +71,12 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')
+        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         /** @var SerializerInterface $serializer */
-        $serializer = $this->getMock('JMS\Serializer\SerializerInterface');
+        $serializer = $this->getMock(SerializerInterface::class);
 
         Job::setSerializer($serializer);
         Job::setRegistry($this->registry);
@@ -159,11 +163,11 @@ abstract class TypeTestCase extends BaseTypeTestCase
             ];
         }
 
-        $validator       = $this->getMock('\Symfony\Component\Validator\Validator\ValidatorInterface');
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $validator       = $this->getMock(ValidatorInterface::class);
+        $metadataFactory = $this->getMock(MetadataFactoryInterface::class);
         $validator->expects($this->any())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
         $validator->expects($this->any())->method('validate')->will($this->returnValue(new ConstraintViolationList()));
-        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $metadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
         $metadataFactory->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
         $validator->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
 
@@ -175,6 +179,6 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     private function methodBlockPrefixExists()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
+        return method_exists(AbstractType::class, 'getBlockPrefix');
     }
 }

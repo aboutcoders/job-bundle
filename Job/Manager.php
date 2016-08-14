@@ -23,6 +23,7 @@ use Abc\Bundle\JobBundle\Sonata\QueueEngine;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
+use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -158,12 +159,12 @@ class Manager implements ManagerInterface
 
         $this->logger->debug(
             'Added job with ticket {ticket} of type {type} with parameters {parameters}, schedules {schedules}',
-            array(
+            [
                 'ticket'     => $job->getTicket(),
                 'type'       => $job->getType(),
                 'parameters' => $job->getParameters(),
                 'schedules'  => $job->getSchedules()
-            )
+            ]
         );
 
         if (!$job->hasSchedules()) {
@@ -178,7 +179,7 @@ class Manager implements ManagerInterface
      */
     public function cancel(JobInterface $job)
     {
-        $this->logger->debug('Cancel job with ticket {ticket}', array('ticket' => $job->getTicket()));
+        $this->logger->debug('Cancel job with ticket {ticket}', ['ticket' => $job->getTicket()]);
 
         if (!$this->jobManager->isManagerOf($job)) {
             $this->jobManager->findByTicket($job->getTicket());
@@ -219,7 +220,7 @@ class Manager implements ManagerInterface
      */
     public function get($ticket)
     {
-        $this->logger->debug('Get job with ticket {ticket}', array('ticket' => $ticket));
+        $this->logger->debug('Get job with ticket {ticket}', ['ticket' => $ticket]);
 
         return $this->findJob($ticket);
     }
@@ -229,7 +230,7 @@ class Manager implements ManagerInterface
      */
     public function getLogs(JobInterface $job)
     {
-        $this->logger->debug('Get logs for ticket {ticket}', array('ticket' => $job->getTicket()));
+        $this->logger->debug('Get logs for ticket {ticket}', ['ticket' => $job->getTicket()]);
 
         return $this->logManager->findByJob($job);
     }
@@ -261,7 +262,7 @@ class Manager implements ManagerInterface
             //check if job is not running
             $this->locker->lock($this->getLockName($job));
         } catch (LockException $e) {
-            $this->logger->warning('Job {job} is already running: {exception}', array('job' => $job, 'exception' => $e));
+            $this->logger->warning('Job {job} is already running: {exception}', ['job' => $job, 'exception' => $e]);
 
             return;
         }
@@ -297,11 +298,18 @@ class Manager implements ManagerInterface
             }
 
             $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
+        } catch (DBALException $e) {
+            $this->logger->critical('Job with ticket {ticket} could not be terminated due to exception {exception}', [
+                'ticket'    => $job->getTicket(),
+                'exception' => $e
+            ]);
+
+            throw $e;
         } catch (\Exception $e) {
-            $this->logger->warning('Job execution {job} failed with the exception {exception}', array('job' => $job, 'exception' => $e));
+            $this->logger->warning('Job execution {job} failed with the exception {exception}', ['job' => $job, 'exception' => $e]);
 
             if ($event->getContext()->has('logger')) {
-                $event->getContext()->get('logger')->error($e->getMessage(), array('exception' => $e));
+                $event->getContext()->get('logger')->error($e->getMessage(), ['exception' => $e]);
             }
 
             $response = new ExceptionResponse($e->getMessage(), $e->getCode());

@@ -15,8 +15,9 @@ use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Logger\Factory\StreamFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Metadata\MetadataFactoryInterface;
+use Monolog\Formatter\FormatterInterface;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -30,10 +31,14 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $metadataFactory;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $directory;
 
-    /** @var JobTypeRegistry */
+    /**
+     * @var JobTypeRegistry
+     */
     private $registry;
 
     /**
@@ -41,17 +46,19 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $logger;
 
-    /** @var StreamFactory */
+    /**
+     * @var StreamFactory
+     */
     private $subject;
 
 
     public function setUp()
     {
         $this->directory = dirname(__FILE__) .'/../../../build/tests';
-        $this->metadataFactory = $this->getMock('Metadata\MetadataFactoryInterface');
+        $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);
 
         $this->registry = new JobTypeRegistry($this->metadataFactory);
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->getMock(LoggerInterface::class);
 
         $this->setUpTestDir($this->directory);
 
@@ -85,7 +92,7 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
         /** @var \Monolog\Handler\StreamHandler $handler */
         $handler = $handlers[0];
 
-        $this->assertInstanceOf('Monolog\Handler\StreamHandler', $handler);
+        $this->assertInstanceOf(StreamHandler::class, $handler);
         $this->assertEquals(Logger::DEBUG, $handler->getLevel());
 
         $logger->info('foobar');
@@ -96,7 +103,7 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateWithFormatterAndProcessor()
     {
         /** @var FormatterInterface|\PHPUnit_Framework_MockObject_MockObject $formatter */
-        $formatter = $this->getMock('Monolog\Formatter\FormatterInterface');
+        $formatter = $this->getMock(FormatterInterface::class);
         $processor = function() {};
 
         $this->registry->register(new JobType('service-id', 'job-type', function(){}, Logger::DEBUG));

@@ -20,7 +20,9 @@ use JMS\Serializer\SerializerInterface;
  */
 class JobTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     private $serializer;
 
     public function setUp()
@@ -31,7 +33,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testAllPropertiesExcluded()
     {
         /** @var JobTypeRegistry $registry */
-        $registry = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')->disableOriginalConstructor()->getMock();
+        $registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
 
         Job::setSerializer($this->serializer);
         Job::setRegistry($registry);

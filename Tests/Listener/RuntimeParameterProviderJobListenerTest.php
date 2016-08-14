@@ -39,8 +39,8 @@ class RuntimeParameterProviderJobListenerTest extends \PHPUnit_Framework_TestCas
 
     public function setUp()
     {
-        $this->manager = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
-        $this->factory = $this->getMock('Abc\Bundle\JobBundle\Job\Logger\FactoryInterface');
+        $this->manager = $this->getMock(ManagerInterface::class);
+        $this->factory = $this->getMock(FactoryInterface::class);
         $this->subject = new RuntimeParameterProviderJobListener($this->manager, $this->factory);
     }
 

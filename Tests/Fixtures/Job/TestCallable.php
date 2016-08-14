@@ -14,14 +14,21 @@ use Abc\Bundle\JobBundle\Job\JobAwareInterface;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Tests\Fixtures\App\Bundle\TestBundle\Entity\Entity;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Annotation\JobParameters;
 use Abc\Bundle\JobBundle\Annotation\JobResponse;
 use Abc\ProcessControl\ControllerAwareInterface;
 use Abc\ProcessControl\ControllerInterface;
+use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TestCallable implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface
+class TestCallable implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface, ContainerAwareInterface
 {
     /**
      * @var JobInterface
@@ -32,6 +39,11 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
      * @var ManagerInterface
      */
     private $manager;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
     /**
      * @var ControllerInterface
@@ -61,6 +73,15 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
     {
         $this->controller = $controller;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
 
     /**
      * @param                 $maxIterations
@@ -206,5 +227,23 @@ class TestCallable implements JobAwareInterface, ManagerAwareInterface, Controll
     public function parameterless(LoggerInterface $logger)
     {
         $logger->debug('invoked parameterless');
+    }
+
+    public function throwDbalException()
+    {
+        /**
+         * @var EntityManager $manager
+         */
+        $manager = $this->container->get('doctrine')->getManager();
+
+        $entity = new Entity();
+        $entity->setName('foobar');
+
+        $manager->persist($entity);
+
+        $entity = new Entity();
+        $entity->setName('foobar');
+
+        $manager->persist($entity);
     }
 }

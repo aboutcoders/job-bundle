@@ -11,15 +11,15 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration\Entity;
 
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
-use Abc\Bundle\JobBundle\Entity\Schedule;
+use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ScheduleManagerTest extends DatabaseTestCase
+class ScheduleManagerTest extends DatabaseKernelTestCase
 {
     /** @var ScheduleManager */
     private $subject;
@@ -31,7 +31,7 @@ class ScheduleManagerTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $this->subject = new ScheduleManager($this->getEntityManager(), 'Abc\Bundle\JobBundle\Entity\Job');
+        $this->subject = new ScheduleManager($this->getEntityManager(), Job::class);
     }
 
     public function testFindSchedules()

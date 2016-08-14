@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Sonata\QueueEngine;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
+use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -23,24 +24,37 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class QueueEngineTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $backend;
-    /** @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $manager;
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $eventDispatcher;
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $logger;
 
-    /** @var QueueEngine */
+    /**
+     * @var QueueEngine
+     */
     private $subject;
 
     public function setUp()
     {
-        $this->backend         = $this->getMock('Sonata\NotificationBundle\Backend\BackendInterface');
-        $this->manager         = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
+        $this->backend         = $this->getMock(BackendInterface::class);
+        $this->manager         = $this->getMock(ManagerInterface::class);
+        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
+        $this->logger          = $this->getMock(LoggerInterface::class);
 
         $this->subject = new QueueEngine($this->backend, $this->eventDispatcher, $this->logger);
         $this->subject->setManager($this->manager);
@@ -131,7 +145,7 @@ class QueueEngineTest extends \PHPUnit_Framework_TestCase
 
     private function createConsumerEvent($type, $messageBody)
     {
-        $message = $this->getMock('Sonata\NotificationBundle\Model\MessageInterface');
+        $message = $this->getMock(MessageInterface::class);
 
         $message->expects($this->any())
             ->method('getBody')

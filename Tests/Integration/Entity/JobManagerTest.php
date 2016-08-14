@@ -11,17 +11,17 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration\Entity;
 
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
+use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Entity\JobManager;
-use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
 use JMS\Serializer\SerializerInterface;
-use Symfony\Component\Validator\ExecutionContext;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobManagerTest extends DatabaseTestCase
+class JobManagerTest extends DatabaseKernelTestCase
 {
 
     /** @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject */
@@ -39,12 +39,12 @@ class JobManagerTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $this->registry   = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')->disableOriginalConstructor()->getMock();
-        $this->serializer = $this->getMock('JMS\Serializer\SerializerInterface');
+        $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->serializer = $this->getMock(SerializerInterface::class);
 
         $this->subject = new JobManager(
             $this->getEntityManager(),
-            'Abc\Bundle\JobBundle\Entity\Job',
+            Job::class,
             $this->getScheduleManager(),
             $this->serializer,
             $this->registry

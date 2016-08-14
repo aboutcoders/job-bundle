@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration\Annotation;
 
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Annotation\TestJob;
 use Metadata\MetadataFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -21,13 +22,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class AnnotationTest extends KernelTestCase
 {
-    /** @var Application */
+    /**
+     * @var Application
+     */
     private $application;
-    /** @var ContainerInterface */
+
+    /**
+     * @var ContainerInterface
+     */
     private $container;
-    /** @var MetadataFactoryInterface */
+
+    /**
+     * @var MetadataFactoryInterface
+     */
     private $metadataFactory;
-    /** @var ClassMetadata */
+
+    /**
+     * @var ClassMetadata
+     */
     private $classMetadata;
 
     /**
@@ -45,7 +57,7 @@ class AnnotationTest extends KernelTestCase
         $this->metadataFactory = $this->container->get('abc.job.metadata_factory');
 
         /** @var ClassMetadata $classMetadata */
-        $this->classMetadata = $this->metadataFactory->getMetadataForClass('Abc\Bundle\JobBundle\Tests\Fixtures\Annotation\TestJob')->getRootClassMetadata();
+        $this->classMetadata = $this->metadataFactory->getMetadataForClass(TestJob::class)->getRootClassMetadata();
     }
 
     public function testMethodWithSingleParameters()

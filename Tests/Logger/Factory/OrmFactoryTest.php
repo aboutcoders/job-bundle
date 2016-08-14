@@ -40,11 +40,11 @@ class OrmFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')
+        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = $this->getMock('Abc\Bundle\JobBundle\Model\LogManagerInterface');
+        $this->manager = $this->getMock(LogManagerInterface::class);
 
         $this->subject = new OrmFactory($this->registry, $this->manager);
 
@@ -60,7 +60,7 @@ class OrmFactoryTest extends \PHPUnit_Framework_TestCase
         /** @var JobAwareOrmHandler $handler */
         $handler = $this->invokeMethod($this->subject, 'createHandler', [$job, $level, $debug]);
 
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Logger\Handler\JobAwareOrmHandler', $handler);
+        $this->assertInstanceOf(JobAwareOrmHandler::class, $handler);
         $this->assertEquals($level, $handler->getBubble());
     }
 

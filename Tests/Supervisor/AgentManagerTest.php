@@ -18,13 +18,19 @@ use Supervisor\Supervisor;
 
 class AgentManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SupervisorManager|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var SupervisorManager|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $supervisorManager;
 
-    /** @var Supervisor|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var Supervisor|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $supervisor;
 
-    /** @var Process|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var Process|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $process;
 
     private static $processInfo = [
@@ -50,7 +56,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->process = $this->getMockBuilder('Supervisor\Process')
+        $this->process = $this->getMockBuilder(Process::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -66,7 +72,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProcessInfo')
             ->willReturn(static::$processInfo);
 
-        $this->supervisor = $this->getMockBuilder('Supervisor\Supervisor')
+        $this->supervisor = $this->getMockBuilder(Supervisor::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -78,7 +84,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProcesses')
             ->willReturn(array($this->process));
 
-        $this->supervisorManager = $this->getMockBuilder('YZ\SupervisorBundle\Manager\SupervisorManager')
+        $this->supervisorManager = $this->getMockBuilder(SupervisorManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -104,7 +110,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindById()
     {
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Model\AgentInterface', $this->subject->findById('setmeup:queue-agent_default'));
+        $this->assertInstanceOf(AgentInterface::class, $this->subject->findById('setmeup:queue-agent_default'));
     }
 
     public function testRefresh()
@@ -116,7 +122,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
 
         $returnValues = array($updatedProcessInfo, $processInfo);
 
-        $this->process = $this->getMockBuilder('Supervisor\Process')
+        $this->process = $this->getMockBuilder(Process::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -134,7 +140,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
                 return array_pop($returnValues);
             });
 
-        $this->supervisor = $this->getMockBuilder('Supervisor\Supervisor')
+        $this->supervisor = $this->getMockBuilder(Supervisor::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -146,7 +152,7 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProcesses')
             ->willReturn(array($this->process));
 
-        $this->supervisorManager = $this->getMockBuilder('YZ\SupervisorBundle\Manager\SupervisorManager')
+        $this->supervisorManager = $this->getMockBuilder(SupervisorManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 

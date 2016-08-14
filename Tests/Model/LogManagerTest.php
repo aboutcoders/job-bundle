@@ -26,11 +26,11 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
 
         $manager->expects($this->once())
             ->method('getClass')
-            ->will($this->returnValue('Abc\Bundle\JobBundle\Model\Log'));
+            ->will($this->returnValue(Log::class));
 
         $schedule = $manager->create();
 
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Model\Log', $schedule);
+        $this->assertInstanceOf(Log::class, $schedule);
     }
 
     public function testFormatLogsUsesLineFormatterByDefault()
@@ -87,7 +87,7 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function buildManager()
     {
-        return $this->getMockForAbstractClass('Abc\Bundle\JobBundle\Model\LogManager');
+        return $this->getMockForAbstractClass(LogManager::class);
     }
 
     /**
@@ -95,7 +95,7 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function buildFormatter()
     {
-        return $this->getMock('Monolog\Formatter\FormatterInterface');
+        return $this->getMock(FormatterInterface::class);
     }
 
     /**

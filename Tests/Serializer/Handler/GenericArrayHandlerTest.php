@@ -36,8 +36,8 @@ class GenericArrayHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->context = $this->getMockForAbstractClass('JMS\Serializer\Context');
-        $this->visitor = $this->getMock('JMS\Serializer\VisitorInterface');
+        $this->context = $this->getMockForAbstractClass(Context::class);
+        $this->visitor = $this->getMock(VisitorInterface::class);
         $this->subject = new GenericArrayHandler();
     }
 

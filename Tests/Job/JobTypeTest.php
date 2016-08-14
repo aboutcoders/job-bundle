@@ -24,7 +24,9 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
     private $callable;
     private $logLevel;
 
-    /** @var JobType */
+    /**
+     * @var JobType
+     */
     protected $subject;
 
     public function setUp()
@@ -33,8 +35,7 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->type      = 'job-type';
         $this->callable  = array(new TestJobAwareCallable, TestJobAwareCallable::getMethodName());
         $this->logLevel  = Logger::ERROR;
-
-        $this->subject = new JobType($this->serviceId, $this->type, $this->callable, $this->logLevel);
+        $this->subject   = new JobType($this->serviceId, $this->type, $this->callable, $this->logLevel);
     }
 
     /**
@@ -62,7 +63,7 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClass()
     {
-        $this->assertEquals('Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable', $this->subject->getClass());
+        $this->assertEquals(TestJobAwareCallable::class, $this->subject->getClass());
     }
 
     public function testGetMethod()
@@ -104,8 +105,7 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
 
     public static function getInvalidConstructorArgs()
     {
-        $callable = function ()
-        {
+        $callable = function () {
         };
 
         return [

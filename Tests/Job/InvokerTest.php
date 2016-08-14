@@ -60,10 +60,10 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->metadataFactory   = $this->getMock('Metadata\MetadataFactoryInterface');
+        $this->metadataFactory   = $this->getMock(MetadataFactoryInterface::class);
         $this->registry          = new JobTypeRegistry($this->metadataFactory);
-        $this->manager           = $this->getMock('Abc\Bundle\JobBundle\Job\ManagerInterface');
-        $this->controllerFactory = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\ProcessControl\Factory')->disableOriginalConstructor()->getMock();
+        $this->manager           = $this->getMock(ManagerInterface::class);
+        $this->controllerFactory = $this->getMockBuilder(Factory::class)->disableOriginalConstructor()->getMock();
         $this->subject           = new Invoker($this->registry);
 
         $this->subject->setManager($this->manager);

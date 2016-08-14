@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 
 use Abc\Bundle\JobBundle\Form\Type\ScheduleType;
 use Abc\Bundle\JobBundle\Entity\Schedule;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Tests\Extension\Validator\Type\TypeTestCase as ValidatorTypeTestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -37,7 +38,7 @@ class ScheduleTypeTest extends ValidatorTypeTestCase
      */
     public function testSubmitValidData($formData, $object)
     {
-        $form = $this->factory->create(method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? ScheduleType::class : 'abc_job_schedule', new Schedule());
+        $form = $this->factory->create(method_exists(AbstractType::class, 'getBlockPrefix') ? ScheduleType::class : 'abc_job_schedule', new Schedule());
 
         $form->submit($formData);
 

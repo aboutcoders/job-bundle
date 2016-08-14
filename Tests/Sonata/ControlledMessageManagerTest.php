@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Sonata;
 
 use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
 use Abc\ProcessControl\ControllerInterface;
+use Sonata\NotificationBundle\Model\MessageInterface;
 use Sonata\NotificationBundle\Model\MessageManagerInterface;
 
 /**
@@ -19,17 +20,25 @@ use Sonata\NotificationBundle\Model\MessageManagerInterface;
  */
 class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $controller;
-    /** @var MessageManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var MessageManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $manager;
-    /** @var ControlledMessageManager */
+
+    /**
+     * @var ControlledMessageManager
+     */
     protected $subject;
 
     public function setUp()
     {
-        $this->controller = $this->getMock('Abc\ProcessControl\ControllerInterface');
-        $this->manager    = $this->getMock('Sonata\NotificationBundle\Model\MessageManagerInterface');
+        $this->controller = $this->getMock(ControllerInterface::class);
+        $this->manager    = $this->getMock(MessageManagerInterface::class);
         $this->subject    = new ControlledMessageManager($this->controller, $this->manager);
     }
 
@@ -200,7 +209,7 @@ class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCancel()
     {
-        $message = $this->getMock('Sonata\NotificationBundle\Model\MessageInterface');
+        $message = $this->getMock(MessageInterface::class);
 
         $this->manager->expects($this->once())
             ->method('cancel')
@@ -211,7 +220,7 @@ class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRestart()
     {
-        $message = $this->getMock('Sonata\NotificationBundle\Model\MessageInterface');
+        $message = $this->getMock(MessageInterface::class);
 
         $this->manager->expects($this->once())
             ->method('restart')

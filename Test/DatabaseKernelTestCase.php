@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests;
+namespace Abc\Bundle\JobBundle\Test;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-abstract class DatabaseTestCase extends KernelTestCase
+abstract class DatabaseKernelTestCase extends KernelTestCase
 {
     /** @var EntityManager */
     private $em;

@@ -22,7 +22,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class MessageTest extends KernelTestCase
 {
 
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     private $serializer;
 
     public function setUp()

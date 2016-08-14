@@ -10,12 +10,32 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Integration;
 
+use Abc\Bundle\JobBundle\Entity\Job;
+use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Event\JobEvents;
+use Abc\Bundle\JobBundle\Form\Type\JobType;
+use Abc\Bundle\JobBundle\Form\Type\MessageType;
 use Abc\Bundle\JobBundle\Job\JobInterface;
+use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
+use Abc\Bundle\JobBundle\Job\LogManagerInterface;
+use Abc\Bundle\JobBundle\Job\Mailer\Mailer;
+use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
+use Abc\Bundle\JobBundle\Job\Report\EraserInterface;
+use Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener;
+use Abc\Bundle\JobBundle\Listener\ScheduleListener;
+use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
+use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
+use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
+use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
+use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
+use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvents;
 use Abc\Bundle\SchedulerBundle\Iterator\IteratorRegistryInterface;
 use Abc\ProcessControl\ChainController;
+use Metadata\MetadataFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,10 +46,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ServiceConfigurationTest extends KernelTestCase
 {
-
-    /** @var Application */
+    /**
+     * @var Application
+     */
     private $application;
-    /** @var ContainerInterface */
+
+    /**
+     * @var ContainerInterface
+     */
     private $container;
 
     /**
@@ -63,24 +87,24 @@ class ServiceConfigurationTest extends KernelTestCase
     public function getServices()
     {
         return [
-            ['abc.job.agent_manager', 'Abc\Bundle\JobBundle\Model\AgentManagerInterface'],
-            ['abc.job.eraser', 'Abc\Bundle\JobBundle\Job\Report\EraserInterface'],
-            ['abc.job.form.type.job', 'Abc\Bundle\JobBundle\Form\Type\JobType'],
-            ['abc.job.form.type.message', 'Abc\Bundle\JobBundle\Form\Type\MessageType'],
-            ['abc.job.job_manager', 'Abc\Bundle\JobBundle\Model\JobManagerInterface'],
-            ['abc.job.listener.job', 'Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener'],
-            ['abc.job.listener.schedule', 'Abc\Bundle\JobBundle\Listener\ScheduleListener'],
-            ['abc.job.logger.factory', 'Abc\Bundle\JobBundle\Job\Logger\FactoryInterface'],
-            ['abc.job.log_manager', 'Abc\Bundle\JobBundle\Job\LogManagerInterface'],
-            ['abc.job.mailer', 'Abc\Bundle\JobBundle\Job\Mailer\Mailer'],
-            ['abc.job.manager', 'Abc\Bundle\JobBundle\Job\ManagerInterface'],
-            ['abc.job.metadata_factory', 'Metadata\MetadataFactory'],
-            ['abc.job.registry', 'Abc\Bundle\JobBundle\Job\JobTypeRegistry'],
-            ['abc.job.schedule_manager', 'Abc\Bundle\JobBundle\Doctrine\ScheduleManager'],
-            ['abc.job.serializer.generic_array_handler', 'Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler'],
-            ['abc.job.sonata.notification.manager.message', 'Abc\Bundle\JobBundle\Sonata\ControlledMessageManager'],
-            ['abc.job.lock_manager', 'Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface'],
-            ['abc.job.controller_factory', 'Abc\Bundle\JobBundle\Job\ProcessControl\Factory']
+            ['abc.job.agent_manager', AgentManagerInterface::class],
+            ['abc.job.eraser', EraserInterface::class],
+            ['abc.job.form.type.job', JobType::class],
+            ['abc.job.form.type.message', MessageType::class],
+            ['abc.job.job_manager', JobManagerInterface::class],
+            ['abc.job.listener.job', RuntimeParameterProviderJobListener::class],
+            ['abc.job.listener.schedule', ScheduleListener::class],
+            ['abc.job.logger.factory', FactoryInterface::class],
+            ['abc.job.log_manager', LogManagerInterface::class],
+            ['abc.job.mailer', Mailer::class],
+            ['abc.job.manager', ManagerInterface::class],
+            ['abc.job.metadata_factory', MetadataFactory::class],
+            ['abc.job.registry', JobTypeRegistry::class],
+            ['abc.job.schedule_manager', ScheduleManager::class],
+            ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
+            ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
+            ['abc.job.lock_manager', LockManagerInterface::class],
+            ['abc.job.controller_factory', Factory::class]
         ];
     }
 
@@ -89,9 +113,9 @@ class ServiceConfigurationTest extends KernelTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
         /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $listener = $this->getMockBuilder('Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener')->disableOriginalConstructor()->getMock();
+        $listener = $this->getMockBuilder(RuntimeParameterProviderJobListener::class)->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $event = $this->getMockBuilder('Abc\Bundle\JobBundle\Event\ExecutionEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(ExecutionEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.job', $listener);
 
@@ -107,9 +131,9 @@ class ServiceConfigurationTest extends KernelTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
         /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $listener = $this->getMockBuilder('Abc\Bundle\JobBundle\Listener\ScheduleListener')->disableOriginalConstructor()->getMock();
+        $listener = $this->getMockBuilder(ScheduleListener::class)->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $event = $this->getMockBuilder('Abc\Bundle\SchedulerBundle\Event\SchedulerEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(SchedulerEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.schedule', $listener);
 
@@ -138,7 +162,7 @@ class ServiceConfigurationTest extends KernelTestCase
         /**
          * @var JobInterface $job
          */
-        $job     = $this->getMock('Abc\Bundle\JobBundle\Entity\Job');
+        $job = $this->getMock(Job::class);
 
         $controller = $factory->create($job);
 

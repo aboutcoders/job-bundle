@@ -34,13 +34,24 @@ class RequestBodyParameterConverterTest extends \PHPUnit_Framework_TestCase
      */
     private $metadataFactory;
 
-    /** @var JobTypeRegistry */
+    /**
+     * @var JobTypeRegistry
+     */
     protected $registry;
-    /** @var ParamConverterInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var ParamConverterInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $converter;
-    /** @var RequestBodyParameterConverter */
+
+    /**
+     * @var RequestBodyParameterConverter
+     */
     protected $subject;
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $dispatcher;
 
     public function setUp()

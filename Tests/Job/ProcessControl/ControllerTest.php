@@ -56,13 +56,13 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager = $this->getMock('Abc\Bundle\JobBundle\Model\JobManagerInterface');
-        $this->job     = $this->getMock('Abc\Bundle\JobBundle\Model\JobInterface');
+        $this->manager = $this->getMock(JobManagerInterface::class);
+        $this->job     = $this->getMock(JobInterface::class);
         $this->time    = $this->getFunctionMock(ControllerTest::TEST_SUBJECT_NAMESPACE, 'time');
 
         $this->manager->expects($this->any())
             ->method('getClass')
-            ->willReturn('Abc\Bundle\JobBundle\Model\JobInterface');
+            ->willReturn(JobInterface::class);
 
         $this->subject = new Controller($this->job, $this->manager, static::$interval);
     }
@@ -80,7 +80,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructValidatesJob()
     {
-        $job = $this->getMock('Abc\Bundle\JobBundle\Job\JobInterface');
+        $job = $this->getMock(\Abc\Bundle\JobBundle\Job\JobInterface::class);
 
         new Controller($job, $this->manager, -1);
     }

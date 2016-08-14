@@ -18,9 +18,10 @@ use Abc\Bundle\JobBundle\Job\Context\Exception\ParameterNotFoundException;
  */
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Context */
+    /**
+     * @var Context
+     */
     protected $subject;
-
 
     public function setUp()
     {
@@ -30,7 +31,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testConstruct()
     {
         $parameters = array('foo' => 'bar');
-        $subject = new Context($parameters);
+        $subject    = new Context($parameters);
 
         $this->assertSame($parameters, $subject->all());
     }
@@ -40,13 +41,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetThrowsParameterNotFoundException()
     {
-        try
-        {
+        try {
             $this->subject->get('foo');
             $this->fail('no exception thrown');
-        }
-        catch(ParameterNotFoundException $e)
-        {
+        } catch (ParameterNotFoundException $e) {
             $this->assertEquals('A parameter with the name "foo" does not exist', $e->getMessage());
             $this->assertEquals('foo', $e->getName());
         }

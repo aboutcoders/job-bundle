@@ -8,10 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests;
+namespace Abc\Bundle\JobBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 
 /**

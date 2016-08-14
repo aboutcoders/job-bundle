@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Entity;
 
 use Abc\Bundle\JobBundle\Entity\Job;
+use Abc\Bundle\JobBundle\Entity\Schedule;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -22,7 +23,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $subject = new Job();
         $schedule = $subject->createSchedule('foo', 'bar');
 
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Entity\Schedule', $schedule);
+        $this->assertInstanceOf(Schedule::class, $schedule);
         $this->assertEquals('foo', $schedule->getType());
         $this->assertEquals('bar', $schedule->getExpression());
     }

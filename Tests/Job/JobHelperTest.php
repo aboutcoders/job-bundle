@@ -22,14 +22,19 @@ use Psr\Log\NullLogger;
  */
 class JobHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $loggerFactory;
-    /** @var JobHelper */
+
+    /**
+     * @var JobHelper
+     */
     private $subject;
 
     public function setUp()
     {
-        $this->loggerFactory   = $this->getMock('Abc\Bundle\JobBundle\Job\Logger\FactoryInterface');
+        $this->loggerFactory   = $this->getMock(FactoryInterface::class);
 
         $this->subject = new JobHelper($this->loggerFactory);
     }

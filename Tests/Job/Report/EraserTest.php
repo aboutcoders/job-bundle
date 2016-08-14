@@ -22,17 +22,25 @@ use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 class EraserTest extends \PHPUnit_Framework_TestCase
 {
 
-    /** @var JobManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var JobManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $jobManager;
-    /** @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $logManager;
-    /** @var Eraser */
+
+    /**
+     * @var Eraser
+     */
     private $subject;
 
     public function setUp()
     {
-        $this->jobManager    = $this->getMock('Abc\Bundle\JobBundle\Model\JobManagerInterface');
-        $this->logManager    = $this->getMock('Abc\Bundle\JobBundle\Job\LogManagerInterface');
+        $this->jobManager    = $this->getMock(JobManagerInterface::class);
+        $this->logManager    = $this->getMock(LogManagerInterface::class);
 
         $this->subject = new Eraser($this->jobManager, $this->logManager);
     }

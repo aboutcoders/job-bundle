@@ -12,7 +12,9 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable;
+use Metadata\ClassHierarchyMetadata;
 use Metadata\MetadataFactoryInterface;
 use Monolog\Logger;
 
@@ -33,15 +35,14 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->metadataFactory = $this->getMock('Metadata\MetadataFactoryInterface');
-
-        $this->subject = new JobTypeRegistry($this->metadataFactory);
+        $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);
+        $this->subject         = new JobTypeRegistry($this->metadataFactory);
     }
 
     public function testAll()
     {
         $callable = array(new TestCallable(), 'log');
-        $jobType = new JobType('service-id', 'type', $callable);
+        $jobType  = new JobType('service-id', 'type', $callable);
 
         $this->subject->register($jobType);
 
@@ -55,7 +56,7 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->subject->has('foobar'));
 
         $callable = array(new TestCallable(), 'log');
-        $jobType = new JobType('service-id', 'type', $callable);
+        $jobType  = new JobType('service-id', 'type', $callable);
 
         $this->subject->register($jobType);
 
@@ -68,9 +69,9 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
         $jobType = new JobType('service-id', 'type', $callable, Logger::ERROR);
 
-        $classHierarchyMetadata = $this->getMockBuilder('Metadata\ClassHierarchyMetadata')->disableOriginalConstructor()->getMock();
+        $classHierarchyMetadata = $this->getMockBuilder(ClassHierarchyMetadata::class)->disableOriginalConstructor()->getMock();
 
-        $classMetadata = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata')->disableOriginalConstructor()->getMock();
+        $classMetadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')

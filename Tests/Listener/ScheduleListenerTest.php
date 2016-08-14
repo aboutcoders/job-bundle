@@ -22,15 +22,20 @@ use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
  */
 class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $queueEngine;
-    /** @var ScheduleListener */
+
+    /**
+     * @var ScheduleListener
+     */
     private $subject;
 
 
     public function setUp()
     {
-        $this->queueEngine = $this->getMock('Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface');
+        $this->queueEngine = $this->getMock(QueueEngineInterface::class);
         $this->subject     = new ScheduleListener($this->queueEngine);
     }
 

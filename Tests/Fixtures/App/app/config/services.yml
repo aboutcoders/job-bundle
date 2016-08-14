@@ -9,6 +9,8 @@ services:
 
     abc.job.callable:
         class: Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable
+        calls:
+            - [ setContainer, [ '@service_container' ] ]
         tags:
             - { name: abc.job, type: log, method: log }
             - { name: abc.job, type: throw_exception, method: throwException }
@@ -20,6 +22,7 @@ services:
             - { name: abc.job, type: manage_job, method: manageJob }
             - { name: abc.job, type: invoke_controller, method: invokeController }
             - { name: abc.job, type: parameterless, method: invokeController }
+            - { name: abc.job, type: throw_dbal_exception, method: throwDbalException }
 
     abc.job.log.processor:
         class: Monolog\Processor\PsrLogMessageProcessor

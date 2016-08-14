@@ -12,20 +12,21 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Doctrine;
 
 use Abc\Bundle\JobBundle\Doctrine\JobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
+use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Schedule;
-use Abc\Bundle\JobBundle\Tests\DatabaseTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Constraints\UuidValidator;
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobManagerTest extends DatabaseTestCase
+class JobManagerTest extends DatabaseKernelTestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
@@ -49,12 +50,12 @@ class JobManagerTest extends DatabaseTestCase
     {
         parent::setUp();
 
-        $this->registry   = $this->getMockBuilder('Abc\Bundle\JobBundle\Job\JobTypeRegistry')->disableOriginalConstructor()->getMock();
-        $this->serializer = $this->getMock('JMS\Serializer\SerializerInterface');
+        $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->serializer = $this->getMock(SerializerInterface::class);
 
         $this->subject = new \Abc\Bundle\JobBundle\Entity\JobManager(
             $this->getEntityManager(),
-            'Abc\Bundle\JobBundle\Entity\Job',
+            Job::class,
             $this->getScheduleManager(),
             $this->serializer,
             $this->registry
@@ -63,7 +64,7 @@ class JobManagerTest extends DatabaseTestCase
 
     public function testIsExpectedInstance()
     {
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Doctrine\JobManager', $this->subject);
+        $this->assertInstanceOf(JobManager::class, $this->subject);
     }
 
     public function testSave()
@@ -81,7 +82,7 @@ class JobManagerTest extends DatabaseTestCase
         $this->assertLessThanOrEqual($now, $job->getCreatedAt());
 
         /** @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context   = $this->getMock('Symfony\Component\Validator\Context\ExecutionContext', [], [], '', false);
+        $context   = $this->getMock(ExecutionContext::class, [], [], '', false);
         $validator = new UuidValidator();
         $validator->initialize($context);
 
@@ -93,7 +94,7 @@ class JobManagerTest extends DatabaseTestCase
         $this->getEntityManager()->clear();
 
         $job = $this->subject->findByTicket($job->getTicket());
-        $this->assertInstanceOf('Abc\Bundle\JobBundle\Job\Status', $job->getStatus());
+        $this->assertInstanceOf(Status::class, $job->getStatus());
     }
 
     public function testHandlesParameterSerialization()

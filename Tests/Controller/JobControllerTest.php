@@ -18,7 +18,7 @@ use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Tests\DatabaseWebTestCase;
+use Abc\Bundle\JobBundle\Test\DatabaseWebTestCase;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -148,7 +148,7 @@ class JobControllerTest extends DatabaseWebTestCase
         // get the (initialized) serializer before it is destroyed by this mockManager() call, otherwise we do not have custom handlers initialized
         $serializer = static::$kernel->getContainer()->get('jms_serializer');
 
-        $this->mockManager();
+        $this->mockServices(['abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
             ->method('get')
@@ -166,10 +166,9 @@ class JobControllerTest extends DatabaseWebTestCase
 
     public function testGetActionReturns404()
     {
-
         $client = static::createClient();
 
-        $this->mockManager();
+        $this->mockServices([ 'abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
             ->method('get')
@@ -202,7 +201,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
-        $this->mockManager();
+        $this->mockServices([ 'abc.job.manager' => $this->manager]);
 
         $client->request(
             'POST',
@@ -230,7 +229,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
-        $this->mockManager();
+        $this->mockServices([ 'abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
             ->method('getJobLogs')
@@ -254,10 +253,10 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
-        // get the (initialized) serializer before it is destroyed by this mockManager() call, otherwise we do not have custom handlers initialized
+        // get the (initialized) serializer before it is destroyed by this mockServices() call, otherwise we do not have custom handlers initialized
         $serializer = static::$kernel->getContainer()->get('jms_serializer');
 
-        $this->mockManager();
+        $this->mockServices([ 'abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
             ->method('cancelJob')

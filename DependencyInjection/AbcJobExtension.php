@@ -46,8 +46,7 @@ class AbcJobExtension extends Extension
         $container->setParameter('abc.job.form_type_message', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
         $container->setParameter('abc.job.form_type_seconds', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
 
-        if('custom' !== $config['db_driver'])
-        {
+        if ('custom' !== $config['db_driver']) {
             $loader->load(sprintf('%s.xml', $config['db_driver']));
         }
 
@@ -56,7 +55,7 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 '' => array(
-                    'model_manager_name' => self::NAMESPACE_PREFIX . 'model_manager_name',
+                    'model_manager_name'    => self::NAMESPACE_PREFIX . 'model_manager_name',
                     'register_default_jobs' => self::NAMESPACE_PREFIX . 'register_default_jobs',
                 )
             )
@@ -92,8 +91,7 @@ class AbcJobExtension extends Extension
         $loader->load('forms.xml');
         $loader->load('controller.xml');
 
-        if($config['register_default_jobs'])
-        {
+        if ($config['register_default_jobs']) {
             $loader->load('default_jobs.xml');
         }
 
@@ -103,28 +101,23 @@ class AbcJobExtension extends Extension
 
     private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
     {
-        if('custom' !== $config['handler'])
-        {
+        if ('custom' !== $config['handler']) {
             $loader->load('logger_' . $config['handler'] . '.xml');
 
-            if('orm' == $config['handler'])
-            {
+            if ('orm' == $config['handler']) {
                 $container->setParameter('abc.job.register_mapping.' . $dbDriver, true);
             }
         }
 
-        if(isset($config['formatter']))
-        {
+        if (isset($config['formatter'])) {
             $jobType = $container->getDefinition('abc.job.logger.factory');
             $jobType->addMethodCall('setFormatter', array(new Reference($config['formatter'])));
         }
 
-        if(!empty($config['processor']))
-        {
+        if (!empty($config['processor'])) {
             $jobType = $container->getDefinition('abc.job.logger.factory');
 
-            foreach($config['processor'] as $serviceId)
-            {
+            foreach ($config['processor'] as $serviceId) {
                 $jobType->addMethodCall('addProcessor', array(new Reference($serviceId)));
             }
         }
@@ -135,10 +128,8 @@ class AbcJobExtension extends Extension
 
     protected function remapParameters(array $config, ContainerBuilder $container, array $map)
     {
-        foreach($map as $name => $paramName)
-        {
-            if(array_key_exists($name, $config))
-            {
+        foreach ($map as $name => $paramName) {
+            if (array_key_exists($name, $config)) {
                 $container->setParameter($paramName, $config[$name]);
             }
         }
@@ -146,28 +137,19 @@ class AbcJobExtension extends Extension
 
     protected function remapParametersNamespaces(array $config, ContainerBuilder $container, array $namespaces)
     {
-        foreach($namespaces as $ns => $map)
-        {
-            if($ns)
-            {
-                if(!array_key_exists($ns, $config))
-                {
+        foreach ($namespaces as $ns => $map) {
+            if ($ns) {
+                if (!array_key_exists($ns, $config)) {
                     continue;
                 }
                 $namespaceConfig = $config[$ns];
-            }
-            else
-            {
+            } else {
                 $namespaceConfig = $config;
             }
-            if(is_array($map))
-            {
+            if (is_array($map)) {
                 $this->remapParameters($namespaceConfig, $container, $map);
-            }
-            else
-            {
-                foreach($namespaceConfig as $name => $value)
-                {
+            } else {
+                foreach ($namespaceConfig as $name => $value) {
                     $container->setParameter(sprintf($map, $name), $value);
                 }
             }

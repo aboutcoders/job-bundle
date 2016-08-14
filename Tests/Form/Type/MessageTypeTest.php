@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Form\Type;
 
 use Abc\Bundle\JobBundle\Form\Type\MessageType;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
+use Symfony\Component\Form\AbstractType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -31,7 +32,7 @@ class MessageTypeTest extends TypeTestCase
      */
     public function getFormType()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message';
+        return method_exists(AbstractType::class, 'getBlockPrefix') ? MessageType::class : 'abc_job_message';
     }
 
     /**
