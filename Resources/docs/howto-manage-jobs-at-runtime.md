@@ -10,7 +10,7 @@ Which one of those you choose is totally up to you.
 
 ## Approach 1: Implement the ManagerAwareInterface
 
-Your job class must implement the interface [ManagerAwareInterface](../Job/ManagerAwareInterface.php).
+Your job class must implement the interface [ManagerAwareInterface](../../Job/ManagerAwareInterface.php).
 
 ```php
 interface ManagerAwareInterface

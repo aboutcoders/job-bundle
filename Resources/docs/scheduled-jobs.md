@@ -49,4 +49,4 @@ In some cases it can be necessary to remove a job that was previously configured
 $job->removeSchedule($schedule);
 ```
 
-You most likely want to do this during execution of the job which requires that your job implements the [JobAwareInterface](../Job/JobAwareInterface.php). Please refer to the [How-To work modify a job at runtime](./howto-modify-job.md) for more details.
+You most likely want to do this during execution of the job which requires that your job implements the [JobAwareInterface](../../Job/JobAwareInterface.php). Please refer to the [How-To work modify a job at runtime](./howto-modify-job.md) for more details.

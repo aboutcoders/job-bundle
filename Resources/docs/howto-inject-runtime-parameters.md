@@ -30,7 +30,7 @@ class RuntimeParameterProviderJobListener
 }
 ```
 
-The event passed to the listener is of type [ExecutionEvent](../Event/ExecutionEvent.php) which provides access to the execution context of a job. This is a simple container where you can register parameters under a certain key. The example shows a snipped of the [RuntimeParameterProviderJobListener](../Listener/RuntimeParameterProviderJobListener.php) which provides the runtime parameter `@logger` that is available for each job.
+The event passed to the listener is of type [ExecutionEvent](../../Event/ExecutionEvent.php) which provides access to the execution context of a job. This is a simple container where you can register parameters under a certain key. The example shows a snipped of the [RuntimeParameterProviderJobListener](../../Listener/RuntimeParameterProviderJobListener.php) which provides the runtime parameter `@logger` that is available for each job.
 
 ## Step 2: Register the listener class in the service container
 

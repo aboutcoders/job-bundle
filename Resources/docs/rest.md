@@ -19,7 +19,7 @@ In case want to be able to add a job from the REST-API you need to define the fo
 
 First you have to define the form class that maps the parameters of the job. This can be any regular form class that implements the `FormTypeInterface`.
 
-__Note:__ There is one special requirement related to this form class. The `$form->getData()` method must return an array representing the job parameters. This requires most likely that you register a data transformer that transforms the input data into an array. Please take a look at the implementation of the class [MessageType](../Form/Type/MessageType.php) that defines the parameters of the `mailer` job that is shipped with this bundle.
+__Note:__ There is one special requirement related to this form class. The `$form->getData()` method must return an array representing the job parameters. This requires most likely that you register a data transformer that transforms the input data into an array. Please take a look at the implementation of the class [MessageType](../../Form/Type/MessageType.php) that defines the parameters of the `mailer` job that is shipped with this bundle.
 
 ### Step 2: Register the form class in the service container
 

@@ -18,7 +18,7 @@ services:
             - { name: abc.job.event_listener, event: abc.job.pre_execute, method: onPreExecute }
 ```
 
-The dispatched event is of type [ExecutionEvent](../Event/ExecutionEvent.php) which gives listeners the option to modify the job or to [provide runtime parameters](./howto-inject-runtime-parameters.md).
+The dispatched event is of type [ExecutionEvent](../../Event/ExecutionEvent.php) which gives listeners the option to modify the job or to [provide runtime parameters](./howto-inject-runtime-parameters.md).
 
 ### Post Execute Event
 
@@ -35,12 +35,12 @@ services:
             - { name: abc.job.event_listener, event: abc.job.post_execute, method: onPostExecute }
 ```
 
-Like the Pre Execution Event the dispatched event is of type [ExecutionEvent](../Event/ExecutionEvent.php).
+Like the Pre Execution Event the dispatched event is of type [ExecutionEvent](../../Event/ExecutionEvent.php).
 
 
 ### Terminate Event
 
-Whenever a job terminates an event with the name `abc.job.terminated` and of type [TerminationEvent](../Event/TerminationEvent.php) is dispatched.
+Whenever a job terminates an event with the name `abc.job.terminated` and of type [TerminationEvent](../../Event/TerminationEvent.php) is dispatched.
 
 In order to register an event listener for this event you have to define the listener class, register it as a service and tag it:
 

@@ -1,7 +1,7 @@
 How-to work with the manager
 ============================
 
-The API of the manager is defined by the interface [ManagerInterface](../Job/ManagerInterface.php).
+The API of the manager is defined by the interface [ManagerInterface](../../Job/ManagerInterface.php).
 
 ## Retrieving the manager
 
