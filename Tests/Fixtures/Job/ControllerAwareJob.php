@@ -16,7 +16,7 @@ use Abc\ProcessControl\ControllerInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TestControllerAwareCallable implements ControllerAwareInterface
+class ControllerAwareJob implements ControllerAwareInterface
 {
     /**
      * @var ControllerInterface

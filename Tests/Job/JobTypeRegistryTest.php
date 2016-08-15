@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJob;
 use Metadata\ClassHierarchyMetadata;
 use Metadata\MetadataFactoryInterface;
 use Monolog\Logger;
@@ -41,7 +41,7 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testAll()
     {
-        $callable = array(new TestCallable(), 'log');
+        $callable = array(new TestJob(), 'log');
         $jobType  = new JobType('service-id', 'type', $callable);
 
         $this->subject->register($jobType);
@@ -55,7 +55,7 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->subject->has('foobar'));
 
-        $callable = array(new TestCallable(), 'log');
+        $callable = array(new TestJob(), 'log');
         $jobType  = new JobType('service-id', 'type', $callable);
 
         $this->subject->register($jobType);
@@ -65,7 +65,7 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterLoadsMetadata()
     {
-        $callable = array(new TestCallable(), 'log');
+        $callable = array(new TestJob(), 'log');
 
         $jobType = new JobType('service-id', 'type', $callable, Logger::ERROR);
 

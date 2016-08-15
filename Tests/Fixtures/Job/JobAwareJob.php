@@ -17,7 +17,7 @@ use Abc\Bundle\JobBundle\Job\JobInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TestJobAwareCallable implements JobAwareInterface
+class JobAwareJob implements JobAwareInterface
 {
     /** @var JobInterface */
     protected $job;

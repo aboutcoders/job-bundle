@@ -12,18 +12,25 @@ namespace Abc\Bundle\JobBundle\Tests\Controller;
 
 use Abc\Bundle\JobBundle\Model\Agent;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
+use Abc\Bundle\JobBundle\Test\WebTestCase;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class AgentControllerTest extends WebTestCase
 {
+    /**
+     * @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $agentManager;
 
-    /** @var SerializerInterface */
-    protected $serializer;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
 
     /**
      * {@inheritDoc}
@@ -31,25 +38,25 @@ class AgentControllerTest extends WebTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->serializer = SerializerBuilder::create()->build();
+
+        $this->agentManager = $this->getMock(AgentManagerInterface::class);
+        $this->serializer   = SerializerBuilder::create()->build();
     }
 
     public function testCgetAction()
     {
         $client = static::createClient();
 
-        /** @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject $agentManager */
-        $agentManager = $client->getContainer()->get('abc.job.agent_manager');
-
-
         $agent = new Agent();
         $agent->setId('id');
         $agent->setName('Foobar');
         $agent->setStatus('PROCESSING');
 
-        $agentManager->expects($this->once())
+        $this->agentManager->expects($this->once())
             ->method('findAll')
             ->willReturn([$agent]);
+
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents');
 
@@ -57,7 +64,7 @@ class AgentControllerTest extends WebTestCase
 
         $data = $client->getResponse()->getContent();
 
-        $deserializedArray = $this->serializer->deserialize($data, 'ArrayCollection<Abc\Bundle\JobBundle\Model\Agent>', 'json');
+        $deserializedArray = $this->serializer->deserialize($data, sprintf('ArrayCollection<%s>', Agent::class), 'json');
 
         $this->assertEquals([$agent], $deserializedArray);
     }
@@ -66,17 +73,16 @@ class AgentControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        /** @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject $agentManager */
-        $agentManager = $client->getContainer()->get('abc.job.agent_manager');
-
         $agent = new Agent();
         $agent->setId('id');
         $agent->setName('Foobar');
         $agent->setStatus('PROCESSING');
 
-        $agentManager->expects($this->once())
+        $this->agentManager->expects($this->once())
             ->method('findById')
             ->willReturn($agent);
+
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents/12345');
 
@@ -84,7 +90,7 @@ class AgentControllerTest extends WebTestCase
 
         $data = $client->getResponse()->getContent();
 
-        $deserializedObject = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\Agent', 'json');
+        $deserializedObject = $this->serializer->deserialize($data, Agent::class, 'json');
 
         $this->assertEquals($agent, $deserializedObject);
     }
@@ -93,12 +99,11 @@ class AgentControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        /** @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject $agentManager */
-        $agentManager = $client->getContainer()->get('abc.job.agent_manager');
-
-        $agentManager->expects($this->any())
+        $this->agentManager->expects($this->any())
             ->method('findById')
             ->willReturn(null);
+
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents/12345');
 
@@ -109,26 +114,25 @@ class AgentControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        /** @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject $agentManager */
-        $agentManager = $client->getContainer()->get('abc.job.agent_manager');
-
         $agent = new Agent();
         $agent->setId('id');
         $agent->setName('Foobar');
         $agent->setStatus('STOPPED');
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('findById')
             ->with('12345')
             ->willReturn($agent);
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('start')
             ->with($agent);
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('refresh')
             ->with($agent);
+
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $client->request('POST', '/api/agents/12345/start');
 
@@ -137,7 +141,7 @@ class AgentControllerTest extends WebTestCase
         $data = $client->getResponse()->getContent();
 
         // would be nice to somehow ensure that refreshed object is returned, however using returnCallback somehow returns a cloned object
-        $deserializedObject = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\Agent', 'json');
+        $deserializedObject = $this->serializer->deserialize($data, Agent::class, 'json');
 
         $this->assertEquals($agent, $deserializedObject);
     }
@@ -146,26 +150,25 @@ class AgentControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        /** @var AgentManagerInterface|\PHPUnit_Framework_MockObject_MockObject $agentManager */
-        $agentManager = $client->getContainer()->get('abc.job.agent_manager');
-
         $agent = new Agent();
         $agent->setId('id');
         $agent->setName('Foobar');
         $agent->setStatus('STOPPED');
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('findById')
             ->with('12345')
             ->willReturn($agent);
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('stop')
             ->with($agent);
 
-        $agentManager->expects($this->atLeastOnce())
+        $this->agentManager->expects($this->atLeastOnce())
             ->method('refresh')
             ->with($agent);
+
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $client->request('POST', '/api/agents/12345/stop');
 
@@ -174,7 +177,7 @@ class AgentControllerTest extends WebTestCase
         $data = $client->getResponse()->getContent();
 
         // would be nice to somehow ensure that refreshed object is returned, however using returnCallback somehow returns a cloned object
-        $deserializedObject = $this->serializer->deserialize($data, 'Abc\Bundle\JobBundle\Model\Agent', 'json');
+        $deserializedObject = $this->serializer->deserialize($data, Agent::class, 'json');
 
         $this->assertEquals($agent, $deserializedObject);
     }

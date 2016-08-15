@@ -18,7 +18,7 @@ use Abc\Bundle\JobBundle\Annotation\JobParameters;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TestManagerAwareCallable implements ManagerAwareInterface
+class ManagerAwareJob implements ManagerAwareInterface
 {
     /**
      * @var ManagerInterface

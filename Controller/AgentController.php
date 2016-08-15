@@ -42,9 +42,7 @@ class AgentController extends FOSRestController
      */
     public function cgetAction()
     {
-        $manager = $this->getAgentManager();
-
-        return $manager->findAll();
+        return $this->getAgentManager()->findAll();
     }
 
     /**

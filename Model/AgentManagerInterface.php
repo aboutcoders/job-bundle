@@ -48,7 +48,7 @@ interface AgentManagerInterface
     /**
      * Finds all agents
      *
-     * @return \Traversable
+     * @return array
      */
     public function findAll();
 

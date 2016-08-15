@@ -16,7 +16,7 @@ use Abc\Bundle\JobBundle\Annotation\JobResponse;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TestJob {
+class AnnotatedJob {
 
 
     /**
@@ -39,4 +39,4 @@ class TestJob {
     public function methodWithResponse()
     {
     }
-} 
+}

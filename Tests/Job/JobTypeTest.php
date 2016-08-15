@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\JobType;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\JobAwareJob;
 use Monolog\Logger;
 
 /**
@@ -33,7 +33,7 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->serviceId = 'service-id';
         $this->type      = 'job-type';
-        $this->callable  = array(new TestJobAwareCallable, TestJobAwareCallable::getMethodName());
+        $this->callable  = array(new JobAwareJob, JobAwareJob::getMethodName());
         $this->logLevel  = Logger::ERROR;
         $this->subject   = new JobType($this->serviceId, $this->type, $this->callable, $this->logLevel);
     }
@@ -63,12 +63,12 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClass()
     {
-        $this->assertEquals(TestJobAwareCallable::class, $this->subject->getClass());
+        $this->assertEquals(JobAwareJob::class, $this->subject->getClass());
     }
 
     public function testGetMethod()
     {
-        $this->assertEquals(TestJobAwareCallable::getMethodName(), $this->subject->getMethod());
+        $this->assertEquals(JobAwareJob::getMethodName(), $this->subject->getMethod());
     }
 
     public function testGetSetLogLevel()

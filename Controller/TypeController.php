@@ -27,9 +27,9 @@ class TypeController extends FOSRestController
      * @return array
      *
      * @ApiDoc(
-     *  description="Returns a collection of job types",
-     *  section="AbcJobBundle",
-     *  requirements={},
+     * description="Returns a collection of job types",
+     * section="AbcJobBundle",
+     * requirements={},
      * output="array<String>",
      *   statusCodes = {
      *     200 = "Returned when successful"
@@ -40,14 +40,13 @@ class TypeController extends FOSRestController
     public function cgetAction()
     {
         $types = array();
-        foreach($this->getRegistry()->all() as $jobType)
-        {
+        foreach ($this->getRegistry()->all() as $jobType) {
             $types[] = $jobType->getName();
         }
 
         return $types;
     }
-    
+
     /**
      * @return JobTypeRegistry
      */

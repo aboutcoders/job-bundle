@@ -18,9 +18,9 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\LoggerAwareJob;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestControllerAwareCallable;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJobAwareCallable;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestManagerAwareCallable;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ControllerAwareJob;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\JobAwareJob;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ManagerAwareJob;
 use Abc\ProcessControl\ControllerInterface;
 use Metadata\MetadataFactoryInterface;
 use Psr\Log\LoggerInterface;
@@ -97,7 +97,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         $serviceId = 'serviceId';
         $type      = 'callable-type';
-        $callable  = new TestJobAwareCallable();
+        $callable  = new JobAwareJob();
         $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
 
         $job = new Job($type);
@@ -112,7 +112,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         $serviceId = 'serviceId';
         $type      = 'callable-type';
-        $callable  = new TestManagerAwareCallable();
+        $callable  = new ManagerAwareJob();
         $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
 
         $job = new Job($type);
@@ -127,7 +127,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         $serviceId  = 'serviceId';
         $type       = 'callable-type';
-        $callable   = new TestControllerAwareCallable();
+        $callable   = new ControllerAwareJob();
         $jobType    = new JobType($serviceId, $type, array($callable, 'execute'));
         $controller = $this->getMock(ControllerInterface::class);
 

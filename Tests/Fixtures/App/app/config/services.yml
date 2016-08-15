@@ -8,7 +8,7 @@ services:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
 
     abc.job.callable:
-        class: Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestCallable
+        class: Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJob
         calls:
             - [ setContainer, [ '@service_container' ] ]
         tags:

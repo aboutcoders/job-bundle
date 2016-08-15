@@ -28,7 +28,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TestCallable implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface, ContainerAwareInterface
+/**
+ * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ */
+class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwareInterface, ContainerAwareInterface
 {
     /**
      * @var JobInterface

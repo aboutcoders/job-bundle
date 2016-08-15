@@ -21,8 +21,10 @@ use Doctrine\DBAL\Types\Type;
 class StatusTypeTest extends \PHPUnit_Framework_TestCase
 {
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $platform;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $platform;
 
     public function setUp()
     {
