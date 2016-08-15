@@ -1,4 +1,4 @@
-How-to manage jobs at runtime
+How-to manage other jobs at runtime
 ===============================
 
 In some situations it might be necessary to manage other jobs at runtime of a given job. There are two ways to achieve this:

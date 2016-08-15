@@ -1,30 +1,31 @@
 How-to make a job cancellable at runtime
 ========================================
 
-A job can be cancelled in two cases: the job is cancelled manually or the job is cancelled externally by a process termination signal. If your job does not take this into account, it will either still be processed, although it has been cancelled or it will be killed at a certain point by some external process control system.
+Jobs can be cancelled in two ways: either the job is cancelled manually by invoking the cancel method of the manager or the job is cancelled by a process termination signal sent to the underlying PHP process. By default a job will always be processed unless a process termination signal kills the PHP process.
 
-In order to make a job terminate gracefully or to make a job more responsive the job class must implement the interface ControllerAwareInterface:
+To make job cancellable the job class must implement the interface ControllerAwareInterface:
 
 ```php
 namespace Abc\ProcessControl;
+
+use Abc\ProcessControl\ControllerInterface;
 
 interface ControllerAwareInterface
 {
     /**
-     * @param Controller $controller
+     * @param ControllerInterface $controller
      * @return void
      */
-    public function setController(Controller $controller);
+    public function setController(ControllerInterface $controller);
 }
 ```
 
-This `Controller` defines one method `doExit()` that can be used to determine whether the job should terminate:
+This `ControllerAwareInterface` defines the method `doExit()` which indicates whether the job has been cancelled or whether a TERM signal has been sent to the underlying PHP process:
 
 ```php
-
 namespace Abc\ProcessControl;
 
-interface Controller
+interface ControllerInterface
 {
     /**
      * Indicates whether to exit a process
@@ -38,19 +39,21 @@ interface Controller
 Below you see an example implementation how a job uses the controller:
 
 ```php
+
 use Abc\ProcessControl\ControllerAwareInterface;
+use Abc\ProcessControl\ControllerInterface;
 
 class Sleeper implements ControllerAwareInterface
 {
     /**
-     * @var Controller
+     * @var ControllerInterface
      */
     private $controller;
 
     /**
      * {@inheritdoc}
      */
-    public function setController(Controller $controller)
+    public function setController(ControllerInterface $controller)
     {
         $this->controller = $controller;
     }
@@ -73,3 +76,5 @@ class Sleeper implements ControllerAwareInterface
     }
 }
 ```
+
+__Note: It is recommended to implement this interface in every job in order to prevent uncontrolled termination of jobs and in order to make the job more responsive.__

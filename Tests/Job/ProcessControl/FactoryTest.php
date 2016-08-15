@@ -10,7 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Job\ProcessControl;
 
-use Abc\Bundle\JobBundle\Job\ProcessControl\Controller;
+use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
+use Abc\Bundle\JobBundle\Job\ProcessControl\StatusController;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
@@ -49,13 +50,20 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getClass')
             ->willReturn(JobInterface::class);
 
+        $this->manager->expects($this->atLeastOnce())
+            ->method('isManagerOf')
+            ->with($this->job)
+            ->willReturn(true);
+
         $this->subject = new Factory($this->manager, $this->interval);
     }
 
     public function testCreate()
     {
         $controller = $this->subject->create($this->job);
-        $this->assertInstanceOf(Controller::class, $controller);
+
+        $this->assertInstanceOf(JobController::class, $controller);
+        $this->assertAttributeInstanceOf(StatusController::class, 'controller', $controller);
     }
 
     public function testCreateReturnsChainedController() {
@@ -69,7 +77,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $controller = $this->subject->create($this->job);
 
-        $this->assertInstanceOf(ChainController::class, $controller);
+        $this->assertInstanceOf(JobController::class, $controller);
+        $this->assertAttributeInstanceOf(ChainController::class, 'controller', $controller);
 
         // assert that default controller is in the chain
         $this->manager->expects($this->once())

@@ -22,16 +22,24 @@ use YZ\SupervisorBundle\Manager\SupervisorManager;
  */
 class AgentManager implements AgentManagerInterface
 {
-    /** @var SupervisorManager */
+    /**
+     * @var SupervisorManager
+     */
     protected $supervisorManager;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $agents;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $processes;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private static $stateToStringMap = [
         0 => 'STOPPED',
         10 => 'STARTING',

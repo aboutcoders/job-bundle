@@ -20,7 +20,7 @@ use Sonata\NotificationBundle\Consumer\ConsumerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * BackendHandler handles operations with the sonata backend.
+ * QueueEngine handles operations with the sonata backend.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
@@ -28,15 +28,25 @@ class QueueEngine implements QueueEngineInterface, ConsumerInterface
 {
     const MESSAGE_PREFIX = 'abc.job.';
 
-    /** @var BackendInterface */
+    /**
+     * @var BackendInterface
+     */
     protected $backend;
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-    /** @var ManagerInterface */
-    protected $manager;
-    /** @var LoggerInterface */
-    protected $logger;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @var ManagerInterface
+     */
+    protected $manager;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @param BackendInterface         $backend

@@ -190,18 +190,18 @@ class Manager implements ManagerInterface
             $this->jobManager->refresh($job);
         }
 
-        if (in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues())) {
-            // should we throw an exception here?
-            return null;
+        if (Status::isTerminated($job->getStatus())) {
+            return false;
         }
 
-        $isRunning = $job->getStatus() == Status::PROCESSING();
+        $isProcessing = $job->getStatus() == Status::PROCESSING();
 
-        $this->helper->updateJob($job, Status::CANCELLED());
+        $this->helper->updateJob($job, $isProcessing ? Status::CANCELLING() : Status::CANCELLED());
         $this->jobManager->save($job);
 
-        if (!$isRunning) {
+        if (!$isProcessing) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
+            $this->logger->info('Cancelled job with ticket {ticket}', ['ticket' => $job->getTicket()]);
         }
 
         return $job;
@@ -323,7 +323,7 @@ class Manager implements ManagerInterface
         $this->helper->updateJob($job, $status, $processingTime, $response);
         $this->jobManager->save($job);
 
-        if (in_array($job->getStatus()->getValue(), Status::getTerminatedStatusValues())) {
+        if (Status::isTerminated($job->getStatus())) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
         }
     }

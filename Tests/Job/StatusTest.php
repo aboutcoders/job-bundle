@@ -17,12 +17,25 @@ use Abc\Bundle\JobBundle\Job\Status;
  */
 class StatusTest extends \PHPUnit_Framework_TestCase
 {
-    public function testUnterminatedStatusValues()
+    public function testGetTerminatedStatus()
     {
-        $unterminatedValues = Status::getTerminatedStatusValues();
-        foreach(array(Status::CANCELLED(), Status::PROCESSED(), Status::ERROR()) as $status)
-        {
-            $this->assertContains($status->getValue(), $unterminatedValues);
+        $values = [Status::CANCELLED, Status::PROCESSED, Status::ERROR];
+        foreach (Status::getTerminatedStatus() as $status) {
+            /**
+             * @var Status $status
+             */
+            $this->assertContains($status->getValue(), $values);
+        }
+    }
+
+    public function testGetUnterminatedStatus()
+    {
+        $values = [Status::REQUESTED, Status::PROCESSING, Status::CANCELLING, Status::SLEEPING];
+        foreach (Status::getUnterminatedStatus() as $status) {
+            /**
+             * @var Status $status
+             */
+            $this->assertContains($status->getValue(), $values);
         }
     }
 }

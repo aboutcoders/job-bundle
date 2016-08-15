@@ -20,8 +20,8 @@ services:
             - { name: abc.job, type: remove_schedule, method: removeSchedule }
             - { name: abc.job, type: update_schedule, method: updateSchedule }
             - { name: abc.job, type: manage_job, method: manageJob }
-            - { name: abc.job, type: invoke_controller, method: invokeController }
-            - { name: abc.job, type: parameterless, method: invokeController }
+            - { name: abc.job, type: cancel, method: cancel }
+            - { name: abc.job, type: parameterless, method: parameterless }
             - { name: abc.job, type: throw_dbal_exception, method: throwDbalException }
 
     abc.job.log.processor:

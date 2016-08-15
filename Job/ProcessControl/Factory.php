@@ -52,7 +52,7 @@ class Factory implements FactoryInterface
 
     /**
      * Adds an additional controller.
-     * 
+     *
      * If additional controllers are registered an instance of ChainController is created
      * containing the all the additional controller plus the one which is created by this
      * factory by default.
@@ -70,12 +70,11 @@ class Factory implements FactoryInterface
      */
     public function create(JobInterface $job)
     {
-        $controller = new Controller($job, $this->manager, $this->interval);
-
+        $controller = new StatusController($job, $this->manager, $this->interval);
         if (count($this->additionalController) > 0) {
             $controller = new ChainController(array_merge($this->additionalController, [$controller]));
         }
 
-        return $controller;
+        return new JobController($controller, $this->manager, $job);
     }
 }

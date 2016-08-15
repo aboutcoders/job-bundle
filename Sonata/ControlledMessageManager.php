@@ -19,9 +19,14 @@ use Sonata\NotificationBundle\Model\MessageManagerInterface;
  */
 class ControlledMessageManager implements MessageManagerInterface
 {
-    /** @var ControllerInterface */
+    /**
+     * @var ControllerInterface
+     */
     protected $controller;
-    /** @var MessageManagerInterface */
+
+    /**
+     * @var MessageManagerInterface
+     */
     protected $manager;
 
     /**
@@ -171,8 +176,8 @@ class ControlledMessageManager implements MessageManagerInterface
      * @param int   $page
      * @param int   $limit
      * @param array $sort
-     *
      * @return \Sonata\DatagridBundle\Pager\PagerInterface
+     * @throws \Exception When invoked
      */
     public function getPager(array $criteria, $page, $limit = 10, array $sort = array())
     {

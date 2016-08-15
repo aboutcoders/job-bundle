@@ -12,9 +12,11 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Job;
 
 use Abc\Bundle\JobBundle\Job\ExceptionResponse;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\ScheduleManagerInterface;
 use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ProcessControl\DoExitController;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 
@@ -156,11 +158,18 @@ class ManagerTest extends DatabaseKernelTestCase
         $this->assertContains('addedJob', $logs);
     }
 
-    public function testJobCanInvokeController()
+    public function testJobCanBeCancelled()
     {
-        $job = $this->getJobManager()->addJob('invoke_controller');
+        /**
+         * @var Factory $controllerFactory
+         */
+        $controllerFactory = $this->getContainer()->get('abc.job.controller_factory');
+        $controllerFactory->addController(new DoExitController());
 
-        $this->assertContains('can invoke controller', $job->getResponse());
+        $job = $this->getJobManager()->addJob('cancel');
+
+        $this->assertContains('cancelled', $job->getResponse());
+        $this->assertEquals(Status::CANCELLED(), $job->getStatus());
     }
 
     /**

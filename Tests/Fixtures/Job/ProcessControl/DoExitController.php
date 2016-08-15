@@ -8,17 +8,20 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Sonata;
+namespace Abc\Bundle\JobBundle\Tests\Fixtures\Job\ProcessControl;
+
+use Abc\ProcessControl\ControllerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class IterationStoppedException extends \Exception
+class DoExitController implements ControllerInterface
 {
-    const CODE = 0;
-
-    public final function __construct()
+    /**
+     * @return true
+     */
+    public function doExit()
     {
-        return parent::__construct('Iteration stopped by process controll', self::CODE);
+        return true;
     }
 }

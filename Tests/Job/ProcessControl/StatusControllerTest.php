@@ -13,14 +13,14 @@ namespace Abc\Bundle\JobBundle\Tests\Job\ProcessControl;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Job\ProcessControl\Controller;
+use Abc\Bundle\JobBundle\Job\ProcessControl\StatusController;
 use phpmock\phpunit\PHPMock;
 
 /**
  * @runTestsInSeparateProcesses
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ControllerTest extends \PHPUnit_Framework_TestCase
+class StatusControllerTest extends \PHPUnit_Framework_TestCase
 {
     use PHPMock;
 
@@ -50,7 +50,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     private $time;
 
     /**
-     * @var Controller
+     * @var StatusController
      */
     private $subject;
 
@@ -58,13 +58,13 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager = $this->getMock(JobManagerInterface::class);
         $this->job     = $this->getMock(JobInterface::class);
-        $this->time    = $this->getFunctionMock(ControllerTest::TEST_SUBJECT_NAMESPACE, 'time');
+        $this->time    = $this->getFunctionMock(StatusControllerTest::TEST_SUBJECT_NAMESPACE, 'time');
 
         $this->manager->expects($this->any())
             ->method('getClass')
             ->willReturn(JobInterface::class);
 
-        $this->subject = new Controller($this->job, $this->manager, static::$interval);
+        $this->subject = new StatusController($this->job, $this->manager, static::$interval);
     }
 
     /**
@@ -72,7 +72,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructValidatesInterval()
     {
-        new Controller($this->job, $this->manager, -1);
+        new StatusController($this->job, $this->manager, -1);
     }
 
     /**
@@ -82,7 +82,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     {
         $job = $this->getMock(\Abc\Bundle\JobBundle\Job\JobInterface::class);
 
-        new Controller($job, $this->manager, -1);
+        new StatusController($job, $this->manager, -1);
     }
 
     public function testDoExitRefreshesOnFirstInvocation()
@@ -101,7 +101,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->subject->doExit();
     }
 
-    public function testDoExitReturnsTrueIfJobIsCancelled()
+    public function testDoExitReturnsTrueIfJobStatusIsCancelling()
     {
         $this->manager->expects($this->once())
             ->method('refresh')
@@ -109,7 +109,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->job->expects($this->once())
             ->method('getStatus')
-            ->willReturn(Status::CANCELLED());
+            ->willReturn(Status::CANCELLING());
 
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
@@ -117,7 +117,11 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->subject->doExit());
     }
 
-    public function testDoExitReturnsFalseIfJobIsNotCancelled()
+    /**
+     * @param Status $status
+     * @dataProvider provideNonCancellingStatus
+     */
+    public function testDoExitReturnsFalseIfJobStatusIsNotCancelling(Status $status)
     {
         $this->manager->expects($this->once())
             ->method('refresh')
@@ -125,7 +129,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->job->expects($this->once())
             ->method('getStatus')
-            ->willReturn(Status::PROCESSING());
+            ->willReturn($status);
 
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
@@ -145,7 +149,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->job->expects($this->exactly(2))
             ->method('getStatus')
-            ->willReturn(Status::CANCELLED());
+            ->willReturn(Status::CANCELLING());
 
         $this->time->expects($this->at(0))->willReturn(0);
         $this->time->expects($this->at(1))->willReturn($secondsPassed);
@@ -169,7 +173,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->job->expects($this->exactly(2))
             ->method('getStatus')
-            ->willReturn(Status::CANCELLED());
+            ->willReturn(Status::CANCELLING());
 
         $this->time->expects($this->at(0))->willReturn(0);
         $this->time->expects($this->at(1))->willReturn($secondsPassed);
@@ -179,6 +183,17 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         // second invocation
         $this->subject->doExit();
+    }
+
+    public static function provideNonCancellingStatus() {
+        return [
+            [Status::REQUESTED()],
+            [Status::CANCELLED()],
+            [Status::PROCESSING()],
+            [Status::PROCESSED()],
+            [Status::SLEEPING()],
+            [Status::ERROR()]
+        ];
     }
 
     public static function provideSecondsGreaterOrEqualToInterval()

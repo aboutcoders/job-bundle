@@ -20,9 +20,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class DatabaseKernelTestCase extends KernelTestCase
 {
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     */
     private $em;
-    /** @var Application */
+
+    /**
+     * @var Application
+     */
     private $application;
 
     /**

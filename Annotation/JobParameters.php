@@ -17,6 +17,8 @@ namespace Abc\Bundle\JobBundle\Annotation;
  */
 final class JobParameters
 {
-    /** @var array<string> @Required */
+    /**
+     * @var array<string> @Required
+     */
     public $typeList;
 }

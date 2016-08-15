@@ -182,15 +182,13 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      * @JobResponse("string")
      * @return string|null
      */
-    public function invokeController()
+    public function cancel()
     {
-        $doExit = $this->controller->doExit();
-
-        if (is_bool($doExit)) {
-            return 'can invoke controller';
+        while(!$this->controller->doExit()) {
+            return 'running';
         }
 
-        return null;
+        return 'cancelled';
     }
 
     /**

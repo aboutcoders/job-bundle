@@ -18,12 +18,12 @@ use Abc\ProcessControl\ControllerInterface;
 /**
  * The default job process controller.
  *
- * This controller uses the configured manager (service id: abc.job.manager)
+ * This controller uses the configured manager (service-id: abc.job.manager)
  * to refresh the job entity and to check whether the job status is CANCELLED
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class Controller implements ControllerInterface
+class StatusController implements ControllerInterface
 {
     /**
      * @var JobManagerInterface
@@ -78,6 +78,6 @@ class Controller implements ControllerInterface
             $this->manager->refresh($this->job);
         }
 
-        return $this->job->getStatus() == Status::CANCELLED();
+        return $this->job->getStatus() == Status::CANCELLING();
     }
 }

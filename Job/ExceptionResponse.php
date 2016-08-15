@@ -19,7 +19,6 @@ use JMS\Serializer\Annotation\Type;
  */
 class ExceptionResponse
 {
-
     /**
      * @var int
      * @Type("integer")

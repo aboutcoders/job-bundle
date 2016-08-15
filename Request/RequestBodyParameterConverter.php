@@ -23,11 +23,19 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class RequestBodyParameterConverter implements ParamConverterInterface
 {
-    /** @var JobTypeRegistry */
+    /**
+     * @var JobTypeRegistry
+     */
     protected $registry;
-    /** @var ParamConverterInterface */
+
+    /**
+     * @var ParamConverterInterface
+     */
     protected $converter;
-    /** @var  EventDispatcherInterface */
+
+    /**
+     * @var  EventDispatcherInterface
+     */
     protected $dispatcher;
 
     /**
@@ -52,27 +60,21 @@ class RequestBodyParameterConverter implements ParamConverterInterface
     {
         $type = $request->attributes->get('type');
 
-        if($type == null)
-        {
+        if ($type == null) {
             throw new BadRequestHttpException('The job type must be defined');
         }
 
-        try
-        {
+        try {
             $jobType = $this->registry->get($type);
-        }
-        catch(JobTypeNotFoundException $e)
-        {
+        } catch (JobTypeNotFoundException $e) {
             throw new BadRequestHttpException(sprintf('A job of type "%s" is not defined', $e->getType()));
         }
 
-        if($request->getContent() == null)
-        {
+        if ($request->getContent() == null) {
             return true;
         }
 
-        if(!is_array($jobType->getParameterTypes()) || count($jobType->getParameterTypes()) == 0)
-        {
+        if (!is_array($jobType->getParameterTypes()) || count($jobType->getParameterTypes()) == 0) {
             throw new BadRequestHttpException(sprintf('The request body for jobs of type "%s" must be empty', $type));
         }
 

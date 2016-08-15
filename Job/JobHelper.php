@@ -48,12 +48,12 @@ class JobHelper
         $job->setProcessingTime($job->getProcessingTime() + ($processingTime === null ? 0 : $processingTime));
         $job->setResponse($response);
 
-        if(in_array($status->getValue(), Status::getTerminatedStatusValues()))
+        if(Status::isTerminated($status))
         {
             $job->setTerminatedAt(new \DateTime());
         }
 
-        if($job->hasSchedules() && in_array($status->getValue(), Status::getTerminatedStatusValues()))
+        if($job->hasSchedules() && Status::isTerminated($status))
         {
             foreach($job->getSchedules() as $schedule)
             {

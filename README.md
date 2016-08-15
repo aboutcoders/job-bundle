@@ -24,15 +24,15 @@ We appreciate if you decide to use this bundle and we appreciate your feedback, 
 
 Follow the installation instructions of the required third party bundles:
 
+* [SensioFrameworkExtraBundle](http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle)
+* [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle)
+* [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
+* [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
 * [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
 * [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
 * [AbcResourceLockBundle](https://github.com/aboutcoders/resource-lock-bundle)
 * [AbcEnumSerializerBundle](https://github.com/aboutcoders/enum-serializer-bundle)
 * [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
-* [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
-* [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
-* [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle)
-* [SensioFrameworkExtraBundle](http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle)
 * [YZSupervisorBundle](https://github.com/yzalis/SupervisorBundle)
 
 Add the AbcJobBundle to your `composer.json` file
@@ -67,7 +67,6 @@ At the current point only doctrine is supported as ORM. However by changing the 
 
 ```yaml
 abc_job:
-
   db_driver: orm
 ```
 
@@ -76,7 +75,6 @@ __Register a doctrine mapping type for the job status__
 ```yaml
 doctrine:
     dbal:
-
         types:
             abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
 ```
@@ -106,7 +104,7 @@ php app/console doctrine:schema:update --force
 
 ## Basic Usage
 
-### Registering a new job
+### Adding a custom job
 
 To register a new job, you have to do two things
 
@@ -149,23 +147,9 @@ __Note:__ You only have to provide the __@JobParameters__ or __@JobResponse__ in
 
 Next you have to register the job as a service within the service container and tag it.
 
-##### Using XML
-```xml
-<?xml version="1.0" ?>
-<container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
-    <services>
-        <service id="my_job" class="My\Bundle\ExampleBundle\Job\MyJob">
-            <tag name="abc.job" type="say_hello" method="sayHello"/>
-        </service>
-    </services>
-</container>
-```
-
-##### Using YML
-
 ```yaml
+# app/config/services.yml
+
 services:
     my_job:
         class: My\Bundle\ExampleBundle\Job\MyJob
@@ -173,7 +157,7 @@ services:
             -  { name: "abc.job", type: "say_hello", method: "sayHello" }
 ```
 
-The tag must define the attributes `name`, `type` and `method` where besides the tag name `type` specifies the unique name of the job (e.g. "mailer") and `method` references the method of the class to be executed.
+The tag with name `abc.job` must define the two attributes `type` and `method` where `type` defines the unique name of the job (e.g. "mailer") and `method` references the method of the job class to must be executed.
 
 ### Adding a job for asynchronous processing
 
@@ -216,20 +200,20 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## How-Tos
 
-- [How-to work with the manager](./docs/howto-manager.md)
-- [How-to modify a job at runtime](./docs/howto-modify-job.md)
-- [How-to manage jobs at runtime](./docs/howto-manage-jobs-at-runtime.md)
-- [How-to inject runtime parameters](./docs/howto-inject-runtime-parameters.md)
-- [How-to work with the job status](./docs/howto-status.md)
-- [How-to make a job cancellable at runtime](./docs/howto-make-a-job-cancellable-at-runtime.md)
+- [How-to work with the manager](./Resources/docs/howto-manager.md)
+- [How-to make a job cancellable at runtime](./Resources/docs/howto-make-a-job-cancellable-at-runtime.md)
+- [How-to inject runtime parameters](./Resources/docs/howto-inject-runtime-parameters.md)
+- [How-to modify a job at runtime](./Resources/docs/howto-modify-job.md)
+- [How-to manage jobs at runtime](./Resources/docs/howto-manage-jobs-at-runtime.md)
+- [How-to work with the job status](./Resources/docs/howto-status.md)
 
 ## Further Documentation
 
-- [Scheduled jobs](./docs/scheduled-jobs.md)
-- [Lifecycle events](./docs/lifecycle-events.md)
-- [Logging](./docs/logging.md)
-- [The REST-API](./docs/rest.md)
-- [Configuration Reference](./docs/configuration-reference.md)
+- [Scheduled jobs](./Resources/docs/scheduled-jobs.md)
+- [Lifecycle events](./Resources/docs/lifecycle-events.md)
+- [Logging](./Resources/docs/logging.md)
+- [The REST-API](./Resources/docs/rest.md)
+- [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ## ToDo:
 
@@ -240,7 +224,6 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - Finalize the REST-API
 - Improve configurability
 - Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?
-- Introduce status cancelling and make sure, job status is only cancelled when no process is still processing the job
 
 ### Planned Features:
 - Add option to configure job as public or not, public jobs a are returned over an API method

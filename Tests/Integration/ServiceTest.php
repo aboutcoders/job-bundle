@@ -22,6 +22,7 @@ use Abc\Bundle\JobBundle\Job\LogManagerInterface;
 use Abc\Bundle\JobBundle\Job\Mailer\Mailer;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
+use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
 use Abc\Bundle\JobBundle\Job\Report\EraserInterface;
 use Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
@@ -44,7 +45,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ServiceConfigurationTest extends KernelTestCase
+class ServiceTest extends KernelTestCase
 {
     /**
      * @var Application
@@ -152,7 +153,7 @@ class ServiceConfigurationTest extends KernelTestCase
         $this->assertCount(1, $registry->all());
     }
 
-    public function testControllerFactoryReturnsChainedController()
+    public function testControllerFactory()
     {
         /**
          * @var Factory $factory
@@ -166,6 +167,6 @@ class ServiceConfigurationTest extends KernelTestCase
 
         $controller = $factory->create($job);
 
-        $this->assertInstanceOf(ChainController::class, $controller);
+        $this->assertInstanceOf(JobController::class, $controller);
     }
 }

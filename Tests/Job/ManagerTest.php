@@ -207,10 +207,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Status $status
-     * @dataProvider provideNonTerminatedStatus
+     * @dataProvider provideUnterminatedStatus
      */
     public function testCancel(Status $status)
     {
+        $isProcessing = $status->getValue() == Status::PROCESSING;
+
         $job = new Job();
         $job->setTicket('ticket');
         $job->setStatus($status);
@@ -219,7 +221,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->helper->expects($this->once())
             ->method('updateJob')
-            ->with($job, Status::CANCELLED())
+            ->with($job, $isProcessing ? Status::CANCELLING() : Status::CANCELLED())
             ->willReturnCallback(
                 function (JobInterface $job, Status $status) {
                     $job->setStatus($status);
@@ -230,13 +232,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(
                 $this->callback(
-                    function ($arg) use ($job) {
-                        return $arg === $job && $job->getStatus() == Status::CANCELLED();
+                    function ($arg) use ($job, $isProcessing) {
+                        return $arg === $job && $job->getStatus() == ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
                     }
                 )
             );
 
-        $this->dispatcher->expects($job->getStatus() != Status::PROCESSING() ? $this->once() : $this->never())
+        $this->dispatcher->expects($isProcessing ? $this->never() : $this->once())
             ->method('dispatch')
             ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
 
@@ -613,8 +615,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnMessageNotUpdatesStatusIfJobWasCancelled()
     {
-        $job       = new Job();
-        $message   = new Message('type', 'ticket');
+        $job     = new Job();
+        $message = new Message('type', 'ticket');
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -696,21 +698,24 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public static function provideNonTerminatedStatus()
+    public static function provideUnterminatedStatus()
     {
-        return [
-            [Status::REQUESTED()],
-            [Status::SLEEPING()]
-        ];
+        $result = [];
+        foreach (Status::getUnterminatedStatus() as $status) {
+            $result[] = [$status];
+        }
+
+        return $result;
     }
 
     public static function provideTerminatedStatus()
     {
-        return [
-            [Status::CANCELLED()],
-            [Status::PROCESSED()],
-            [Status::ERROR()]
-        ];
+        $result = [];
+        foreach (Status::getTerminatedStatus() as $status) {
+            $result[] = [$status];
+        }
+
+        return $result;
     }
 
     /**

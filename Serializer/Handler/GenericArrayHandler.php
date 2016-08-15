@@ -24,7 +24,7 @@ class GenericArrayHandler implements SubscribingHandlerInterface
     public static function getSubscribingMethods()
     {
         $methods = array();
-        $formats = array('json');
+        $formats = ['json'];
 
         foreach($formats as $format)
         {
