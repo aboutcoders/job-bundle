@@ -15,6 +15,7 @@ use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
 use Psr\Log\NullLogger;
 
 /**
@@ -34,7 +35,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->loggerFactory   = $this->getMock(FactoryInterface::class);
+        $this->loggerFactory = $this->getMock(FactoryInterface::class);
 
         $this->subject = new JobHelper($this->loggerFactory);
     }
@@ -130,6 +131,34 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['response'], $job->getResponse());
     }
 
+    public function testCopyJob()
+    {
+        /**
+         * @var ScheduleInterface|\PHPUnit_Framework_MockObject_MockObject
+         */
+        $schedule = $this->getMock(ScheduleInterface::class);
+
+        $original = new Job();
+        $original->setTicket('JobTicket');
+        $original->setResponse('JobResponse');
+        $original->setStatus(Status::REQUESTED());
+        $original->addSchedule($schedule);
+
+        $copy = new Job();
+
+        $returnValue = $this->subject->copyJob($original, $copy);
+
+        $this->assertSame($copy, $returnValue);
+        $this->assertNull($copy->getTicket());
+        $this->assertEquals($original->getType(), $copy->getType());
+        $this->assertEquals($original->getResponse(), $copy->getResponse());
+        $this->assertEquals($original->getStatus(), $copy->getStatus());
+        $this->assertEquals($original->getSchedules(), $copy->getSchedules());
+    }
+
+    /**
+     * @return array
+     */
     public static function getTerminatedStatus()
     {
         return [
@@ -139,6 +168,9 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function getNonTerminatedStatus()
     {
         return [

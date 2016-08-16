@@ -29,8 +29,10 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
+use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -166,10 +168,41 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($job, $addedJob);
     }
 
+    public function testAddEnsuresJobIsManaged()
+    {
+        $job        = $this->getMock(JobInterface::class);
+        $managedJob = $this->getMock(JobInterface::class);
+
+        $this->registry->expects($this->any())
+            ->method('has')
+            ->willReturn(true);
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(false);
+
+        $this->jobManager->expects($this->once())
+            ->method('create')
+            ->with()
+            ->willReturn($managedJob);
+
+        $this->helper->expects($this->once())
+            ->method('copyJob')
+            ->with($job, $managedJob)
+            ->willReturn($managedJob);
+
+        $this->jobManager->expects($this->once())
+            ->method('save')
+            ->with($job);
+
+        $this->subject->add($job);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testJobThrowsExceptionIfTypeIsNotRegistered()
+    public function testAddThrowsExceptionIfTypeIsNotRegistered()
     {
         $job = new Job();
         $job->setType('foobar');
@@ -203,6 +236,27 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception);
 
         $this->subject->add($job);
+    }
+
+    public function testAddJob()
+    {
+        $type       = 'JobType';
+        $parameters = ['JobParameters'];
+        $schedule   = $this->getMock(ScheduleInterface::class);
+        $job        = $this->getMock(JobInterface::class);
+
+        $subject = $this->createMockedSubject(['add']);
+
+        $this->jobManager->expects($this->once())
+            ->method('create')
+            ->with($type, $parameters, $schedule)
+            ->willReturn($job);
+
+        $subject->expects($this->once())
+            ->method('add')
+            ->with($job);
+
+        $subject->addJob($type, $parameters, $schedule);
     }
 
     /**
@@ -490,7 +544,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $type       = 'JobType';
         $ticket     = 'JobTicket';
         $microTime  = microtime(true);
-        $parameters = array('parameters');
+        $parameters = ['parameters'];
         $response   = 'response';
 
         $job = new Job($type);
@@ -613,6 +667,29 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
+    /**
+     * @expectedException \Doctrine\DBAL\DBALException
+     */
+    public function testOnMessageHandlesDbalExceptionsThrownByJob()
+    {
+        $job       = new Job();
+        $microTime = microtime(true);
+        $message   = new Message('type', 'ticket');
+        $exception = $this->getMockBuilder(DBALException::class)->disableOriginalConstructor()->getMock();
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($message->getTicket())
+            ->willReturn($job);
+
+        $this->invoker->expects($this->once())
+            ->method('invoke')
+            ->with($job, $this->isInstanceOf(Context::class))
+            ->willThrowException($exception);
+
+        $this->subject->onMessage($message);
+    }
+
     public function testOnMessageNotUpdatesStatusIfJobWasCancelled()
     {
         $job     = new Job();
@@ -680,6 +757,153 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRestartThrowsExecptionIfJobIsNotManaged()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(false);
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn(false);
+
+        $this->subject->restart($job);
+    }
+
+    public function testRestartCopiesJobIfJobIsNotManaged()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $managedJob = new Job();
+
+        $subject = $this->createMockedSubject(['add']);
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(false);
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($managedJob);
+
+        $this->helper->expects($this->once())
+            ->method('copyJob')
+            ->with($job, $managedJob)
+            ->willReturn($managedJob);
+
+        $subject->expects($this->once())
+            ->method('add')
+            ->willReturn($managedJob);
+
+        $subject->restart($job);
+    }
+
+    public function testRestartWithManagedJob()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+        $job->setProcessingTime(500);
+
+        $subject = $this->createMockedSubject(['add']);
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
+
+        $this->helper->expects($this->never())
+            ->method('copyJob');
+
+        $subject->expects($this->once())
+            ->method('add')
+            ->with($job);
+
+        $subject->restart($job);
+
+        $this->assertEquals(0, $job->getProcessingTime());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testUpdateThrowsExecptionIfJobIsNotManaged()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(false);
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn(false);
+
+        $this->subject->update($job);
+    }
+
+    public function testUpdateCopiesJobIfJobIsNotManaged()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $managedJob = new Job();
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(false);
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($managedJob);
+
+        $this->helper->expects($this->once())
+            ->method('copyJob')
+            ->with($job, $managedJob)
+            ->willReturn($managedJob);
+
+        $this->jobManager->expects($this->once())
+            ->method('save')
+            ->with($managedJob);
+
+        $this->subject->update($job);
+    }
+
+    public function testUpdateWithManagedJob()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $this->jobManager->expects($this->once())
+            ->method('isManagerOf')
+            ->with($job)
+            ->willReturn(true);
+
+        $this->helper->expects($this->never())
+            ->method('copyJob');
+
+        $this->jobManager->expects($this->once())
+            ->method('save')
+            ->with($job);
+
+        $this->subject->update($job);
+    }
+
+    /**
      * @return array
      */
     public static function provideExceptions()
@@ -729,6 +953,35 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ['job-type', ['parameter']],
             ['job-type', ['parameter'], new Schedule()]
         ];
+    }
+
+    /**
+     * @param array $mockedMethods
+     * @return Manager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createMockedSubject(array $mockedMethods)
+    {
+        /**
+         * @var Manager|\PHPUnit_Framework_MockObject_MockObject $subject
+         */
+        $subject = $this->getMockBuilder(Manager::class)
+            ->setConstructorArgs([
+                $this->registry,
+                $this->jobManager,
+                $this->invoker,
+                $this->loggerFactory,
+                $this->logManager,
+                $this->dispatcher,
+                $this->helper,
+                $this->locker,
+                $this->logger
+            ])
+            ->setMethods($mockedMethods)
+            ->getMock();
+
+        $subject->setQueueEngine($this->queueEngine);
+
+        return $subject;
     }
 
     /**

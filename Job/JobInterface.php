@@ -58,15 +58,15 @@ interface JobInterface
     public function hasSchedules();
 
     /**
+     * @return ScheduleInterface[]
+     */
+    public function getSchedules();
+
+    /**
      * @param ScheduleInterface $schedule
      * @return void
      */
     public function addSchedule(ScheduleInterface $schedule);
-
-    /**
-     * @return ScheduleInterface[]
-     */
-    public function getSchedules();
 
     /**
      * @param ScheduleInterface $schedule

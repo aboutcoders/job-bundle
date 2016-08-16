@@ -39,17 +39,17 @@ interface ManagerInterface
      * Adds a job for asynchronous processing.
      *
      * @param JobInterface $job
-     * @return JobInterface The added job (not necessarily the same instance as the given one)
+     * @return JobInterface The added job
      */
     public function add(JobInterface $job);
 
     /**
      * Adds a job for asynchronous processing.
      *
-     * @param string                 $type The job type
+     * @param string                 $type       The job type
      * @param array|null             $parameters The job parameters
-     * @param ScheduleInterface|null $schedule The schedule of the job
-     * @return JobInterface The added job (not necessarily the same instance as the given one)
+     * @param ScheduleInterface|null $schedule   The schedule of the job
+     * @return JobInterface
      */
     public function addJob($type, array $parameters = null, ScheduleInterface $schedule = null);
 
@@ -111,32 +111,24 @@ interface ManagerInterface
     public function onMessage(Message $message);
 
     /**
+     * Restarts a job.
+     *
+     * @param JobInterface $job
+     * @return JobInterface The restarted job
+     * @throws TicketNotFoundException
+     * @throws \InvalidArgumentException If the given job is not managed by the manager
+     * @throws \RuntimeException
+     */
+    public function restart(JobInterface $job);
+
+    /**
      * Updates a job.
      *
      * @param JobInterface $job
-     * @return JobInterface|null The updated job
+     * @return JobInterface The updated job
      * @throws TicketNotFoundException
+     * @throws \InvalidArgumentException If the given job is not managed by the manager
      * @throws \RuntimeException
      */
     public function update(JobInterface $job);
-
-    /**
-     * Resumes a cancelled job.
-     *
-     * @param JobInterface $job
-     * @return JobInterface|null The updated job
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function resume(JobInterface $job);
-
-    /**
-     * Resumes a cancelled job.
-     *
-     * @param string $ticket
-     * @return JobInterface|null The updated job
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function resumeJob($ticket);
 }

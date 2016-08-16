@@ -155,7 +155,11 @@ class Manager implements ManagerInterface
             throw new \InvalidArgumentException(sprintf('A job of type "%s" is not registered', $job->getType()));
         }
 
-        $this->jobManager->save($this->castJobIfTypeIsWrong($job));
+        if (!$this->jobManager->isManagerOf($job)) {
+            $job = $this->helper->copyJob($job, $this->jobManager->create());
+        }
+
+        $this->jobManager->save($job);
 
         $this->logger->debug(
             'Added job with ticket {ticket} of type {type} with parameters {parameters}, schedules {schedules}',
@@ -331,25 +335,37 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
+    public function restart(JobInterface $job)
+    {
+        if (!$this->jobManager->isManagerOf($job)) {
+            if ($managedJob = $this->jobManager->findByTicket($job->getTicket())) {
+                $job = $this->helper->copyJob($job, $managedJob);
+            } else {
+                throw new \InvalidArgumentException('The given job is not managed by this manger');
+            }
+        }
+
+        $job->setProcessingTime(0);
+
+        return $this->add($job);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function update(JobInterface $job)
     {
-        // TODO: Implement update() method.
-    }
+        if (!$this->jobManager->isManagerOf($job)) {
+            if ($managedJob = $this->jobManager->findByTicket($job->getTicket())) {
+                $job = $this->helper->copyJob($job, $managedJob);
+            } else {
+                throw new \InvalidArgumentException('The given job is not managed by this manger');
+            }
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resume(JobInterface $job)
-    {
-        // TODO: Implement resume() method.
-    }
+        $this->jobManager->save($job);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resumeJob($ticket)
-    {
-        // TODO: Implement resumeJob() method.
+        return $job;
     }
 
     /**
@@ -395,23 +411,6 @@ class Manager implements ManagerInterface
         $this->logger->error('Job with ticket {ticket} not found', ['ticket' => $ticket]);
 
         throw new TicketNotFoundException($ticket);
-    }
-
-    /**
-     * @param \Abc\Bundle\JobBundle\Job\JobInterface $job
-     * @return \Abc\Bundle\JobBundle\Model\JobInterface
-     */
-    protected function castJobIfTypeIsWrong(JobInterface $job)
-    {
-        if (!$this->jobManager->isManagerOf($job)) {
-            $newJob = $this->jobManager->create($job->getType(), $job->getParameters());
-            foreach ($job->getSchedules() as $schedule) {
-                $newJob->addSchedule($schedule);
-            }
-            $job = $newJob;
-        }
-
-        return $job;
     }
 
     /**

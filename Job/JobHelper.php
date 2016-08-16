@@ -12,6 +12,8 @@ namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\JobInterface as EntityJobInterface;
+use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -21,7 +23,9 @@ use Psr\Log\LoggerInterface;
  */
 class JobHelper
 {
-    /** @var FactoryInterface */
+    /**
+     * @var FactoryInterface
+     */
     protected $loggerFactory;
 
     /**
@@ -29,7 +33,7 @@ class JobHelper
      */
     function __construct(FactoryInterface $loggerFactory)
     {
-        $this->loggerFactory   = $loggerFactory;
+        $this->loggerFactory = $loggerFactory;
     }
 
     /**
@@ -38,9 +42,9 @@ class JobHelper
      * If the given status is ERROR or CANCELLED the child jobs of the given job will be terminated with status CANCELLED.
      *
      * @param EntityJobInterface $job
-     * @param Status            $status
-     * @param int               $processingTime
-     * @param mixed|null        $response
+     * @param Status             $status
+     * @param int                $processingTime
+     * @param mixed|null         $response
      */
     public function updateJob(EntityJobInterface $job, Status $status, $processingTime = 0, $response = null)
     {
@@ -48,17 +52,13 @@ class JobHelper
         $job->setProcessingTime($job->getProcessingTime() + ($processingTime === null ? 0 : $processingTime));
         $job->setResponse($response);
 
-        if(Status::isTerminated($status))
-        {
+        if (Status::isTerminated($status)) {
             $job->setTerminatedAt(new \DateTime());
         }
 
-        if($job->hasSchedules() && Status::isTerminated($status))
-        {
-            foreach($job->getSchedules() as $schedule)
-            {
-                if(method_exists($schedule, 'setIsActive'))
-                {
+        if ($job->hasSchedules() && Status::isTerminated($status)) {
+            foreach ($job->getSchedules() as $schedule) {
+                if (method_exists($schedule, 'setIsActive')) {
                     $schedule->setIsActive(false);
                 }
             }
@@ -83,5 +83,29 @@ class JobHelper
     public function getJobLogger(EntityJobInterface $job)
     {
         return $this->loggerFactory->create($job);
+    }
+
+    /**
+     * Copies properties of a job to another job
+     *
+     * @param JobInterface                             $original The original job
+     * @param \Abc\Bundle\JobBundle\Model\JobInterface $copy     The job where where properties from original job are copied to
+     * @return \Abc\Bundle\JobBundle\Model\JobInterface The copied job
+     */
+    public function copyJob(JobInterface $original, \Abc\Bundle\JobBundle\Model\JobInterface $copy)
+    {
+
+
+        $copy->setType($original->getType());
+        $copy->setStatus($original->getStatus());
+        $copy->setResponse($original->getResponse());
+        $copy->setParameters(['JobParameters']);
+
+
+        foreach ($original->getSchedules() as $schedule) {
+            $copy->addSchedule($schedule);
+        }
+
+        return $copy;
     }
 }

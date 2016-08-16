@@ -24,14 +24,24 @@ use JMS\Serializer\SerializerInterface;
  */
 abstract class JobManager extends BaseJobManager
 {
-    /** @var ObjectManager */
+    /**
+     * @var ObjectManager
+     */
     protected $objectManager;
-    /** @var string */
+
+    /**
+     * @var string
+     */
     protected $class;
-    /** @var ObjectRepository */
+
+    /**
+     * @var ObjectRepository
+     */
     protected $repository;
 
-    /** @var ScheduleManager */
+    /**
+     * @var ScheduleManager
+     */
     protected $scheduleManager;
 
     /**
