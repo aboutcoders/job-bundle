@@ -97,7 +97,7 @@ class JobController extends FOSRestController
      * @return JobInterface
      *
      * @ApiDoc(
-     * description="Returns a job with the given ticket",
+     * description="Returns a job",
      * section="AbcJobBundle",
      * output="Abc\Bundle\JobBundle\Model\Job",
      *   statusCodes = {
@@ -120,7 +120,7 @@ class JobController extends FOSRestController
      * Adds a job
      *
      * @ApiDoc(
-     *   description="Adds a new job",
+     *   description="Adds a job",
      *   section="AbcJobBundle",
      *   output="Abc\Bundle\JobBundle\Model\Job",
      *   statusCodes = {

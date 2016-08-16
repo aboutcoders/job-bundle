@@ -22,7 +22,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
  */
 class TypeController extends FOSRestController
 {
-
     /**
      * @return array
      *
@@ -39,12 +38,7 @@ class TypeController extends FOSRestController
      */
     public function cgetAction()
     {
-        $types = array();
-        foreach ($this->getRegistry()->all() as $jobType) {
-            $types[] = $jobType->getName();
-        }
-
-        return $types;
+        return $this->getRegistry()->getTypeChoices();
     }
 
     /**
