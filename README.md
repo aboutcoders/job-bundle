@@ -102,6 +102,12 @@ Finally you need to update your database schema in order to create the required 
 php app/console doctrine:schema:update --force
 ```
 
+__Check swiftmailer configuration__
+
+If you are using the mailer job that is shipped with this bundle you have to make sure that the spool configuration is changed so that mails are sent at once and not only if the kernel terminates, which is the default behavior (see: [How to Spool Emails](http://symfony.com/doc/current/email/spool.html)).
+
+To change this configuration only for the job processing and leave the default configuration as is you have to run the job processing in a dedicated environment (see: [How to Master and Create new Environments](http://symfony.com/doc/current/configuration/environments.html))).
+
 ## Basic Usage
 
 ### Adding a custom job
@@ -218,7 +224,6 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 ### Stable release:
-- Explain in installation instructions that it is necessary to define a custom environment for the queue agents
 - Finalize the REST-API
 - Improve configurability
 - Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?
