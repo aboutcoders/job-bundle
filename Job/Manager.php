@@ -181,18 +181,11 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function cancel(JobInterface $job)
+    public function cancel($ticket)
     {
-        $this->logger->debug('Cancel job with ticket {ticket}', ['ticket' => $job->getTicket()]);
+        $this->logger->debug('Cancel job with ticket {ticket}', ['ticket' => $ticket]);
 
-        if (!$this->jobManager->isManagerOf($job)) {
-            $this->jobManager->findByTicket($job->getTicket());
-        } else {
-            /**
-             * @var \Abc\Bundle\JobBundle\Model\JobInterface $job
-             */
-            $this->jobManager->refresh($job);
-        }
+        $job = $this->findJob($ticket);
 
         if (Status::isTerminated($job->getStatus())) {
             return false;
@@ -214,14 +207,6 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function cancelJob($ticket)
-    {
-        return $this->cancel($this->findJob($ticket));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get($ticket)
     {
         $this->logger->debug('Get job with ticket {ticket}', ['ticket' => $ticket]);
@@ -232,19 +217,11 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(JobInterface $job)
+    public function getLogs($ticket)
     {
-        $this->logger->debug('Get logs for ticket {ticket}', ['ticket' => $job->getTicket()]);
+        $this->logger->debug('Get logs for ticket {ticket}', ['ticket' => $ticket]);
 
-        return $this->logManager->findByJob($job);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getJobLogs($ticket)
-    {
-        return $this->getLogs($this->findJob($ticket));
+        return $this->logManager->findByJob($this->findJob($ticket));
     }
 
     /**
@@ -335,15 +312,9 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function restart(JobInterface $job)
+    public function restart($ticket)
     {
-        if (!$this->jobManager->isManagerOf($job)) {
-            if ($managedJob = $this->jobManager->findByTicket($job->getTicket())) {
-                $job = $this->helper->copyJob($job, $managedJob);
-            } else {
-                throw new \InvalidArgumentException('The given job is not managed by this manger');
-            }
-        }
+        $job = $this->findJob($ticket);
 
         $job->setProcessingTime(0);
 
@@ -356,11 +327,8 @@ class Manager implements ManagerInterface
     public function update(JobInterface $job)
     {
         if (!$this->jobManager->isManagerOf($job)) {
-            if ($managedJob = $this->jobManager->findByTicket($job->getTicket())) {
-                $job = $this->helper->copyJob($job, $managedJob);
-            } else {
-                throw new \InvalidArgumentException('The given job is not managed by this manger');
-            }
+            $managedJob = $this->findJob($job->getTicket());
+            $job = $this->helper->copyJob($job, $managedJob);
         }
 
         $this->jobManager->save($job);

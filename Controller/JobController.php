@@ -20,16 +20,17 @@ use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -121,6 +122,7 @@ class JobController extends FOSRestController
      * @ApiDoc(
      *   description="Adds a new job",
      *   section="AbcJobBundle",
+     *   output="Abc\Bundle\JobBundle\Model\Job",
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     400 = "Form validation error"
@@ -128,27 +130,49 @@ class JobController extends FOSRestController
      * )
      *
      * @param Request $request the request object
-     *
-     * @return View
+     * @return JobInterface|Form
      */
     public function postAction(Request $request)
     {
-        $type = $request->get('type');
-        if (!$this->getRegistry()->has($type)) {
-            throw $this->createNotFoundException(sprintf('A job of type "%s" not found', $type));
-        }
+        $job = $this->getEntityManager()->create($request->get('type'));
 
-        $formType = method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? JobType::class : 'abc_job';
-
-        $form = $this->createNamedForm('', $formType, $this->getEntityManager()->create($type));
+        $form = $this->createNamedForm('', $this->getJobFormType(), $job);
 
         return $this->processForm($form, $request);
     }
 
     /**
-     * @param string $ticket
-     * @return JobInterface
+     * Updates a job.
      *
+     * @ApiDoc(
+     *   description="Updates a job",
+     *   section="AbcJobBundle",
+     *   output="Abc\Bundle\JobBundle\Model\Job",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     400 = "Returned when validation fails",
+     *     404 = "Returned when job not found"
+     *   }
+     * )
+     *
+     * @param string  $ticket
+     * @param Request $request the request object
+     * @return JobInterface|Form
+     */
+    public function putAction($ticket, Request $request)
+    {
+        if(!$job = $this->getJobManager()->get($ticket)){
+            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket));
+        }
+
+        $form = $this->createNamedForm('', $this->getJobFormType(), $job, [
+            'method' => 'PUT'
+        ]);
+
+        return $this->processForm($form, $request, $ticket);
+    }
+
+    /**
      * @Post
      *
      * @ApiDoc(
@@ -161,11 +185,40 @@ class JobController extends FOSRestController
      *     404 = "Returned when job not found",
      *   }
      * )
+     *
+     * @param string $ticket
+     * @return JobInterface
      */
     public function cancelAction($ticket)
     {
         try {
-            return $this->getJobManager()->cancelJob($ticket);
+            return $this->getJobManager()->cancel($ticket);
+        } catch (TicketNotFoundException $e) {
+            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+        }
+    }
+
+    /**
+     * @Post
+     *
+     * @ApiDoc(
+     * description="Restarts a job",
+     * section="AbcJobBundle",
+     * output="Abc\Bundle\JobBundle\Model\Job",
+     * parameters={},
+     * statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when job not found",
+     *   }
+     * )
+     *
+     * @param string $ticket
+     * @return JobInterface
+     */
+    public function restartAction($ticket)
+    {
+        try {
+            return $this->getJobManager()->restart($ticket);
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
@@ -191,23 +244,31 @@ class JobController extends FOSRestController
     public function getLogsAction($ticket)
     {
         try {
-            return $this->getJobManager()->getJobLogs($ticket);
+            return $this->getJobManager()->getLogs($ticket);
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
     }
 
     /**
-     * @param Form    $form
-     * @param Request $request
-     * @return object Entity
+     * @param Form        $form
+     * @param Request     $request
+     * @param string|null $ticket
+     * @return JobInterface|Form The added job if validation succeeded, otherwise the form
      */
-    protected function processForm(Form $form, $request)
+    protected function processForm(Form $form, $request, $ticket = null)
     {
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->getJobManager()->add($form->getData());
+            if ('POST' === $request->getMethod()) {
+                return $this->getJobManager()->add($form->getData());
+            } elseif ('PUT' === $request->getMethod()) {
+                $job = $form->getData();
+                $job->setTicket($ticket);
+
+                return $this->getJobManager()->update($job);
+            }
+
         } else {
             return $form;
         }
@@ -230,11 +291,10 @@ class JobController extends FOSRestController
             }
         }
 
-        if(isset($criteria['status'])) {
+        if (isset($criteria['status'])) {
             try {
                 $criteria['status'] = $this->getSerializer()->deserialize(json_encode($criteria['status']), Status::class, 'json');
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 throw new BadRequestHttpException('Invalid status defined in criteria');
             }
         }
@@ -267,17 +327,10 @@ class JobController extends FOSRestController
     }
 
     /**
-     * @return JobTypeRegistry
-     */
-    protected function getRegistry()
-    {
-        return $this->get('abc.job.registry');
-    }
-
-    /**
      * @return SerializerInterface
      */
-    protected function getSerializer() {
+    protected function getSerializer()
+    {
         return $this->get('jms_serializer');
     }
 
@@ -286,10 +339,18 @@ class JobController extends FOSRestController
      * @param       $type
      * @param null  $data
      * @param array $options
-     * @return mixed
+     * @return Form
      */
-    private function createNamedForm($name, $type, $data = null, array $options = array())
+    private function createNamedForm($name, $type, $data = null, array $options = [])
     {
         return $this->container->get('form.factory')->createNamed($name, $type, $data, $options);
+    }
+
+    /**
+     * @return string
+     */
+    private function getJobFormType()
+    {
+        return method_exists(AbstractType::class, 'getBlockPrefix') ? JobType::class : 'abc_job';
     }
 }

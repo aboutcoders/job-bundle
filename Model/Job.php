@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Type;
+use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -31,6 +32,7 @@ class Job implements JobInterface
     /**
      * @var string
      * @Type("string")
+     * @AbcJobAssert\JobType
      */
     protected $type;
 

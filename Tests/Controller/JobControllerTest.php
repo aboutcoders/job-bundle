@@ -120,7 +120,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
     public function testCgetActionValidatesStatus()
     {
-        $url = '/api/jobs?' . http_build_query(['criteria' => ['status' => 'foo']]);
+        $url    = '/api/jobs?' . http_build_query(['criteria' => ['status' => 'foo']]);
         $client = static::createClient();
 
         $client->request(
@@ -168,7 +168,7 @@ class JobControllerTest extends DatabaseWebTestCase
     {
         $client = static::createClient();
 
-        $this->mockServices([ 'abc.job.manager' => $this->manager]);
+        $this->mockServices(['abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
             ->method('get')
@@ -201,7 +201,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
-        $this->mockServices([ 'abc.job.manager' => $this->manager]);
+        $this->mockServices(['abc.job.manager' => $this->manager]);
 
         $client->request(
             'POST',
@@ -222,6 +222,74 @@ class JobControllerTest extends DatabaseWebTestCase
         }
     }
 
+    /**
+     * @param string $ticket
+     * @param $parameters
+     * @param $expectedStatusCode
+     * @dataProvider providePutData
+     */
+    public function testPutAction($ticket, $parameters, $expectedStatusCode)
+    {
+        $url = '/api/jobs/' . $ticket;
+        $job = $this->buildJobFromArray($parameters);
+        $job->setTicket($ticket);
+
+        $this->manager->expects($this->once())
+            ->method('get')
+            ->with($ticket)
+            ->willReturn($job);
+
+        $this->manager->expects($this->once())
+            ->method('update')
+            ->with($this->equalTo($job))
+            ->willReturnArgument(0);
+
+        $client = static::createClient();
+
+        $this->mockServices(['abc.job.manager' => $this->manager]);
+
+        $client->request(
+            'PUT',
+            $url,
+            $parameters,
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            null,
+            'json'
+        );
+
+        $this->assertEquals($expectedStatusCode, $client->getResponse()->getStatusCode());
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals($ticket, $data['ticket']);
+    }
+
+    public function testPutActionReturns404IfJobNotFound()
+    {
+        $url = '/api/jobs/JobTicket';
+
+        $this->manager->expects($this->once())
+            ->method('get')
+            ->willReturn(null);
+
+        $client = static::createClient();
+
+        $this->mockServices(['abc.job.manager' => $this->manager]);
+
+        $client->request(
+            'PUT',
+            $url,
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            null,
+            'json'
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
     public function testGetLogsAction()
     {
         $job = new Job();
@@ -229,10 +297,10 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $client = static::createClient();
 
-        $this->mockServices([ 'abc.job.manager' => $this->manager]);
+        $this->mockServices(['abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
-            ->method('getJobLogs')
+            ->method('getLogs')
             ->with($job->getTicket())
             ->willReturn('LogMessage');
 
@@ -256,10 +324,10 @@ class JobControllerTest extends DatabaseWebTestCase
         // get the (initialized) serializer before it is destroyed by this mockServices() call, otherwise we do not have custom handlers initialized
         $serializer = static::$kernel->getContainer()->get('jms_serializer');
 
-        $this->mockServices([ 'abc.job.manager' => $this->manager]);
+        $this->mockServices(['abc.job.manager' => $this->manager]);
 
         $this->manager->expects($this->once())
-            ->method('cancelJob')
+            ->method('cancel')
             ->with($job->getTicket())
             ->willReturn($job);
 
@@ -273,6 +341,71 @@ class JobControllerTest extends DatabaseWebTestCase
         $deserializedObject = $serializer->deserialize($data, Job::class, 'json');
 
         $this->assertEquals($job->getStatus(), $deserializedObject->getStatus());
+    }
+
+    public function testCancelReturns404IfJobNotFound()
+    {
+        $job = new Job();
+        $job->setTicket('12345');
+
+        $client = static::createClient();
+
+        $this->mockServices(['abc.job.manager' => $this->manager]);
+
+        $this->manager->expects($this->once())
+            ->method('cancel')
+            ->willThrowException(new TicketNotFoundException($job->getTicket()));
+
+        $client->request('POST', '/api/jobs/12345/cancel');
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    public function testRestartAction()
+    {
+        $job = new Job();
+        $job->setTicket('12345');
+
+        $client = static::createClient();
+
+        // get the (initialized) serializer before it is destroyed by this mockServices() call, otherwise we do not have custom handlers initialized
+        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+
+        $this->mockServices(['abc.job.manager' => $this->manager]);
+
+        $this->manager->expects($this->once())
+            ->method('restart')
+            ->with($job->getTicket())
+            ->willReturn($job);
+
+        $client->request('POST', '/api/jobs/12345/restart');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        $data = $client->getResponse()->getContent();
+
+        /** @var JobInterface $deserializedObject */
+        $deserializedObject = $serializer->deserialize($data, Job::class, 'json');
+
+        $this->assertEquals($job->getTicket(), $deserializedObject->getTicket());
+    }
+
+    public function testRestartReturns404IfJobNotFound()
+    {
+        $job = new Job();
+        $job->setTicket('12345');
+
+        $client = static::createClient();
+
+        $this->mockServices(['abc.job.manager' => $this->manager]);
+
+        $this->manager->expects($this->once())
+            ->method('restart')
+            ->willThrowException(new TicketNotFoundException($job->getTicket()));
+
+        $client->request('POST', '/api/jobs/12345/restart');
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
     public static function providePostData()
@@ -322,7 +455,7 @@ class JobControllerTest extends DatabaseWebTestCase
             ],
             [
                 [
-                    'type'       => 'parameterless'
+                    'type' => 'parameterless'
                 ],
                 200
             ],
@@ -337,7 +470,26 @@ class JobControllerTest extends DatabaseWebTestCase
                 [
                     'type' => 'undefined'
                 ],
-                404
+                400
+            ]
+        ];
+    }
+
+    public static function providePutData()
+    {
+        return [
+            [
+                'JobTicket',
+                [
+                    'type'       => 'mailer',
+                    'parameters' => [
+                        'to'      => 'to@domain.tld',
+                        'from'    => 'from@domain.tld',
+                        'message' => 'message body',
+                        'subject' => 'subject',
+                    ]
+                ],
+                200
             ]
         ];
     }

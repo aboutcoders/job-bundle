@@ -219,8 +219,6 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ### Stable release:
 - Explain in installation instructions that it is necessary to define a custom environment for the queue agents
-- Add option to update a scheduled job
-- Add option to resume a canceled job
 - Finalize the REST-API
 - Improve configurability
 - Deliver Logs over API as array (nice for formatting) or one big string (current implementation)?

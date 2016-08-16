@@ -56,22 +56,12 @@ interface ManagerInterface
     /**
      * Cancels execution of a job.
      *
-     * @param JobInterface $job
-     * @return JobInterface|false The cancelled job, or false if given job is already terminated
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function cancel(JobInterface $job);
-
-    /**
-     * Cancels execution of a job.
-     *
      * @param string $ticket The ticket of the job
      * @return JobInterface|null The cancelled job, or null if given job is already terminated
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */
-    public function cancelJob($ticket);
+    public function cancel($ticket);
 
     /**
      * Returns a job.
@@ -86,19 +76,11 @@ interface ManagerInterface
     /**
      * Returns the logs of a job.
      *
-     * @param JobInterface $job
-     * @return string|null
-     */
-    public function getLogs(JobInterface $job);
-
-    /**
-     * Returns the logs of a job.
-     *
      * @param string $ticket
      * @return string|null
      * @throws TicketNotFoundException
      */
-    public function getJobLogs($ticket);
+    public function getLogs($ticket);
 
     /**
      * Handles a message from the queue engine.
@@ -113,13 +95,12 @@ interface ManagerInterface
     /**
      * Restarts a job.
      *
-     * @param JobInterface $job
+     * @param string $ticket
      * @return JobInterface The restarted job
      * @throws TicketNotFoundException
-     * @throws \InvalidArgumentException If the given job is not managed by the manager
      * @throws \RuntimeException
      */
-    public function restart(JobInterface $job);
+    public function restart($ticket);
 
     /**
      * Updates a job.
@@ -127,7 +108,6 @@ interface ManagerInterface
      * @param JobInterface $job
      * @return JobInterface The updated job
      * @throws TicketNotFoundException
-     * @throws \InvalidArgumentException If the given job is not managed by the manager
      * @throws \RuntimeException
      */
     public function update(JobInterface $job);

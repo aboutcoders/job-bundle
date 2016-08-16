@@ -30,12 +30,12 @@ use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
 use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
+use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvents;
 use Abc\Bundle\SchedulerBundle\Iterator\IteratorRegistryInterface;
-use Abc\ProcessControl\ChainController;
 use Metadata\MetadataFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -105,7 +105,8 @@ class ServiceTest extends KernelTestCase
             ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
             ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
             ['abc.job.lock_manager', LockManagerInterface::class],
-            ['abc.job.controller_factory', Factory::class]
+            ['abc.job.controller_factory', Factory::class],
+            ['abc.job.validator.job_type', JobTypeValidator::class]
         ];
     }
 

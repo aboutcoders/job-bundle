@@ -273,6 +273,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $terminationEvent = new TerminationEvent($job);
 
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+                ->willReturn($job);
+
         $this->helper->expects($this->once())
             ->method('updateJob')
             ->with($job, $isProcessing ? Status::CANCELLING() : Status::CANCELLED())
@@ -287,7 +292,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->callback(
                     function ($arg) use ($job, $isProcessing) {
-                        return $arg === $job && $job->getStatus() == ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
+                        return $arg === $job && $arg->getStatus() == ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
                     }
                 )
             );
@@ -296,7 +301,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
 
-        $this->subject->cancel($job);
+        $this->subject->cancel($job->getTicket());
     }
 
     /**
@@ -310,13 +315,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job->setTicket('ticket');
 
         $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(true);
-
-        $this->jobManager->expects($this->once())
-            ->method('refresh')
-            ->with($job)
+            ->method('findByTicket')
+            ->with($job->getTicket())
             ->willReturn($job);
 
         $this->helper->expects($this->never())
@@ -328,28 +328,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
 
-        $this->subject->cancel($job);
-    }
-
-    public function testCancelJob()
-    {
-        /**
-         * @var Manager|\PHPUnit_Framework_MockObject_MockObject $subject
-         */
-        $subject = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['cancel', 'findJob'])
-            ->getMock();
-
-        $job = new Job();
-        $job->setTicket('JobTicket');
-
-        $subject->expects($this->once())
-            ->method('findJob')
-            ->with($job->getTicket())
-            ->willReturn($job);
-
-        $subject->cancelJob($job->getTicket());
+        $this->assertFalse($this->subject->cancel($job));
     }
 
     public function testGet()
@@ -382,12 +361,17 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setTicket('ticket');
 
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($job);
+
         $this->logManager->expects($this->once())
             ->method('findByJob')
             ->with($job)
             ->willReturn('logs');
 
-        $this->assertSame('logs', $this->subject->getLogs($job));
+        $this->assertSame('logs', $this->subject->getLogs($job->getTicket()));
     }
 
     public function testOnMessageHandlesExecutionEventExceptions()
@@ -676,6 +660,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $microTime = microtime(true);
         $message   = new Message('type', 'ticket');
         $exception = $this->getMockBuilder(DBALException::class)->disableOriginalConstructor()->getMock();
+        $exception->expects($this->any())
+            ->method('getMessage')
+            ->willReturn('foobar');
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -756,59 +743,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRestartThrowsExecptionIfJobIsNotManaged()
-    {
-        $job = new Job();
-        $job->setTicket('JobTicket');
-
-        $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(false);
-
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
-            ->with($job->getTicket())
-            ->willReturn(false);
-
-        $this->subject->restart($job);
-    }
-
-    public function testRestartCopiesJobIfJobIsNotManaged()
-    {
-        $job = new Job();
-        $job->setTicket('JobTicket');
-
-        $managedJob = new Job();
-
-        $subject = $this->createMockedSubject(['add']);
-
-        $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(false);
-
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
-            ->with($job->getTicket())
-            ->willReturn($managedJob);
-
-        $this->helper->expects($this->once())
-            ->method('copyJob')
-            ->with($job, $managedJob)
-            ->willReturn($managedJob);
-
-        $subject->expects($this->once())
-            ->method('add')
-            ->willReturn($managedJob);
-
-        $subject->restart($job);
-    }
-
-    public function testRestartWithManagedJob()
+    public function testRestart()
     {
         $job = new Job();
         $job->setTicket('JobTicket');
@@ -817,24 +752,21 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $subject = $this->createMockedSubject(['add']);
 
         $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(true);
-
-        $this->helper->expects($this->never())
-            ->method('copyJob');
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($job);
 
         $subject->expects($this->once())
             ->method('add')
             ->with($job);
 
-        $subject->restart($job);
+        $subject->restart($job->getTicket());
 
         $this->assertEquals(0, $job->getProcessingTime());
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException
      */
     public function testUpdateThrowsExecptionIfJobIsNotManaged()
     {
@@ -849,7 +781,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
             ->with($job->getTicket())
-            ->willReturn(false);
+            ->willReturn(null);
 
         $this->subject->update($job);
     }

@@ -112,7 +112,7 @@ class ManagerTest extends DatabaseKernelTestCase
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
     }
 
-    public function testCancelJobWithSchedule()
+    public function testCancelWithSchedule()
     {
         $schedule = new Schedule();
         $schedule->setExpression('* * * * *');
@@ -120,7 +120,7 @@ class ManagerTest extends DatabaseKernelTestCase
 
         $ticket = $this->getJobManager()->addJob('schedule', array(1), $schedule);
 
-        $this->getJobManager()->cancelJob($ticket);
+        $this->getJobManager()->cancel($ticket);
 
         $this->assertEmpty($this->getJobManager()->getLogs($ticket));
         $this->assertEquals(Status::CANCELLED(), $this->getJobManager()->get($ticket)->getStatus());
@@ -153,7 +153,7 @@ class ManagerTest extends DatabaseKernelTestCase
 
         $ticket = $job->getResponse();
 
-        $logs = $this->getJobManager()->getJobLogs($ticket);
+        $logs = $this->getJobManager()->getLogs($ticket);
 
         $this->assertContains('addedJob', $logs);
     }

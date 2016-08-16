@@ -45,32 +45,35 @@ $job = $manager->get($ticket);
 
 ## Cancelling a job
 
-You can cancel a job with one of the following commands:
-
-Use `cancelJob` in case you only know the ticket:
+Use the following command to get to cancel a job:
 
 ```php
-$manager->cancelJob($ticket);
+$manager->cancel($job->getTicket());
 ```
 
-Use `cancel` in case you already retrieved the job from the manager:
+## Restarting a job
+
+Use the following command to get to restart a job:
 
 ```php
-$manager->cancel($job);
+$manager->restart($job->getTicket());
 ```
 
-## Retrieving the logs
+## Updating a job
 
-Each job has access its own logger. You can retrieve the logs of a job with one of the following commands:
-
-Use `getJobLogs` in case you only know the ticket:
+Use the following command to get to restart a job:
 
 ```php
-$logsString = $manager->getLogs($job);
+// modify the job
+$job->removeSchedules()
+
+$manager->update($job);
 ```
 
-Use `getLogs` in case you already retrieved the job from the manager:
+## Getting the logs of a job
+
+Use the following command to get to logs of a job:
 
 ```php
-$logsString = $manager->getLogs($job);
+$logsString = $manager->getLogs($job->getTicket());
 ```

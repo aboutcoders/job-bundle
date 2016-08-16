@@ -63,6 +63,6 @@ class SecondsType extends AbstractType
      */
     private function methodBlockPrefixExists()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
+        return method_exists(AbstractType::class, 'getBlockPrefix');
     }
 }

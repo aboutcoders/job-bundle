@@ -66,10 +66,14 @@ class JobType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($registry)
             {
-
-                /** @var JobInterface $job */
+                /**
+                 * @var JobInterface $job
+                 */
                 $job = $event->getData();
-                /** @var Form $form */
+
+                /**
+                 * @var Form $form
+                 */
                 $form = $event->getForm();
 
                 if(!is_null($job) && !is_null($job->getType()) && $registry->has($job->getType()))
@@ -149,6 +153,6 @@ class JobType extends AbstractType
      */
     private function methodBlockPrefixExists()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix');
+        return method_exists(AbstractType::class, 'getBlockPrefix');
     }
 }

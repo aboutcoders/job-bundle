@@ -82,4 +82,11 @@ class JobTypeRegistry
 
         return $this->types[$type];
     }
+
+    /**
+     * @return string[] An array containing all registered type keys
+     */
+    public function getTypeChoices() {
+        return array_keys($this->types);
+    }
 }
