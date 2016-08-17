@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="abc.job.queue_engine" class="Abc\Bundle\JobBundle\Sonata\QueueEngine" public="false">
+        <service id="abc.job.queue_engine" class="Abc\Bundle\JobBundle\Sonata\SonataAdapter" public="false">
             <argument type="service" id="sonata.notification.backend"/>
             <argument type="service" id="sonata.notification.dispatcher"/>
             <argument type="service" id="logger" on-invalid="null"/>

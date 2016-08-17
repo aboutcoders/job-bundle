@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
-use Abc\Bundle\JobBundle\Sonata\QueueEngine;
+use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -70,7 +70,7 @@ class RegisterSonataListenersPass implements CompilerPassInterface
                 $dispatcher->addMethodCall(
                     'addListenerService',
                     array(
-                        QueueEngine::MESSAGE_PREFIX . $tag['type'],
+                        SonataAdapter::MESSAGE_PREFIX . $tag['type'],
                         array($this->queueEngineService, 'process')
                     )
                 );

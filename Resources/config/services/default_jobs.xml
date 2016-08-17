@@ -8,11 +8,11 @@
 
         <service id="abc.job.mailer" class="Abc\Bundle\JobBundle\Job\Mailer\Mailer" public="true">
             <argument type="service" id="mailer"/>
-            <tag name="abc.job" type="mailer" method="send" formType="%abc.job.form_type_message%"/>
+            <tag name="abc.job" type="mailer" method="send" formType="%abc.job.form.form_type_message%"/>
         </service>
 
         <service id="abc.job.sleeper" class="Abc\Bundle\JobBundle\Job\Sleeper">
-            <tag name="abc.job" type="sleeper" method="sleep" formType="%abc.job.form_type_seconds%"/>
+            <tag name="abc.job" type="sleeper" method="sleep" formType="%abc.job.form.form_type_seconds%"/>
         </service>
 
     </services>

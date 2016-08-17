@@ -15,6 +15,8 @@ use Sonata\NotificationBundle\Model\MessageInterface;
 use Sonata\NotificationBundle\Model\MessageManagerInterface;
 
 /**
+ * A message manager controlled by a process controller that decorates the message manager injected in the constructor.
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class ControlledMessageManager implements MessageManagerInterface
@@ -30,8 +32,8 @@ class ControlledMessageManager implements MessageManagerInterface
     protected $manager;
 
     /**
-     * @param ControllerInterface     $controller
-     * @param MessageManagerInterface $manager
+     * @param ControllerInterface     $controller The controller
+     * @param MessageManagerInterface $manager The message manage to be controlled
      */
     public function __construct(ControllerInterface $controller, MessageManagerInterface $manager)
     {

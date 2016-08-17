@@ -88,10 +88,10 @@ class ServiceTest extends KernelTestCase
     public function getServices()
     {
         return [
-            ['abc.job.agent_manager', AgentManagerInterface::class],
+            ['abc.job.agent_entity_manager', AgentManagerInterface::class],
             ['abc.job.eraser', EraserInterface::class],
             ['abc.job.form.type.job', JobType::class],
-            ['abc.job.job_manager', JobManagerInterface::class],
+            ['abc.job.job_entity_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],
             ['abc.job.listener.schedule', ScheduleListener::class],
             ['abc.job.logger.factory', FactoryInterface::class],
@@ -100,7 +100,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.manager', ManagerInterface::class],
             ['abc.job.metadata_factory', MetadataFactory::class],
             ['abc.job.registry', JobTypeRegistry::class],
-            ['abc.job.schedule_manager', ScheduleManager::class],
+            ['abc.job.schedule_entity_manager', ScheduleManager::class],
             ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
             ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
             ['abc.job.lock_manager', LockManagerInterface::class],

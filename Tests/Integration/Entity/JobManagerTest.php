@@ -24,12 +24,19 @@ use JMS\Serializer\SerializerInterface;
 class JobManagerTest extends DatabaseKernelTestCase
 {
 
-    /** @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $registry;
-    /** @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject */
+
+    /**
+     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $serializer;
 
-    /** @var JobManager */
+    /**
+     * @var JobManager
+     */
     private $subject;
 
     /**
@@ -185,6 +192,6 @@ class JobManagerTest extends DatabaseKernelTestCase
      */
     private function getScheduleManager()
     {
-        return $this->getContainer()->get('abc.job.schedule_manager');
+        return $this->getContainer()->get('abc.job.schedule_entity_manager');
     }
 }

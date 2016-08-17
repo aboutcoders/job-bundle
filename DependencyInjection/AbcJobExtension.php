@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\AbstractType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -35,19 +36,22 @@ class AbcJobExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config/services'));
 
-        // default services
-        $container->setAlias('abc.job.manager', $config['service']['manager']);
-        $container->setAlias('abc.job.job_manager', $config['service']['job_manager']);
-        $container->setAlias('abc.job.agent_manager', $config['service']['agent_manager']);
-        $container->setAlias('abc.job.schedule_manager', $config['service']['schedule_manager']);
-        $container->setAlias('abc.job.schedule_iterator', $config['service']['schedule_iterator']);
-        $container->setAlias('abc.job.schedule_manager_iterator', $config['service']['schedule_manager_iterator']);
-        $container->setAlias('abc.job.controller_factory', $config['service']['controller_factory']);
-        $container->setParameter('abc.job.form_type_message', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
-        $container->setParameter('abc.job.form_type_seconds', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
+        $this->configureServices($container, $config, [
+            'manager',
+            'job_entity_manager',
+            'agent_entity_manager',
+            'schedule_entity_manager',
+            'schedule_iterator',
+            'schedule_manager_iterator',
+            'controller_factory'
+        ]);
 
         if ('custom' !== $config['db_driver']) {
             $loader->load(sprintf('%s.xml', $config['db_driver']));
+        }
+
+        if ('custom' !== $config['adapter']) {
+            $loader->load(sprintf('%s.xml', $config['adapter']));
         }
 
         $this->remapParametersNamespaces(
@@ -86,18 +90,16 @@ class AbcJobExtension extends Extension
         $loader->load('schedule.xml');
         $loader->load('listener.xml');
         $loader->load('eraser.xml');
-        $loader->load('sonata.xml');
         $loader->load('metadata.xml');
         $loader->load('forms.xml');
         $loader->load('process_control.xml');
         $loader->load('validator.xml');
 
         if ($config['register_default_jobs']) {
-            $loader->load('default_jobs.xml');
+            $this->registerDefaultJobs($container, $loader);
         }
 
         $this->loadLogger($config['logging'], $container, $loader, $config['db_driver']);
-
     }
 
     private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
@@ -127,6 +129,25 @@ class AbcJobExtension extends Extension
         $container->setParameter('abc.job.logging.custom_level', $config['custom_level']);
     }
 
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param array            $services
+     * @return void
+     */
+    protected function configureServices(ContainerBuilder $container, array $config, array $services)
+    {
+        foreach ($services as $name) {
+            $container->setAlias(self::NAMESPACE_PREFIX . $name, $config['service'][$name]);
+        }
+    }
+
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param array            $map
+     * @return void
+     */
     protected function remapParameters(array $config, ContainerBuilder $container, array $map)
     {
         foreach ($map as $name => $paramName) {
@@ -136,6 +157,12 @@ class AbcJobExtension extends Extension
         }
     }
 
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param array            $namespaces $supportedAdapters
+     * @return void
+     */
     protected function remapParametersNamespaces(array $config, ContainerBuilder $container, array $namespaces)
     {
         foreach ($namespaces as $ns => $map) {
@@ -155,5 +182,17 @@ class AbcJobExtension extends Extension
                 }
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param XmlFileLoader    $loader
+     * @return void
+     */
+    private function registerDefaultJobs(ContainerBuilder $container, XmlFileLoader $loader) {
+        $container->setParameter('abc.job.form.form_type_message', method_exists(AbstractType::class, 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
+        $container->setParameter('abc.job.form.form_type_seconds', method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
+
+        $loader->load('default_jobs.xml');
     }
 }

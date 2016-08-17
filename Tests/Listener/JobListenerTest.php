@@ -21,7 +21,7 @@ use Psr\Log\NullLogger;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class RuntimeParameterProviderJobListenerTest extends \PHPUnit_Framework_TestCase
+class JobListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ManagerInterface
@@ -43,7 +43,6 @@ class RuntimeParameterProviderJobListenerTest extends \PHPUnit_Framework_TestCas
         $this->factory = $this->getMock(FactoryInterface::class);
         $this->subject = new JobListener($this->manager, $this->factory);
     }
-
 
     public function testOnPreExecuteRegistersLogger()
     {

@@ -151,6 +151,6 @@ class AgentController extends FOSRestController
      */
     private function getAgentManager()
     {
-        return $this->get('abc.job.agent_manager');
+        return $this->get('abc.job.agent_entity_manager');
     }
 }

@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('abc_job');
 
         $supportedDrivers = array('orm', 'custom');
-        $supportedQueueEngines = array('sonata', 'custom');
+        $supportedAdapters = array('sonata', 'custom');
         $supportedLoggingHandlers = array('file', 'orm', 'custom');
 
         $rootNode
@@ -41,6 +41,14 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeOverwritten()
                     ->isRequired()
                     ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('adapter')
+                    ->validate()
+                        ->ifNotInArray($supportedAdapters)
+                        ->thenInvalid('The adapter %s is not supported. Please choose one of ' . json_encode($supportedAdapters))
+                    ->end()
+                    ->cannotBeOverwritten()
+                    ->defaultValue('sonata')
                 ->end()
                 ->booleanNode('register_default_jobs')
                     ->defaultTrue()
@@ -99,10 +107,9 @@ class Configuration implements ConfigurationInterface
                         ->addDefaultsIfNotSet()
                         ->children()
                             ->scalarNode('manager')->defaultValue('abc.job.manager.default')->end()
-                            ->scalarNode('job_manager')->defaultValue('abc.job.job_manager.default')->end()
-                            ->scalarNode('agent_manager')->defaultValue('abc.job.agent_manager.default')->end()
-                            ->scalarNode('queue_engine')->defaultValue('abc.job.queue_engine.sonata')->end()
-                            ->scalarNode('schedule_manager')->defaultValue('abc.job.schedule_manager.default')->end()
+                            ->scalarNode('job_entity_manager')->defaultValue('abc.job.job_entity_manager.default')->end()
+                            ->scalarNode('agent_entity_manager')->defaultValue('abc.job.agent_entity_manager.default')->end()
+                            ->scalarNode('schedule_entity_manager')->defaultValue('abc.job.schedule_entity_manager.default')->end()
                             ->scalarNode('schedule_iterator')->defaultValue('abc.job.schedule_iterator.default')->end()
                             ->scalarNode('schedule_manager_iterator')->defaultValue('abc.job.schedule_manager_iterator.default')->end()
                             ->scalarNode('controller_factory')->defaultValue('abc.job.controller_factory.default')->end()

@@ -21,7 +21,9 @@ use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
  */
 class ScheduleManagerTest extends DatabaseKernelTestCase
 {
-    /** @var ScheduleManager */
+    /**
+     * @var ScheduleManager
+     */
     private $subject;
 
     /**
@@ -39,12 +41,12 @@ class ScheduleManagerTest extends DatabaseKernelTestCase
         /**
          * @var ScheduleManager $scheduleManager
          */
-        $scheduleManager = $this->getContainer()->get('abc.job.schedule_manager');
+        $scheduleManager = $this->getContainer()->get('abc.job.schedule_entity_manager');
 
         /**
          * @var JobManagerInterface $jobManager
          */
-        $jobManager = $this->getContainer()->get('abc.job.job_manager');
+        $jobManager = $this->getContainer()->get('abc.job.job_entity_manager');
 
         $schedule1 = $scheduleManager->create();
         $schedule1->setType('cron');

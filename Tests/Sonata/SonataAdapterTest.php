@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Sonata;
 
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Sonata\QueueEngine;
+use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class QueueEngineTest extends \PHPUnit_Framework_TestCase
+class SonataAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -45,7 +45,7 @@ class QueueEngineTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var QueueEngine
+     * @var SonataAdapter
      */
     private $subject;
 
@@ -56,7 +56,7 @@ class QueueEngineTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
         $this->logger          = $this->getMock(LoggerInterface::class);
 
-        $this->subject = new QueueEngine($this->backend, $this->eventDispatcher, $this->logger);
+        $this->subject = new SonataAdapter($this->backend, $this->eventDispatcher, $this->logger);
         $this->subject->setManager($this->manager);
     }
 
@@ -73,7 +73,7 @@ class QueueEngineTest extends \PHPUnit_Framework_TestCase
 
         $this->backend->expects($this->once())
             ->method('createAndPublish')
-            ->with(QueueEngine::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
+            ->with(SonataAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
 
         $this->subject->publish($message);
     }

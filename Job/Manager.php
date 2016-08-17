@@ -19,7 +19,7 @@ use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
 use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface as LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Sonata\QueueEngine;
+use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
@@ -44,7 +44,7 @@ class Manager implements ManagerInterface
     protected $registry;
 
     /**
-     * @var QueueEngine
+     * @var SonataAdapter
      */
     protected $queueEngine;
 
@@ -158,6 +158,8 @@ class Manager implements ManagerInterface
         if (!$this->jobManager->isManagerOf($job)) {
             $job = $this->helper->copyJob($job, $this->jobManager->create());
         }
+
+        $job->setStatus(Status::REQUESTED());
 
         $this->jobManager->save($job);
 

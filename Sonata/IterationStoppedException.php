@@ -11,6 +11,8 @@
 namespace Abc\Bundle\JobBundle\Sonata;
 
 /**
+ * Exception thrown to abort continuous iteration over messages.
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class IterationStoppedException extends \Exception
@@ -19,6 +21,6 @@ class IterationStoppedException extends \Exception
 
     public final function __construct()
     {
-        return parent::__construct('Iteration stopped by process controll', self::CODE);
+        return parent::__construct('Iteration stopped by process control', self::CODE);
     }
 }

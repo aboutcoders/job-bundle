@@ -69,7 +69,9 @@ class JobManagerTest extends DatabaseKernelTestCase
 
     public function testSave()
     {
-        /** @var Status $status */
+        /**
+         * @var Status $status
+         */
         $job = $this->subject->create('type');
         $job->setStatus(Status::REQUESTED());
 
@@ -81,7 +83,9 @@ class JobManagerTest extends DatabaseKernelTestCase
         $now->add(new \DateInterval('P5M'));
         $this->assertLessThanOrEqual($now, $job->getCreatedAt());
 
-        /** @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /**
+         * @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context
+         */
         $context   = $this->getMock(ExecutionContext::class, [], [], '', false);
         $validator = new UuidValidator();
         $validator->initialize($context);
@@ -178,7 +182,9 @@ class JobManagerTest extends DatabaseKernelTestCase
 
         $this->getEntityManager()->clear();
 
-        /** @var Schedule[] $schedules */
+        /**
+         * @var Schedule[] $schedules
+         */
         $schedules = $this->getScheduleManager()->findSchedules();
         $this->assertCount(1, $schedules);
         $this->assertEquals('Type', $schedules[0]->getType());
@@ -187,7 +193,9 @@ class JobManagerTest extends DatabaseKernelTestCase
         // UPDATE
         $job = $this->subject->findByTicket($job->getTicket());
 
-        /** @var Schedule[] $schedules */
+        /**
+         * @var Schedule[] $schedules
+         */
         $schedules = $job->getSchedules();
         $schedules[0]->setType('UpdatedType');
         $schedules[0]->setExpression('UpdatedExpression');
@@ -196,7 +204,9 @@ class JobManagerTest extends DatabaseKernelTestCase
 
         $this->getEntityManager()->clear();
 
-        /** @var Schedule[] $schedules */
+        /**
+         * @var Schedule[] $schedules
+         */
         $schedules = $this->getScheduleManager()->findSchedules();
 
         $this->assertCount(1, $schedules);
@@ -231,7 +241,7 @@ class JobManagerTest extends DatabaseKernelTestCase
      */
     private function getScheduleManager()
     {
-        return $this->getContainer()->get('abc.job.schedule_manager');
+        return $this->getContainer()->get('abc.job.schedule_entity_manager');
     }
 
     /**

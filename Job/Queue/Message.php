@@ -17,9 +17,14 @@ namespace Abc\Bundle\JobBundle\Job\Queue;
  */
 class Message {
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $type;
-    /** @var string */
+
+    /**
+     * @var string
+     */
     protected $ticket;
 
     /**
@@ -47,4 +52,4 @@ class Message {
     {
         return $this->ticket;
     }
-} 
+}

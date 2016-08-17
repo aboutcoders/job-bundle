@@ -74,7 +74,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $client = static::createClient();
 
         /** @var JobManagerInterface $manager */
-        $manager = static::$kernel->getContainer()->get('abc.job.job_manager');
+        $manager = static::$kernel->getContainer()->get('abc.job.job_entity_manager');
 
         $job1 = $manager->create('foo');
         $job1->setStatus(Status::REQUESTED());

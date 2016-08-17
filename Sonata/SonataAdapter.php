@@ -20,11 +20,12 @@ use Sonata\NotificationBundle\Consumer\ConsumerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * QueueEngine handles operations with the sonata backend.
+ * QueueEngine adapter that works with a sonata backend.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ * @see https://sonata-project.org/bundles/notification/3-x/doc/index.html
  */
-class QueueEngine implements QueueEngineInterface, ConsumerInterface
+class SonataAdapter implements QueueEngineInterface, ConsumerInterface
 {
     const MESSAGE_PREFIX = 'abc.job.';
 
