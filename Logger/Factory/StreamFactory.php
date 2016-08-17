@@ -24,9 +24,10 @@ use Monolog\Logger;
  */
 class StreamFactory extends AbstractFactory
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $directory;
-
 
     /**
      * @param JobTypeRegistry         $registry

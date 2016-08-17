@@ -224,6 +224,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 ### Stable release:
+- cleanup/document Eraser
 - Finalize the REST-API
 - Improve configurability
 - Deliver Logs over API as JSON instead or string

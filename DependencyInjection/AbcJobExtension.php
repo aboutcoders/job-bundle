@@ -39,9 +39,9 @@ class AbcJobExtension extends Extension
         $container->setAlias('abc.job.manager', $config['service']['manager']);
         $container->setAlias('abc.job.job_manager', $config['service']['job_manager']);
         $container->setAlias('abc.job.agent_manager', $config['service']['agent_manager']);
-        $container->setAlias('abc.job.queue_engine', $config['service']['queue_engine']);
         $container->setAlias('abc.job.schedule_manager', $config['service']['schedule_manager']);
         $container->setAlias('abc.job.schedule_iterator', $config['service']['schedule_iterator']);
+        $container->setAlias('abc.job.schedule_manager_iterator', $config['service']['schedule_manager_iterator']);
         $container->setAlias('abc.job.controller_factory', $config['service']['controller_factory']);
         $container->setParameter('abc.job.form_type_message', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
         $container->setParameter('abc.job.form_type_seconds', method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
@@ -89,7 +89,7 @@ class AbcJobExtension extends Extension
         $loader->load('sonata.xml');
         $loader->load('metadata.xml');
         $loader->load('forms.xml');
-        $loader->load('controller.xml');
+        $loader->load('process_control.xml');
         $loader->load('validator.xml');
 
         if ($config['register_default_jobs']) {

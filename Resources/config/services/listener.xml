@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="abc.job.listener.job" class="Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener" public="true">
+        <service id="abc.job.listener.job" class="Abc\Bundle\JobBundle\Listener\JobListener" public="true">
             <argument type="service" id="abc.job.manager"/>
             <argument type="service" id="abc.job.logger.factory"/>
             <tag name="abc.job.event_listener" event="abc.job.pre_execute" method="onPreExecute"/>

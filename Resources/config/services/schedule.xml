@@ -11,7 +11,7 @@
             <tag name="abc.scheduler.iterator"/>
         </service>
 
-        <service id="abc.job.schedule_manager_iterator" class="Abc\Bundle\SchedulerBundle\Iterator\ScheduleManagerScheduleIterator" public="false">
+        <service id="abc.job.schedule_manager_iterator.default" class="Abc\Bundle\SchedulerBundle\Iterator\ScheduleManagerScheduleIterator" public="false">
             <argument type="service" id="abc.job.schedule_manager"/>
         </service>
 

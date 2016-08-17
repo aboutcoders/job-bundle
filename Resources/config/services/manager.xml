@@ -26,16 +26,6 @@
             <tag name="monolog.logger" channel="abc.job.manager"/>
         </service>
 
-        <service id="abc.job.queue_engine.default" class="Abc\Bundle\JobBundle\Sonata\QueueEngine" public="false">
-            <argument type="service" id="sonata.notification.backend"/>
-            <argument type="service" id="sonata.notification.dispatcher"/>
-            <argument type="service" id="logger" on-invalid="null"/>
-            <call method="setManager">
-                <argument type="service" id="abc.job.manager"/>
-            </call>
-            <tag name="monolog.logger" channel="abc.job.queue_engine"/>
-        </service>
-
         <service id="abc.job.invoker" class="Abc\Bundle\JobBundle\Job\Invoker" public="false">
             <argument type="service" id="abc.job.registry"/>
             <call method="setManager">

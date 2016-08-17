@@ -19,8 +19,9 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class StreamLogManager implements LogManagerInterface
 {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $directory;
 
     /**

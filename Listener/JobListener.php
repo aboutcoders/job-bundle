@@ -15,9 +15,11 @@ use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 
 /**
+ * Registers the default runtime parameters "manager" and "logger".
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class RuntimeParameterProviderJobListener
+class JobListener
 {
     /**
      * @var ManagerInterface

@@ -18,13 +18,20 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
+ * Listens to scheduler events for jobs and sends messages to the queue engine
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class ScheduleListener
 {
-    /** @var QueueEngineInterface */
+    /**
+     * @var QueueEngineInterface
+     */
     private $queueEngine;
-    /** @var LoggerInterface */
+
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     /**

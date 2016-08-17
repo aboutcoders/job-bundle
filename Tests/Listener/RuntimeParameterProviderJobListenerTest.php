@@ -14,7 +14,7 @@ use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
-use Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener;
+use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Model\Job;
 use Psr\Log\NullLogger;
 
@@ -33,7 +33,7 @@ class RuntimeParameterProviderJobListenerTest extends \PHPUnit_Framework_TestCas
      */
     private $factory;
     /**
-     * @var RuntimeParameterProviderJobListener
+     * @var JobListener
      */
     private $subject;
 
@@ -41,7 +41,7 @@ class RuntimeParameterProviderJobListenerTest extends \PHPUnit_Framework_TestCas
     {
         $this->manager = $this->getMock(ManagerInterface::class);
         $this->factory = $this->getMock(FactoryInterface::class);
-        $this->subject = new RuntimeParameterProviderJobListener($this->manager, $this->factory);
+        $this->subject = new JobListener($this->manager, $this->factory);
     }
 
 

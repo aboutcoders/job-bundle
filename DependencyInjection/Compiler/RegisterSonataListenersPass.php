@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
+ * Registers the service abc.job.queue_engine as listener for all messages dispatched from the sonata backend.
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class RegisterSonataListenersPass implements CompilerPassInterface
@@ -51,8 +53,8 @@ class RegisterSonataListenersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if((!$container->hasDefinition($this->queueEngineService) && !$container->hasAlias($this->queueEngineService))
-            || (!$container->hasDefinition($this->dispatcherService) && !$container->hasAlias($this->dispatcherService))
+        if(!($container->hasDefinition($this->queueEngineService) || !$container->hasAlias($this->queueEngineService))
+            && !($container->hasDefinition($this->dispatcherService) || $container->hasAlias($this->dispatcherService))
         )
         {
             return;
@@ -75,4 +77,4 @@ class RegisterSonataListenersPass implements CompilerPassInterface
             }
         }
     }
-} 
+}

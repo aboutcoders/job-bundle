@@ -24,7 +24,7 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
 use Abc\Bundle\JobBundle\Job\Report\EraserInterface;
-use Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener;
+use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
@@ -91,9 +91,8 @@ class ServiceTest extends KernelTestCase
             ['abc.job.agent_manager', AgentManagerInterface::class],
             ['abc.job.eraser', EraserInterface::class],
             ['abc.job.form.type.job', JobType::class],
-            ['abc.job.form.type.message', MessageType::class],
             ['abc.job.job_manager', JobManagerInterface::class],
-            ['abc.job.listener.job', RuntimeParameterProviderJobListener::class],
+            ['abc.job.listener.job', JobListener::class],
             ['abc.job.listener.schedule', ScheduleListener::class],
             ['abc.job.logger.factory', FactoryInterface::class],
             ['abc.job.log_manager', LogManagerInterface::class],
@@ -114,8 +113,8 @@ class ServiceTest extends KernelTestCase
     {
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
-        $listener = $this->getMockBuilder(RuntimeParameterProviderJobListener::class)->disableOriginalConstructor()->getMock();
+        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+        $listener = $this->getMockBuilder(JobListener::class)->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
         $event = $this->getMockBuilder(ExecutionEvent::class)->disableOriginalConstructor()->getMock();
 
@@ -132,7 +131,7 @@ class ServiceTest extends KernelTestCase
     {
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\RuntimeParameterProviderJobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
         $listener = $this->getMockBuilder(ScheduleListener::class)->disableOriginalConstructor()->getMock();
         /** @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
         $event = $this->getMockBuilder(SchedulerEvent::class)->disableOriginalConstructor()->getMock();

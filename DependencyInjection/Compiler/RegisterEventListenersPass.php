@@ -15,7 +15,7 @@ use \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class RegisterListenersPass extends BaseRegisterListenersPass
+class RegisterEventListenersPass extends BaseRegisterListenersPass
 {
     /**
      * @param string $dispatcherService Service name of the event dispatcher in processed container
