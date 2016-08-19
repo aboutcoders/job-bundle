@@ -165,6 +165,10 @@ class AbcJobExtension extends Extension
         $container->setParameter('abc.job.form.form_type_seconds', method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
 
         $loader->load('default_jobs.xml');
+
+        if(!method_exists(AbstractType::class, 'getBlockPrefix')){
+            $loader->load('default_jobs_forms.xml');
+        }
     }
 
     private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
