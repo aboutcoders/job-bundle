@@ -315,7 +315,7 @@ class JobController extends FOSRestController
      */
     protected function getEntityManager()
     {
-        return $this->get('abc.job.job_entity_manager');
+        return $this->get('abc.job.job_manager');
     }
 
     /**

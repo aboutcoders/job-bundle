@@ -12,7 +12,7 @@
 
         <service id="abc.job.manager.default" class="Abc\Bundle\JobBundle\Job\Manager" public="true">
             <argument type="service" id="abc.job.registry" />
-            <argument type="service" id="abc.job.job_entity_manager"/>
+            <argument type="service" id="abc.job.job_manager"/>
             <argument type="service" id="abc.job.invoker"/>
             <argument type="service" id="abc.job.logger.factory"/>
             <argument type="service" id="abc.job.log_manager"/>

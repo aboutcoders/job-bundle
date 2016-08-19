@@ -24,8 +24,6 @@ use Symfony\Component\Form\AbstractType;
  */
 class AbcJobExtension extends Extension
 {
-    const NAMESPACE_PREFIX = 'abc.job.';
-
     /**
      * {@inheritDoc}
      */
@@ -38,9 +36,9 @@ class AbcJobExtension extends Extension
 
         $this->configureServices($container, $config, [
             'manager',
-            'job_entity_manager',
-            'agent_entity_manager',
-            'schedule_entity_manager',
+            'job_manager',
+            'agent_manager',
+            'schedule_manager',
             'schedule_iterator',
             'schedule_manager_iterator',
             'controller_factory'
@@ -59,8 +57,8 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 '' => array(
-                    'model_manager_name'    => self::NAMESPACE_PREFIX . 'model_manager_name',
-                    'register_default_jobs' => self::NAMESPACE_PREFIX . 'register_default_jobs',
+                    'model_manager_name'    => 'abc.job.model_manager_name',
+                    'register_default_jobs' => 'abc.job.register_default_jobs',
                 )
             )
         );
@@ -70,7 +68,7 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 'logging' => array(
-                    'directory' => self::NAMESPACE_PREFIX . 'logging.directory',
+                    'directory' => 'abc.job.logging.directory',
                 )
             )
         );
@@ -80,7 +78,7 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 'controller' => array(
-                    'refresh_interval' => self::NAMESPACE_PREFIX . 'controller.refresh_interval'
+                    'refresh_interval' => 'abc.job.controller.refresh_interval'
                 )
             )
         );
@@ -102,33 +100,6 @@ class AbcJobExtension extends Extension
         $this->loadLogger($config['logging'], $container, $loader, $config['db_driver']);
     }
 
-    private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
-    {
-        if ('custom' !== $config['handler']) {
-            $loader->load('logger_' . $config['handler'] . '.xml');
-
-            if ('orm' == $config['handler']) {
-                $container->setParameter('abc.job.register_mapping.' . $dbDriver, true);
-            }
-        }
-
-        if (isset($config['formatter'])) {
-            $jobType = $container->getDefinition('abc.job.logger.factory');
-            $jobType->addMethodCall('setFormatter', array(new Reference($config['formatter'])));
-        }
-
-        if (!empty($config['processor'])) {
-            $jobType = $container->getDefinition('abc.job.logger.factory');
-
-            foreach ($config['processor'] as $serviceId) {
-                $jobType->addMethodCall('addProcessor', array(new Reference($serviceId)));
-            }
-        }
-
-        $container->setParameter('abc.job.logging.default_level', $config['default_level']);
-        $container->setParameter('abc.job.logging.custom_level', $config['custom_level']);
-    }
-
     /**
      * @param ContainerBuilder $container
      * @param array            $config
@@ -138,7 +109,7 @@ class AbcJobExtension extends Extension
     protected function configureServices(ContainerBuilder $container, array $config, array $services)
     {
         foreach ($services as $name) {
-            $container->setAlias(self::NAMESPACE_PREFIX . $name, $config['service'][$name]);
+            $container->setAlias('abc.job.'. $name, $config['service'][$name]);
         }
     }
 
@@ -194,5 +165,32 @@ class AbcJobExtension extends Extension
         $container->setParameter('abc.job.form.form_type_seconds', method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
 
         $loader->load('default_jobs.xml');
+    }
+
+    private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
+    {
+        if ('custom' !== $config['handler']) {
+            $loader->load('logger_' . $config['handler'] . '.xml');
+
+            if ('orm' == $config['handler']) {
+                $container->setParameter('abc.job.register_mapping.' . $dbDriver, true);
+            }
+        }
+
+        if (isset($config['formatter'])) {
+            $jobType = $container->getDefinition('abc.job.logger.factory');
+            $jobType->addMethodCall('setFormatter', array(new Reference($config['formatter'])));
+        }
+
+        if (!empty($config['processor'])) {
+            $jobType = $container->getDefinition('abc.job.logger.factory');
+
+            foreach ($config['processor'] as $serviceId) {
+                $jobType->addMethodCall('addProcessor', array(new Reference($serviceId)));
+            }
+        }
+
+        $container->setParameter('abc.job.logging.default_level', $config['default_level']);
+        $container->setParameter('abc.job.logging.custom_level', $config['custom_level']);
     }
 }

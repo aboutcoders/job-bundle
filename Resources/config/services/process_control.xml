@@ -7,7 +7,7 @@
     <services>
 
         <service id="abc.job.controller_factory.default" class="Abc\Bundle\JobBundle\Job\ProcessControl\Factory" public="true">
-            <argument type="service" id="abc.job.job_entity_manager"/>
+            <argument type="service" id="abc.job.job_manager"/>
             <argument>%abc.job.controller.refresh_interval%</argument>
             <call method="addController">
                 <argument type="service" id="abc.process_control.controller" on-invalid="null"/>

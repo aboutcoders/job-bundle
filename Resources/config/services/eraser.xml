@@ -7,7 +7,7 @@
     <services>
 
         <service id="abc.job.eraser" class="Abc\Bundle\JobBundle\Job\Report\Eraser" public="true">
-            <argument type="service" id="abc.job.job_entity_manager"/>
+            <argument type="service" id="abc.job.job_manager"/>
             <argument type="service" id="abc.job.log_manager"/>
             <argument type="service" id="logger" on-invalid="null"/>
             <tag name="monolog.logger" channel="abc.job.eraser"/>

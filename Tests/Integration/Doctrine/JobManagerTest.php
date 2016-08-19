@@ -241,7 +241,7 @@ class JobManagerTest extends DatabaseKernelTestCase
      */
     private function getScheduleManager()
     {
-        return $this->getContainer()->get('abc.job.schedule_entity_manager');
+        return $this->getContainer()->get('abc.job.schedule_manager');
     }
 
     /**

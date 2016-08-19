@@ -12,7 +12,7 @@
         </service>
 
         <service id="abc.job.schedule_manager_iterator.default" class="Abc\Bundle\SchedulerBundle\Iterator\ScheduleManagerScheduleIterator" public="false">
-            <argument type="service" id="abc.job.schedule_entity_manager"/>
+            <argument type="service" id="abc.job.schedule_manager"/>
         </service>
 
     </services>

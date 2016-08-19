@@ -56,7 +56,7 @@ class AgentControllerTest extends WebTestCase
             ->method('findAll')
             ->willReturn([$agent]);
 
-        $this->mockServices(['abc.job.agent_entity_manager' => $this->agentManager]);
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents');
 
@@ -82,7 +82,7 @@ class AgentControllerTest extends WebTestCase
             ->method('findById')
             ->willReturn($agent);
 
-        $this->mockServices(['abc.job.agent_entity_manager' => $this->agentManager]);
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents/12345');
 
@@ -103,7 +103,7 @@ class AgentControllerTest extends WebTestCase
             ->method('findById')
             ->willReturn(null);
 
-        $this->mockServices(['abc.job.agent_entity_manager' => $this->agentManager]);
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $crawler = $client->request('GET', '/api/agents/12345');
 
@@ -132,7 +132,7 @@ class AgentControllerTest extends WebTestCase
             ->method('refresh')
             ->with($agent);
 
-        $this->mockServices(['abc.job.agent_entity_manager' => $this->agentManager]);
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $client->request('POST', '/api/agents/12345/start');
 
@@ -168,7 +168,7 @@ class AgentControllerTest extends WebTestCase
             ->method('refresh')
             ->with($agent);
 
-        $this->mockServices(['abc.job.agent_entity_manager' => $this->agentManager]);
+        $this->mockServices(['abc.job.agent_manager' => $this->agentManager]);
 
         $client->request('POST', '/api/agents/12345/stop');
 

@@ -41,12 +41,12 @@ class ScheduleManagerTest extends DatabaseKernelTestCase
         /**
          * @var ScheduleManager $scheduleManager
          */
-        $scheduleManager = $this->getContainer()->get('abc.job.schedule_entity_manager');
+        $scheduleManager = $this->getContainer()->get('abc.job.schedule_manager');
 
         /**
          * @var JobManagerInterface $jobManager
          */
-        $jobManager = $this->getContainer()->get('abc.job.job_entity_manager');
+        $jobManager = $this->getContainer()->get('abc.job.job_manager');
 
         $schedule1 = $scheduleManager->create();
         $schedule1->setType('cron');

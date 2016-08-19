@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="abc.job.agent_entity_manager.default" class="Abc\Bundle\JobBundle\Supervisor\AgentManager" public="true">
+        <service id="abc.job.agent_manager.default" class="Abc\Bundle\JobBundle\Supervisor\AgentManager" public="true">
             <argument type="service" id="supervisor.manager"/>
         </service>
 
