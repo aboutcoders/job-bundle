@@ -31,7 +31,7 @@ class ManagerTest extends DatabaseKernelTestCase
 
         $logs = $this->getJobManager()->getLogs($ticket);
 
-        $this->assertContains('message', $logs);
+        $this->assertTrue($this->containsMessage('message', $logs));
     }
 
     public function testHandlesExceptionsThrownByJob()
@@ -107,7 +107,7 @@ class ManagerTest extends DatabaseKernelTestCase
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
 
-        $this->assertContains('removed schedule', $this->getJobManager()->getLogs($ticket));
+        $this->assertTrue($this->containsMessage('removed schedule', $this->getJobManager()->getLogs($ticket)));
         $this->assertEquals(Status::PROCESSED(), $this->getJobManager()->get($ticket)->getStatus());
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
     }
@@ -155,7 +155,7 @@ class ManagerTest extends DatabaseKernelTestCase
 
         $logs = $this->getJobManager()->getLogs($ticket);
 
-        $this->assertContains('addedJob', $logs);
+        $this->assertTrue($this->containsMessage('addedJob', $this->getJobManager()->getLogs($ticket)));
     }
 
     public function testJobCanBeCancelled()
@@ -175,7 +175,8 @@ class ManagerTest extends DatabaseKernelTestCase
     /**
      * @expectedException \Sonata\NotificationBundle\Exception\HandlingException
      */
-    public function testRecoversFromDbalException() {
+    public function testRecoversFromDbalException()
+    {
 
         $this->markTestIncomplete('Handle DBALExceptions');
 
@@ -202,5 +203,21 @@ class ManagerTest extends DatabaseKernelTestCase
     protected function getScheduleManager()
     {
         return $this->getContainer()->get('abc.job.schedule_manager');
+    }
+
+    /**
+     * @param string $key
+     * @param array $logs
+     * @return bool
+     */
+    private function containsMessage($key, $logs)
+    {
+        foreach ($logs as $log) {
+            if(false !== strpos($log['message'], $key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

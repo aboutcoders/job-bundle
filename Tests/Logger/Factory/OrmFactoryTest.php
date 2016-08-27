@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Logger\Factory;
 use Abc\Bundle\JobBundle\Logger\Handler\JobAwareOrmHandler;
 use Abc\Bundle\JobBundle\Logger\Handler\OrmHandler;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use Abc\Bundle\JobBundle\Logger\Factory\OrmFactory;
+use Abc\Bundle\JobBundle\Logger\Factory\OrmLoggerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\LogManagerInterface;
 use Monolog\Logger;
@@ -34,7 +34,7 @@ class OrmFactoryTest extends \PHPUnit_Framework_TestCase
     private $manager;
 
     /**
-     * @var OrmFactory
+     * @var OrmLoggerFactory
      */
     private $subject;
 
@@ -46,9 +46,9 @@ class OrmFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->manager = $this->getMock(LogManagerInterface::class);
 
-        $this->subject = new OrmFactory($this->registry, $this->manager);
+        $this->subject = new OrmLoggerFactory($this->registry, $this->manager);
 
-        new OrmFactory($this->registry, $this->manager);
+        new OrmLoggerFactory($this->registry, $this->manager);
     }
 
     public function testCreateHandler()

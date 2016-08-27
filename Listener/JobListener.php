@@ -11,8 +11,8 @@
 namespace Abc\Bundle\JobBundle\Listener;
 
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 
 /**
  * Registers the default runtime parameters "manager" and "logger".

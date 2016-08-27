@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StreamLogManager implements LogManagerInterface
+class FileLogManager implements LogManagerInterface
 {
     /**
      * @var string
@@ -31,8 +31,7 @@ class StreamLogManager implements LogManagerInterface
      */
     public function __construct($directory)
     {
-        if(!is_string($directory) || !is_dir($directory) || !is_writable($directory))
-        {
+        if (!is_string($directory) || !is_dir($directory) || !is_writable($directory)) {
             throw new \InvalidArgumentException('$directory must be a string specifying the path to a writable directory');
         }
 
@@ -45,8 +44,28 @@ class StreamLogManager implements LogManagerInterface
     public function findByJob(JobInterface $job)
     {
         $path = $this->buildPath($job->getTicket());
+        if(!file_exists($path)) {
+            return [];
+        }
 
-        return file_exists($path) ? file_get_contents($path) : null;
+        $content = file_get_contents($path);
+        if(strlen($content) == 0) {
+            return [];
+        }
+
+        $records = [];
+        $lines = explode("/n", $content);
+        foreach ($lines as $line) {
+            $record = json_decode($line, true);
+            if(false === $record) {
+                throw new \Exception('Failed to deserialze logs from file ' . $path);
+            }
+            if(null !== $record) {
+                $records[] = $record;
+            }
+        }
+
+        return $records;
     }
 
     /**Tests/
@@ -57,8 +76,7 @@ class StreamLogManager implements LogManagerInterface
         $path = $this->buildPath($job->getTicket());
 
         $filesystem = new Filesystem();
-        if($filesystem->exists($path))
-        {
+        if ($filesystem->exists($path)) {
             $filesystem->remove($path);
         }
     }

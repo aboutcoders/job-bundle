@@ -56,15 +56,4 @@ interface LogManagerInterface extends BaseLogManagerInterface
      * @return int The number of deleted entities
      */
     public function delete(LogInterface $log);
-
-    /**
-     * @param FormatterInterface $formatter
-     * @return void
-     */
-    public function setFormatter(FormatterInterface $formatter);
-
-    /**
-     * @return FormatterInterface
-     */
-    public function getFormatter();
 }

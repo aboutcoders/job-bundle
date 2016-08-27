@@ -77,7 +77,7 @@ interface ManagerInterface
      * Returns the logs of a job.
      *
      * @param string $ticket
-     * @return string|null
+     * @return array An array of Monolog compliant log records
      * @throws TicketNotFoundException
      */
     public function getLogs($ticket);

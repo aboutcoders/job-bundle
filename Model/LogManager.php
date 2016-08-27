@@ -11,8 +11,6 @@
 namespace Abc\Bundle\JobBundle\Model;
 
 use Abc\Bundle\JobBundle\Job\JobInterface as BaseJobInterface;
-use Monolog\Formatter\FormatterInterface;
-use Monolog\Formatter\LineFormatter;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -20,81 +18,50 @@ use Monolog\Formatter\LineFormatter;
 abstract class LogManager implements LogManagerInterface
 {
     /**
-     * @var FormatterInterface
-     */
-    protected $formatter;
-
-    /**
      * {@inheritDoc}
      */
     public function create()
     {
         $class = $this->getClass();
 
-        /** @var LogInterface $log */
+        /**
+         * @var LogInterface $log
+         */
         return new $class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setFormatter(FormatterInterface $formatter)
+    public function findByJob(BaseJobInterface $job)
     {
-        $this->formatter = $formatter;
+        $records = array();
+        foreach ($this->findBy(['jobTicket' => $job->getTicket()], ['datetime' => 'ASC']) as $log) {
+            /**
+             * @var LogInterface $log
+             */
+            $records[] = $log->toRecord();
+        }
+
+        return $records;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFormatter()
+    public function deleteByJob(BaseJobInterface $job)
     {
-        if(!$this->formatter)
-        {
-            $this->formatter = $this->getDefaultFormatter();
-        }
-
-        return $this->formatter;
+        return $this->deleteLogs($this->findBy(['jobTicket' => $job->getTicket()]));
     }
 
     /**
-     * Gets the default formatter.
-     *
-     * @return FormatterInterface
-     */
-    protected function getDefaultFormatter()
-    {
-        return new LineFormatter();
-    }
-
-    /**
-     * Formats an array of Log[] items using the formatter
-     *
-     * @param Log[] $logs
-     * @return string
-     * @see getFormatter
-     */
-    protected function formatLogs($logs)
-    {
-        $string = '';
-        foreach($logs as $log)
-        {
-            $string .= $this->getFormatter()->format($log->toRecord());
-        }
-
-        return $string;
-    }
-
-    /**
-     * Formats an array of Log[] items using the formatter
-     *
-     * @param Log[] $logs
+     * @param LogInterface[] $logs
      * @return int the number of delete entries
      */
     protected function deleteLogs($logs)
     {
         $i = 0;
-        foreach($logs as $log)
-        {
+        foreach ($logs as $log) {
             $this->delete($log);
             $i++;
         }

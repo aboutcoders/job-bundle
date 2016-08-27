@@ -11,7 +11,6 @@
 namespace Abc\Bundle\JobBundle\Entity;
 
 use Abc\Bundle\JobBundle\Doctrine\LogManager as BaseLogManager;
-use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Model\LogInterface;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use Doctrine\ORM\EntityManager;
@@ -57,21 +56,5 @@ class LogManager extends BaseLogManager
         }
 
         parent::save($log, $andFlush);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findByJob(JobInterface $job)
-    {
-        return $this->formatLogs($this->findBy(['jobTicket' => $job->getTicket()]));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteByJob(JobInterface $job)
-    {
-        return $this->deleteLogs($this->findBy(['jobTicket' => $job->getTicket()]));
     }
 }

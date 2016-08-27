@@ -209,12 +209,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      */
     public function log($message, LoggerInterface $logger)
     {
-        $logger->debug($message);
         $logger->info($message);
-        $logger->notice($message);
-        $logger->warning($message);
-        $logger->alert($message);
-        $logger->critical($message);
     }
 
     /**

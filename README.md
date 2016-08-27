@@ -205,7 +205,6 @@ $job = $manager->add($job);
 This will create a job that is executed every 5 minutes. Please take a look at the documentation o the [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle) to get more information on how to work with schedules.
 
 ## How-Tos
-
 - [How-to work with the manager](./Resources/docs/howto-manager.md)
 - [How-to make a job cancellable at runtime](./Resources/docs/howto-make-a-job-cancellable-at-runtime.md)
 - [How-to inject runtime parameters](./Resources/docs/howto-inject-runtime-parameters.md)
@@ -224,9 +223,15 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 ## ToDo:
 
 ### Stable release:
-- cleanup/document Eraser
-- Finalize the REST-API
-- Deliver Logs over API as JSON instead or string
+- Get rid of forms and use validation service inside manager to validate job parameters
+- Document how to manage queues within soanta (abc.job prefix)
+- Define a clear serializer interface
+- Provider a TestCase for jobs
+- Consider replacement of SonataNotificationBundle with https://github.com/bernardphp/BernardBundle
+- Cleanup & document agent management
+- Cleanup & document queue management
+- Cleanup & document supervisor integration
+- Cleanup/document Eraser
 
 ### Planned Features:
 - Support XML as API response format

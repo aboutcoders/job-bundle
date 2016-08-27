@@ -10,9 +10,9 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Job;
 
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\Status;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;

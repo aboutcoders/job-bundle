@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Logger\Factory;
 
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use Abc\Bundle\JobBundle\Logger\Factory\StreamFactory;
+use Abc\Bundle\JobBundle\Logger\Factory\FileLoggerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Metadata\MetadataFactoryInterface;
 use Monolog\Formatter\FormatterInterface;
@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StreamFactoryTest extends \PHPUnit_Framework_TestCase
+class FileFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var MetadataFactoryInterface
@@ -47,7 +47,7 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var StreamFactory
+     * @var FileLoggerFactory
      */
     private $subject;
 
@@ -62,16 +62,19 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->setUpTestDir($this->directory);
 
-        $this->subject = new StreamFactory($this->registry, $this->directory);
+        $this->subject = new FileLoggerFactory($this->registry, $this->directory);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getInvalidConstructorArgs
+     * @param       $registry
+     * @param       $path
+     * @param array $processors
      */
-    public function testConstructThrowsInvalidArgumentException($registry, $path, $formatter = null, $processors = array())
+    public function testConstructThrowsInvalidArgumentException($registry, $path, $processors = array())
     {
-        new StreamFactory($registry, $path, $formatter, $processors);
+        new FileLoggerFactory($registry, $path, $processors);
     }
 
     public function testCreate()
@@ -89,7 +92,10 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $logger->getHandlers());
 
         $handlers = $logger->getHandlers();
-        /** @var \Monolog\Handler\StreamHandler $handler */
+
+        /**
+         * @var \Monolog\Handler\StreamHandler $handler
+         */
         $handler = $handlers[0];
 
         $this->assertInstanceOf(StreamHandler::class, $handler);
@@ -100,16 +106,13 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log');
     }
 
-    public function testCreateWithFormatterAndProcessor()
+    public function testCreateWithProcessor()
     {
-        /** @var FormatterInterface|\PHPUnit_Framework_MockObject_MockObject $formatter */
-        $formatter = $this->getMock(FormatterInterface::class);
         $processor = function() {};
 
         $this->registry->register(new JobType('service-id', 'job-type', function(){}, Logger::DEBUG));
 
         $this->subject->addProcessor($processor);
-        $this->subject->setFormatter($formatter);
 
         $job = new Job();
         $job->setTicket('job-ticket');
@@ -117,16 +120,13 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
 
         $logger = $this->subject->create($job);
         $handlers = $logger->getHandlers();
-        /** @var \Monolog\Handler\StreamHandler $handler */
+
+        /**
+         * @var \Monolog\Handler\StreamHandler $handler
+         */
         $handler = $handlers[0];
 
-        $this->assertSame($formatter, $handler->getFormatter());
         $this->assertSame($handler->popProcessor(), $processor);
-    }
-
-    public function testSetFormatter()
-    {
-        $this->subject->setFormatter($this->getMock('Monolog\Formatter\FormatterInterface'));
     }
 
     public function testAddProcessorAcceptsCallable()
@@ -144,10 +144,10 @@ class StreamFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function getInvalidConstructorArgs()
     {
-        return array(
-            array(new JobTypeRegistry($this->getMock('Metadata\MetadataFactoryInterface')), 'path/to/nowhere'),
-            array(new JobTypeRegistry($this->getMock('Metadata\MetadataFactoryInterface')), sys_get_temp_dir(), null, array('foo'))
-        );
+        return [
+            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class)), 'path/to/nowhere'],
+            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class)), sys_get_temp_dir(), ['foo']]
+        ];
     }
 
     private function setUpTestDir($path)

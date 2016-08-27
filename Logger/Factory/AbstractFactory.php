@@ -8,11 +8,10 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Job\Logger;
+namespace Abc\Bundle\JobBundle\Logger\Factory;
 
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Psr\Log\NullLogger;
@@ -33,29 +32,22 @@ abstract class AbstractFactory implements FactoryInterface
     protected $bubble;
 
     /**
-     * @var FormatterInterface
-     */
-    protected $formatter;
-
-    /**
      * @var array
      */
     protected $processors = array();
 
     /**
      * @param JobTypeRegistry         $registry
-     * @param FormatterInterface|null $formatter Optional, the formatter to use for the created loggers
      * @param array                   $processors Processors pushed to the handler
      * @param bool                    $bubble defaults to true
      */
-    public function __construct(JobTypeRegistry $registry, FormatterInterface $formatter = null, array $processors = array(), $bubble = true)
+    public function __construct(JobTypeRegistry $registry, array $processors = array(), $bubble = true)
     {
         foreach($processors as $callable)
         {
             $this->addProcessor($callable);
         }
 
-        $this->formatter = $formatter;
         $this->registry = $registry;
     }
 
@@ -73,25 +65,12 @@ abstract class AbstractFactory implements FactoryInterface
 
         $handler = $this->createHandler($job, $level, $this->bubble);
 
-        if($this->formatter != null)
-        {
-            $handler->setFormatter($this->formatter);
-        }
-
         foreach($this->processors as $processor)
         {
             $handler->pushProcessor($processor);
         }
 
         return new Logger($this->buildChannel($job), array($handler));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFormatter(FormatterInterface $formatter)
-    {
-        $this->formatter = $formatter;
     }
 
     /**

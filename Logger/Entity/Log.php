@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Logger\Entity;
 use Abc\Bundle\JobBundle\Entity\Log as BaseLog;
 
 /**
- * Only reason this class is defined here is on order to register mapping (Doctrine, MongodDB, CouchDB) conditionally
+ * Only reason this class is defined here is on order to register the mapping (Doctrine, MongodDB, CouchDB) conditionally
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @see  Abc\Bundle\JobBundle\AbcJobBundle

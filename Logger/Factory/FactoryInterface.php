@@ -8,10 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Job\Logger;
+namespace Abc\Bundle\JobBundle\Logger\Factory;
 
 use Abc\Bundle\JobBundle\Job\JobInterface;
-use Monolog\Formatter\FormatterInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -26,12 +25,6 @@ interface FactoryInterface
      * @return LoggerInterface
      */
     public function create(JobInterface $job);
-
-    /**
-     * @param FormatterInterface $formatter
-     * @return void
-     */
-    public function setFormatter(FormatterInterface $formatter);
 
     /**
      * @param $callable

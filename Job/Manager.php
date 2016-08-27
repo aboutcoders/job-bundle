@@ -16,7 +16,7 @@ use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface as LoggerFactoryInterface;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface as LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Sonata\SonataAdapter;

@@ -10,10 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Job;
 
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\JobInterface as EntityJobInterface;
-use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Psr\Log\LoggerInterface;
 
 /**

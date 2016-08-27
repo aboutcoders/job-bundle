@@ -10,14 +10,15 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Logger;
 
-use Abc\Bundle\JobBundle\Logger\StreamLogManager;
+use Abc\Bundle\JobBundle\Logger\FileLogManager;
 use Abc\Bundle\JobBundle\Model\Job;
+use Abc\Bundle\JobBundle\Model\JobInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
+class FileLogManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var
@@ -25,7 +26,7 @@ class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
     private $directory;
 
     /**
-     * @var StreamLogManager
+     * @var FileLogManager
      */
     private $subject;
 
@@ -36,7 +37,7 @@ class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
         $this->setUpDirectory($directory);
 
         $this->directory = $directory;
-        $this->subject   = new StreamLogManager($this->directory);
+        $this->subject   = new FileLogManager($this->directory);
     }
 
     /**
@@ -44,27 +45,53 @@ class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructThrowsInvalidArgumentException()
     {
-        new StreamLogManager('path/to/nowhere');
+        new FileLogManager('path/to/nowhere');
     }
 
-    public function testFetchLogWithExistingFile()
+    public function testFindByJobWithNonExistingFile()
     {
         $job = new Job();
         $job->setTicket('job-ticket');
         $job->setType('job-type');
 
-        $this->assertNull($this->subject->findByJob($job));
+        $this->assertEmpty($this->subject->findByJob($job));
     }
 
-    public function testFetchLogWithNonExistingFile()
+    public function testFindByJobWithEmptyFile()
     {
         $job = new Job();
         $job->setTicket('job-ticket');
         $job->setType('job-type');
 
-        file_put_contents($this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log', 'foobar');
+        file_put_contents($this->buildFilename($job), '');
+        $this->assertEmpty($this->subject->findByJob($job));
+    }
 
-        $this->assertEquals('foobar', $this->subject->findByJob($job));
+    public function testFindByJobDecodesJSON()
+    {
+        $job = new Job();
+        $job->setTicket('job-ticket');
+        $job->setType('job-type');
+
+        $line1 = ['message' => 'foo'];
+        $line2 = ['message' => 'bar'];
+
+        $content = json_encode($line1) . "/n" . json_encode($line2);
+
+        file_put_contents($this->buildFilename($job), $content);
+
+        $this->assertEquals([$line1, $line2], $this->subject->findByJob($job));
+    }
+
+    public function testFindByJobHandlesNullDecodes()
+    {
+        $job = new Job();
+        $job->setTicket('job-ticket');
+        $job->setType('job-type');
+
+        file_put_contents($this->buildFilename($job), '{asdasdasd');
+
+        $this->assertEmpty($this->subject->findByJob($job));
     }
 
     public function testDeleteLogWithExistingFile()
@@ -73,11 +100,11 @@ class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
         $job->setTicket('job-ticket');
         $job->setType('job-type');
 
-        file_put_contents($this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log', 'foobar');
+        file_put_contents($this->buildFilename($job), 'foobar');
 
         $this->subject->deleteByJob($job);
 
-        $this->assertFileNotExists($this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log');
+        $this->assertFileNotExists($this->buildFilename($job));
     }
 
     public function testDeleteLogWithNonExistingFile()
@@ -95,12 +122,20 @@ class StreamLogManagerTest extends \PHPUnit_Framework_TestCase
         $filesystem->remove($this->directory);
     }
 
+    /**
+     * @param JobInterface $job
+     * @return string
+     */
+    private function buildFilename(JobInterface $job)
+    {
+        return $this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log';
+    }
+
     private function setUpDirectory($path)
     {
         $filesystem = new Filesystem();
 
-        if(is_dir($path))
-        {
+        if (is_dir($path)) {
             $filesystem->remove($path);
         }
 

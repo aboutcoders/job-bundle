@@ -17,7 +17,7 @@ interface LogManagerInterface
 {
     /**
      * @param JobInterface $job
-     * @return string|null The logs of a job (null if no logs are found)
+     * @return array The log records of a job
      */
     public function findByJob(JobInterface $job);
 

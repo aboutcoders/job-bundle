@@ -12,8 +12,7 @@ namespace Abc\Bundle\JobBundle\Logger\Factory;
 
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\JobInterface;
-use Abc\Bundle\JobBundle\Job\Logger\AbstractFactory;
-use Monolog\Formatter\FormatterInterface;
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -22,7 +21,7 @@ use Monolog\Logger;
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StreamFactory extends AbstractFactory
+class FileLoggerFactory extends AbstractFactory
 {
     /**
      * @var string
@@ -32,14 +31,13 @@ class StreamFactory extends AbstractFactory
     /**
      * @param JobTypeRegistry         $registry
      * @param string                  $directory Path to a directory where log files for jobs are stored
-     * @param FormatterInterface|null $formatter Optional, the formatter to use for the created loggers
      * @param array                   $processors Processors pushed to the handler
      * @throws \InvalidArgumentException If $directory does not specify a path to a writable directory
      * @throws \InvalidArgumentException If $processors contains elements that are not a callable
      */
-    public function __construct(JobTypeRegistry $registry, $directory, FormatterInterface $formatter = null, array $processors = array())
+    public function __construct(JobTypeRegistry $registry, $directory, array $processors = array())
     {
-        parent::__construct($registry, $formatter, $processors);
+        parent::__construct($registry, $processors);
 
         if(!is_string($directory) || !is_dir($directory) || !is_writable($directory))
         {
@@ -54,7 +52,10 @@ class StreamFactory extends AbstractFactory
      */
     protected function createHandler(JobInterface $job, $level = Logger::DEBUG, $bubble = true)
     {
-        return new StreamHandler($this->buildPath($job->getTicket()), $level);
+        $handler = new StreamHandler($this->buildPath($job->getTicket()), $level);
+        $handler->setFormatter(new JsonFormatter());
+
+        return $handler;
     }
 
     /**

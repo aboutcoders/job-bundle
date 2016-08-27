@@ -12,9 +12,9 @@ namespace Abc\Bundle\JobBundle\Tests\Listener;
 
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\Context\Context;
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Listener\JobListener;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;;
 use Abc\Bundle\JobBundle\Model\Job;
 use Psr\Log\NullLogger;
 

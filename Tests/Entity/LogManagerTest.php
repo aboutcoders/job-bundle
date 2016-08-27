@@ -79,40 +79,4 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->subject->save($log);
     }
-
-    public function testFindByJob()
-    {
-        $job = new Job();
-        $job->setTicket('Ticket');
-
-        $this->subject->expects($this->once())
-            ->method('findBy')
-            ->with(['jobTicket' => $job->getTicket()])
-            ->willReturn(['LogEntity']);
-
-        $this->subject->expects($this->once())
-            ->method('formatLogs')
-            ->with(['LogEntity'])
-            ->willReturn('FormattedEntities');
-
-        $this->assertEquals('FormattedEntities', $this->subject->findByJob($job));
-    }
-
-    public function testDeleteByJob()
-    {
-        $job = new Job();
-        $job->setTicket('Ticket');
-
-        $this->subject->expects($this->at(0))
-            ->method('findBy')
-            ->with(['jobTicket' => $job->getTicket()])
-            ->willReturn(['foobar']);
-
-        $this->subject->expects($this->at(1))
-            ->method('deleteLogs')
-            ->with(['foobar'])
-            ->willReturn(5);
-
-        $this->assertEquals(5, $this->subject->deleteByJob($job));
-    }
 }

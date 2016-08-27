@@ -20,82 +20,87 @@ use Monolog\Formatter\FormatterInterface;
  */
 class LogManagerTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @var LogManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $subject;
+
+    public function setUp()
+    {
+        $this->subject = $this->getMockForAbstractClass(LogManager::class);
+    }
+
     public function testCreate()
     {
-        $manager = $this->buildManager();
-
-        $manager->expects($this->once())
+        $this->subject->expects($this->once())
             ->method('getClass')
             ->will($this->returnValue(Log::class));
 
-        $schedule = $manager->create();
+        $schedule = $this->subject->create();
 
         $this->assertInstanceOf(Log::class, $schedule);
-    }
-
-    public function testFormatLogsUsesLineFormatterByDefault()
-    {
-        $ticket = 'Ticket';
-        $job = new Job();
-        $job->setTicket($ticket);
-
-        $log_A = $this->buildLog('ChannelA', 'LevelA', 'MessageA');
-        $log_B = $this->buildLog('ChannelB', 'LevelB', 'MessageB');
-
-        $manager = $this->buildManager();
-
-        $returnValue = $this->invokeMethod($manager, 'formatLogs', [[$log_A, $log_B]]);
-
-        $lines = explode("\n", $returnValue);
-
-        $this->assertContains('ChannelA', $lines[0]);
-        $this->assertContains('ChannelB', $lines[1]);
     }
 
     public function testFindByJobUsesCustomFormatter()
     {
         $ticket = 'Ticket';
-        $job = new Job();
+        $job    = new Job();
         $job->setTicket($ticket);
 
         $log_A = $this->buildLog('ChannelA', 'LevelA', 'MessageA');
         $log_B = $this->buildLog('ChannelB', 'LevelB', 'MessageB');
 
-        $formatter = $this->buildFormatter();
+        $job = new Job();
+        $job->setTicket('Ticket');
 
-        $formatter->expects($this->at(0))
-            ->method('format')
-            ->with($this->contains('ChannelA'))
-            ->willReturn('FormattedA');
+        $this->subject->expects($this->once())
+            ->method('findBy')
+            ->with(['jobTicket' => $job->getTicket()], ['datetime' => 'ASC'])
+            ->willReturn([$log_A, $log_B]);
 
-        $formatter->expects($this->at(1))
-            ->method('format')
-            ->with($this->contains('ChannelB'))
-            ->willReturn('FormattedB');
-
-        $manager = $this->buildManager();
-
-        $manager->setFormatter($formatter);
-
-        $returnValue = $this->invokeMethod($manager, 'formatLogs', [[$log_A, $log_B]]);
-
-        $this->assertEquals('FormattedAFormattedB', $returnValue);
+        $this->assertEquals([
+            [
+                'channel'    => 'ChannelA',
+                'level'      => 'LevelA',
+                'level_name' => null,
+                'message'    => 'MessageA',
+                'datetime'   => null,
+                'context'    => [],
+                'extra'      => [],
+            ],
+            [
+                'channel'    => 'ChannelB',
+                'level'      => 'LevelB',
+                'level_name' => null,
+                'message'    => 'MessageB',
+                'datetime'   => null,
+                'context'    => [],
+                'extra'      => [],
+            ]
+        ], $this->subject->findByJob($job));
     }
 
-    /**
-     * @return LogManager|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function buildManager()
+    public function testDeleteByJob()
     {
-        return $this->getMockForAbstractClass(LogManager::class);
-    }
+        $job = new Job();
+        $job->setTicket('Ticket');
 
-    /**
-     * @return FormatterInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function buildFormatter()
-    {
-        return $this->getMock(FormatterInterface::class);
+        $log_A = $this->buildLog('ChannelA', 'LevelA', 'MessageA');
+
+        $this->subject = $this->getMockForAbstractClass(LogManager::class, [], '', null, null, null, ['delete']);
+
+        $this->subject->expects($this->once())
+            ->method('findBy')
+            ->with(['jobTicket' => $job->getTicket()])
+            ->willReturn([$log_A]);
+
+        $this->subject->expects($this->once())
+            ->method('delete')
+            ->with($log_A);
+
+
+        $this->assertEquals(1, $this->subject->deleteByJob($job));
     }
 
     /**

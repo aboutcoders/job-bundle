@@ -18,13 +18,12 @@ use Abc\Bundle\JobBundle\Job\Context\ContextInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\JobHelper;
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface as LoggerFactoryInterface;
-use Abc\Bundle\JobBundle\Job\Logger\FactoryInterface;
 use Abc\Bundle\JobBundle\Job\LogManagerInterface;
 use Abc\Bundle\JobBundle\Job\Manager;
 use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Status;
+use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
@@ -59,7 +58,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     protected $invoker;
 
     /**
-     * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $loggerFactory;
 

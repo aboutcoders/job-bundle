@@ -181,16 +181,11 @@ class AbcJobExtension extends Extension
             }
         }
 
-        if (isset($config['formatter'])) {
-            $jobType = $container->getDefinition('abc.job.logger.factory');
-            $jobType->addMethodCall('setFormatter', array(new Reference($config['formatter'])));
-        }
-
         if (!empty($config['processor'])) {
-            $jobType = $container->getDefinition('abc.job.logger.factory');
+            $factory = $container->getDefinition('abc.job.logger.factory');
 
             foreach ($config['processor'] as $serviceId) {
-                $jobType->addMethodCall('addProcessor', array(new Reference($serviceId)));
+                $factory->addMethodCall('addProcessor', array(new Reference($serviceId)));
             }
         }
 

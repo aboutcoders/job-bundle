@@ -93,7 +93,7 @@ interface LogInterface
     public function setExtra($extra);
 
     /**
-     * @return array The Monolog compliant record
+     * @return array The PSR compliant log record
      */
     public function toRecord();
 }

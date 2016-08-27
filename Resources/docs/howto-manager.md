@@ -75,5 +75,7 @@ $manager->update($job);
 Use the following command to get to logs of a job:
 
 ```php
-$logsString = $manager->getLogs($job->getTicket());
+$records = $manager->getLogs($job->getTicket());
 ```
+
+The method returns an array of log records that have the very structure as the ones that are handled by a `Monolog\Handler\HandlerInterface`.

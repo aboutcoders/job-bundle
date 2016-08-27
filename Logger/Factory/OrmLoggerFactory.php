@@ -10,18 +10,16 @@
 
 namespace Abc\Bundle\JobBundle\Logger\Factory;
 
-use Abc\Bundle\JobBundle\Job\Logger\AbstractFactory;
 use Abc\Bundle\JobBundle\Logger\Handler\JobAwareOrmHandler;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\LogManagerInterface;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class OrmFactory extends AbstractFactory
+class OrmLoggerFactory extends AbstractFactory
 {
     /**
      * @var JobTypeRegistry
@@ -36,13 +34,12 @@ class OrmFactory extends AbstractFactory
     /**
      * @param JobTypeRegistry     $registry
      * @param LogManagerInterface $manager
-     * @param FormatterInterface  $formatter
      * @param array               $processors
      * @param bool                $bubble
      */
-    public function __construct(JobTypeRegistry $registry, LogManagerInterface $manager, FormatterInterface $formatter = null, array $processors = array(), $bubble = true)
+    public function __construct(JobTypeRegistry $registry, LogManagerInterface $manager, array $processors = array(), $bubble = true)
     {
-        parent::__construct($registry, $formatter, $processors, $bubble);
+        parent::__construct($registry, $processors, $bubble);
 
         $this->manager  = $manager;
         $this->registry = $registry;
