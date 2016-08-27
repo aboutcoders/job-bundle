@@ -233,7 +233,7 @@ class JobController extends FOSRestController
      * @ApiDoc(
      * description="Returns the logs of a job",
      * section="AbcJobBundle",
-     * output="string",
+     * output="Abc\Bundle\JobBundle\Model\Log",
      * parameters={},
      * statusCodes = {
      *     200 = "Returned when successful",

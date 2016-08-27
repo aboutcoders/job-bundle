@@ -10,42 +10,51 @@
 
 namespace Abc\Bundle\JobBundle\Model;
 
+use JMS\Serializer\Annotation\Type;
+
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class Log implements LogInterface
 {
     /**
+     * @Type("string")
      * @var string
      */
     protected $channel;
 
     /**
+     * @Type("integer")
      * @var integer
      */
     protected $level;
 
     /**
+     * @Type("string")
      * @var string
      */
     protected $levelName;
 
     /**
+     * @Type("string")
      * @var string
      */
     protected $message;
 
     /**
+     * @Type("datetime")
      * @var \DateTime
      */
     protected $datetime;
 
     /**
+     * @Type("array")
      * @var array
      */
     protected $context;
 
     /**
+     * @Type("array")
      * @var array
      */
     protected $extra;
