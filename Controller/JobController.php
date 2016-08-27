@@ -19,6 +19,7 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\Bundle\JobBundle\Model\LogInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -225,21 +226,20 @@ class JobController extends FOSRestController
     }
 
     /**
-     * @param string $ticket
-     * @return string
-     *
      * @Get
      *
      * @ApiDoc(
      * description="Returns the logs of a job",
      * section="AbcJobBundle",
-     * output="Abc\Bundle\JobBundle\Model\Log",
+     * output="array<Abc\Bundle\JobBundle\Model\Log>",
      * parameters={},
      * statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned when job not found",
      *   }
      * )
+     * @param string $ticket
+     * @return array|LogInterface[]
      */
     public function getLogsAction($ticket)
     {
