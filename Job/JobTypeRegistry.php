@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
+use Abc\Bundle\JobBundle\Job\Queue\QueueConfigInterface;
 use Metadata\MetadataFactoryInterface;
 
 /**
@@ -25,16 +26,28 @@ class JobTypeRegistry
      */
     private $metadataFactory;
 
-    public function __construct(MetadataFactoryInterface $metadataFactory)
-    {
-        $this->metadataFactory = $metadataFactory;
-    }
-
-    /** @var array */
-    private $types = array();
+    /**
+     * @var QueueConfigInterface
+     */
+    private $queueConfig;
 
     /**
-     * @return JobType[]
+     * @var array
+     */
+    private $types = [];
+
+    /**
+     * @param MetadataFactoryInterface $metadataFactory
+     * @param QueueConfigInterface     $queueConfig
+     */
+    public function __construct(MetadataFactoryInterface $metadataFactory, QueueConfigInterface $queueConfig)
+    {
+        $this->metadataFactory = $metadataFactory;
+        $this->queueConfig = $queueConfig;
+    }
+
+    /**
+     * @return JobTypeInterface[]
      */
     public function all()
     {
@@ -47,7 +60,7 @@ class JobTypeRegistry
      */
     public function has($type)
     {
-        return is_null($type) ? false : array_key_exists($type, $this->types);
+        return array_key_exists($type, $this->types);
     }
 
     /**
@@ -56,8 +69,7 @@ class JobTypeRegistry
      */
     public function register(JobTypeInterface $jobType, $loadClassMetadata = false)
     {
-        if($loadClassMetadata)
-        {
+        if ($loadClassMetadata) {
             /** @var ClassMetadata $classMetadata */
             $classMetadata = $this->metadataFactory->getMetadataForClass($jobType->getClass())->getRootClassMetadata();
 
@@ -65,18 +77,19 @@ class JobTypeRegistry
             $jobType->setResponseType($classMetadata->getMethodReturnType($jobType->getMethod()));
         }
 
+        $jobType->setQueue($this->queueConfig->getQueue($jobType->getName()));
+
         $this->types[$jobType->getName()] = $jobType;
     }
 
     /**
      * @param string $type The job type
-     * @return JobType
+     * @return JobTypeInterface
      * @throws JobTypeNotFoundException If a definition with the given type does not exist
      */
     public function get($type)
     {
-        if(!isset($this->types[$type]))
-        {
+        if (!isset($this->types[$type])) {
             throw new JobTypeNotFoundException($type);
         }
 
@@ -86,7 +99,8 @@ class JobTypeRegistry
     /**
      * @return string[] An array containing all registered type keys
      */
-    public function getTypeChoices() {
+    public function getTypeChoices()
+    {
         return array_keys($this->types);
     }
 }

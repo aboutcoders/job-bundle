@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Listener;
 
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
+use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
@@ -23,9 +23,9 @@ use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
 class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProducerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $queueEngine;
+    private $producer;
 
     /**
      * @var ScheduleListener
@@ -35,8 +35,8 @@ class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->queueEngine = $this->getMock(QueueEngineInterface::class);
-        $this->subject     = new ScheduleListener($this->queueEngine);
+        $this->producer = $this->getMock(ProducerInterface::class);
+        $this->subject  = new ScheduleListener($this->producer);
     }
 
 
@@ -53,8 +53,8 @@ class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
 
         $self = $this;
 
-        $this->queueEngine->expects($this->once())
-            ->method('publish')
+        $this->producer->expects($this->once())
+            ->method('produce')
             ->willReturnCallback(
                 function (Message $message) use ($self)
                 {
@@ -70,8 +70,8 @@ class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = new SchedulerEvent(new Schedule());
 
-        $this->queueEngine->expects($this->never())
-            ->method('publish');
+        $this->producer->expects($this->never())
+            ->method('produce');
 
         $this->subject->onSchedule($event);
     }

@@ -221,13 +221,20 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ## ToDo:
+- Unit test both sonata and bernard integration tests
+- Make QueuConfig configurable & document
+- Add unit tests for bernard adapters
+- Remove all logging channels except abc.job
+- Update documenation
+- Configure sonata queues & invoke & implement consumer
+- Add consumer command
+- Test setting queue for job types in registry
 
 ### Stable release:
 - Get rid of forms and use validation service inside manager to validate job parameters
 - Document how to manage queues within soanta (abc.job prefix)
-- Define a clear serializer interface
+- Define & document a clear serializer interface
 - Provider a TestCase for jobs
-- Consider replacement of SonataNotificationBundle with https://github.com/bernardphp/BernardBundle
 - Cleanup & document agent management
 - Cleanup & document queue management
 - Cleanup & document supervisor integration

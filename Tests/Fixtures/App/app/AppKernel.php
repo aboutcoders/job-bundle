@@ -44,7 +44,8 @@ class AppKernel extends Kernel
             new Abc\Bundle\ResourceLockBundle\AbcResourceLockBundle(),
             new Abc\Bundle\EnumSerializerBundle\AbcEnumSerializerBundle(),
             new Abc\Bundle\JobBundle\AbcJobBundle(),
-            new Abc\Bundle\JobBundle\Tests\Fixtures\App\Bundle\TestBundle\TestBundle()
+            new Abc\Bundle\JobBundle\Tests\Fixtures\App\Bundle\TestBundle\TestBundle(),
+            new Bernard\BernardBundle\BernardBernardBundle()
         );
     }
 

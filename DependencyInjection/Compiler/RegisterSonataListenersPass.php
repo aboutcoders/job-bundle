@@ -10,12 +10,12 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
-use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
+use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Registers the service abc.job.queue_engine as listener for all messages dispatched from the sonata backend.
+ * Registers the service abc.job.producer as listener for all messages dispatched from the sonata backend.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
@@ -41,7 +41,7 @@ class RegisterSonataListenersPass implements CompilerPassInterface
      * @param string $queueEngineService
      * @param string $jobTag
      */
-    public function __construct($dispatcherService = 'sonata.notification.dispatcher', $queueEngineService = 'abc.job.queue_engine', $jobTag = 'abc.job')
+    public function __construct($dispatcherService = 'sonata.notification.dispatcher', $queueEngineService = 'abc.job.producer', $jobTag = 'abc.job')
     {
         $this->dispatcherService  = $dispatcherService;
         $this->queueEngineService = $queueEngineService;
@@ -70,7 +70,7 @@ class RegisterSonataListenersPass implements CompilerPassInterface
                 $dispatcher->addMethodCall(
                     'addListenerService',
                     array(
-                        SonataAdapter::MESSAGE_PREFIX . $tag['type'],
+                        ProducerAdapter::MESSAGE_PREFIX . $tag['type'],
                         array($this->queueEngineService, 'process')
                     )
                 );

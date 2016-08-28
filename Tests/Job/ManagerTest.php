@@ -20,7 +20,7 @@ use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\LogManagerInterface;
 use Abc\Bundle\JobBundle\Job\Manager;
-use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
+use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
@@ -88,9 +88,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var QueueEngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ProducerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $queueEngine;
+    private $producer;
 
     /**
      * @var Manager
@@ -108,7 +108,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->helper        = $this->getMockBuilder(JobHelper::class)->disableOriginalConstructor()->getMock();
         $this->locker        = $this->getMock(LockManagerInterface::class);
         $this->logger        = $this->getMock(LoggerInterface::class);
-        $this->queueEngine   = $this->getMock(QueueEngineInterface::class);
+        $this->producer      = $this->getMock(ProducerInterface::class);
 
         $this->jobManager->method('getClass')
             ->willReturn('Abc\Bundle\JobBundle\Model\Job');
@@ -125,7 +125,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $this->logger
         );
 
-        $this->subject->setQueueEngine($this->queueEngine);
+        $this->subject->setProducer($this->producer);
     }
 
     /**
@@ -158,8 +158,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with($job);
 
-        $this->queueEngine->expects($schedule == null ? $this->once() : $this->never())
-            ->method('publish')
+        $this->producer->expects($schedule == null ? $this->once() : $this->never())
+            ->method('produce')
             ->with($this->equalTo(new Message($job->getType(), $job->getTicket())));
 
         $addedJob = $this->subject->add($job);
@@ -230,8 +230,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('has')
             ->willReturn(true);
 
-        $this->queueEngine->expects($this->once())
-            ->method('publish')
+        $this->producer->expects($this->once())
+            ->method('produce')
             ->willThrowException(new \Exception);
 
         $this->subject->add($job);
@@ -910,7 +910,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods($mockedMethods)
             ->getMock();
 
-        $subject->setQueueEngine($this->queueEngine);
+        $subject->setProducer($this->producer);
 
         return $subject;
     }

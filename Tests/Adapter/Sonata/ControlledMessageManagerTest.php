@@ -8,9 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Sonata;
+namespace Abc\Bundle\JobBundle\Tests\Adapter\Sonata;
 
-use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
+use Abc\Bundle\JobBundle\Adapter\Sonata\ControlledMessageManager;
 use Abc\ProcessControl\ControllerInterface;
 use Sonata\NotificationBundle\Model\MessageInterface;
 use Sonata\NotificationBundle\Model\MessageManagerInterface;
@@ -43,7 +43,7 @@ class ControlledMessageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Abc\Bundle\JobBundle\Sonata\IterationStoppedException
+     * @expectedException \Abc\Bundle\JobBundle\Adapter\Sonata\IterationStoppedException
      */
     public function testFindByTypesThrowsException()
     {

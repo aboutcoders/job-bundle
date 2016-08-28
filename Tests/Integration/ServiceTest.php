@@ -101,7 +101,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
             ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
-            ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
+            # ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
             ['abc.job.lock_manager', LockManagerInterface::class],
             ['abc.job.controller_factory', Factory::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]
@@ -128,11 +128,19 @@ class ServiceTest extends KernelTestCase
 
     public function testScheduleListenerListensToSchedule()
     {
-        /** @var EventDispatcherInterface $dispatcher */
+        /**
+         * @var EventDispatcherInterface $dispatcher
+         */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $listener = $this->getMockBuilder(ScheduleListener::class)->disableOriginalConstructor()->getMock();
-        /** @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $event = $this->getMockBuilder(SchedulerEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.schedule', $listener);
@@ -146,7 +154,9 @@ class ServiceTest extends KernelTestCase
 
     public function testScheduleIteratorIsRegistered()
     {
-        /** @var IteratorRegistryInterface $registry */
+        /**
+         * @var IteratorRegistryInterface $registry
+         */
         $registry = $this->container->get('abc.scheduler.iterator_registry');
 
         $this->assertCount(1, $registry->all());

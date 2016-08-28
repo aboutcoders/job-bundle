@@ -13,7 +13,7 @@
         </service>
 
         <service id="abc.job.listener.schedule" class="Abc\Bundle\JobBundle\Listener\ScheduleListener" public="true">
-            <argument type="service" id="abc.job.queue_engine" />
+            <argument type="service" id="abc.job.producer" />
             <argument type="service" id="logger" on-invalid="null"/>
             <tag name="abc.scheduler.event_listener" method="onSchedule"/>
             <tag name="monolog.logger" channel="abc.job.listener.schedule"/>

@@ -8,11 +8,11 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Sonata;
+namespace Abc\Bundle\JobBundle\Adapter\Sonata;
 
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
+use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @see https://sonata-project.org/bundles/notification/3-x/doc/index.html
  */
-class SonataAdapter implements QueueEngineInterface, ConsumerInterface
+class ProducerAdapter implements ProducerInterface, ConsumerInterface
 {
     const MESSAGE_PREFIX = 'abc.job.';
 
@@ -76,7 +76,7 @@ class SonataAdapter implements QueueEngineInterface, ConsumerInterface
      * @return void
      * @throws \RuntimeException If publishing fails
      */
-    public function publish(Message $message)
+    public function produce(Message $message)
     {
         $type = self::MESSAGE_PREFIX . $message->getType();
         $body = array('ticket' => $message->getTicket());
@@ -109,13 +109,12 @@ class SonataAdapter implements QueueEngineInterface, ConsumerInterface
         $this->logger->debug('Process event {event} from sonata backend', array('event' => $event));
 
         $ticket   = $event->getMessage()->getValue('ticket', null);
-        $callback = $event->getMessage()->getValue('callback', null);
 
         if(!is_string($ticket) || strlen((string) $ticket) == 0)
         {
             throw new \InvalidArgumentException('The message body must be an array containing the key "ticket"');
         }
 
-        $this->manager->onMessage(new Message($event->getMessage()->getType(), $ticket, $callback));
+        $this->manager->onMessage(new Message($event->getMessage()->getType(), $ticket));
     }
 }

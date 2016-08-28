@@ -10,9 +10,9 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Sonata;
 
+use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class SonataAdapterTest extends \PHPUnit_Framework_TestCase
+class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -45,7 +45,7 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var SonataAdapter
+     * @var ProducerAdapter
      */
     private $subject;
 
@@ -56,7 +56,7 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
         $this->logger          = $this->getMock(LoggerInterface::class);
 
-        $this->subject = new SonataAdapter($this->backend, $this->eventDispatcher, $this->logger);
+        $this->subject = new ProducerAdapter($this->backend, $this->eventDispatcher, $this->logger);
         $this->subject->setManager($this->manager);
     }
 
@@ -73,9 +73,9 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this->backend->expects($this->once())
             ->method('createAndPublish')
-            ->with(SonataAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
+            ->with(ProducerAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
 
-        $this->subject->publish($message);
+        $this->subject->produce($message);
     }
 
     /**
@@ -89,7 +89,7 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('createAndPublish')
             ->willThrowException(new \Exception);
 
-        $this->subject->publish($message);
+        $this->subject->produce($message);
     }
 
     /**

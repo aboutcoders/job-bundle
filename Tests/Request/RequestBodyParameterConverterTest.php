@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Request;
 
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Job\Queue\QueueConfig;
 use Abc\Bundle\JobBundle\Request\RequestBodyParameterConverter;
 use Metadata\MetadataFactoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -58,7 +59,7 @@ class RequestBodyParameterConverterTest extends \PHPUnit_Framework_TestCase
     {
         $this->paramConverter = $this->getMockBuilder('Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter')->disableOriginalConstructor()->getMock();
         $this->metadataFactory = $this->getMock('Metadata\MetadataFactoryInterface');
-        $this->registry   = new JobTypeRegistry($this->metadataFactory);
+        $this->registry   = new JobTypeRegistry($this->metadataFactory, new QueueConfig());
         $this->converter  = $this->getMock('Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface');
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->subject    = new RequestBodyParameterConverter($this->registry, $this->converter, $this->dispatcher);

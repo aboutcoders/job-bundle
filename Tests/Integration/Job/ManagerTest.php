@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Job;
 use Abc\Bundle\JobBundle\Job\ExceptionResponse;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
+use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\ScheduleManagerInterface;
 use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
@@ -29,6 +30,8 @@ class ManagerTest extends DatabaseKernelTestCase
     {
         $ticket = $this->getJobManager()->addJob('log', array('message'));
 
+        $this->processJobs();
+        
         $logs = $this->getJobManager()->getLogs($ticket);
 
         $this->assertTrue($this->containsMessage('message', $logs));
@@ -37,6 +40,8 @@ class ManagerTest extends DatabaseKernelTestCase
     public function testHandlesExceptionsThrownByJob()
     {
         $job = $this->getJobManager()->addJob('throw_exception', array('message', 100));
+
+        $this->processJobs();
 
         $this->assertEquals(Status::ERROR(), $job->getStatus());
         $this->assertInstanceOf(ExceptionResponse::class, $job->getResponse());
@@ -49,6 +54,8 @@ class ManagerTest extends DatabaseKernelTestCase
         $expectedResponse = new TestResponse('foobar');
         $ticket           = $this->getJobManager()->addJob('set_response', array($expectedResponse));
 
+        $this->processJobs();
+
         $response = $this->getJobManager()->get($ticket)->getResponse();
 
         $this->assertEquals($expectedResponse, $response);
@@ -56,7 +63,9 @@ class ManagerTest extends DatabaseKernelTestCase
 
     public function testJobCanCreateSchedule()
     {
-        $ticket = $this->getJobManager()->addJob('create_schedule', array('cron', '* * * * *'));
+        $ticket = $this->getJobManager()->addJob('create_schedule', ['cron', '* * * * *']);
+
+        $this->processJobs();
 
         $this->assertEquals(Status::SLEEPING(), $this->getJobManager()->get($ticket)->getStatus());
 
@@ -73,13 +82,13 @@ class ManagerTest extends DatabaseKernelTestCase
 
     public function testJobCanUpdateSchedule()
     {
-        // create scheduled job
         $schedule = $this->getScheduleManager()->create('cron', '* * * * *');
 
-        $ticket = $this->getJobManager()->addJob('update_schedule', array('cron', '1 1 * * *'), $schedule);
+        $this->getJobManager()->addJob('update_schedule', ['cron', '1 1 * * *'], $schedule);
 
-        // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
+
+        $this->processJobs();
 
         $this->getEntityManager()->clear();
 
@@ -87,7 +96,9 @@ class ManagerTest extends DatabaseKernelTestCase
 
         $this->assertCount(1, $schedules);
 
-        /** @var Schedule $schedule */
+        /**
+         * @var Schedule $schedule
+         */
         $schedule = $schedules[0];
 
         $this->assertEquals('cron', $schedule->getType());
@@ -107,6 +118,8 @@ class ManagerTest extends DatabaseKernelTestCase
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
 
+        $this->processJobs();
+
         $this->assertTrue($this->containsMessage('removed schedule', $this->getJobManager()->getLogs($ticket)));
         $this->assertEquals(Status::PROCESSED(), $this->getJobManager()->get($ticket)->getStatus());
         $this->assertEmpty($this->getScheduleManager()->findSchedules());
@@ -119,6 +132,8 @@ class ManagerTest extends DatabaseKernelTestCase
         $schedule->setType('cron');
 
         $ticket = $this->getJobManager()->addJob('schedule', array(1), $schedule);
+
+        $this->processJobs();
 
         $this->getJobManager()->cancel($ticket);
 
@@ -140,6 +155,8 @@ class ManagerTest extends DatabaseKernelTestCase
         // process schedules
         $this->runConsole("abc:scheduler:process", array("--iteration" => 1));
 
+        $this->processJobs();
+
         $this->assertEquals(Status::ERROR(), $this->getJobManager()->get($ticket)->getStatus());
 
         $schedules = $this->getScheduleManager()->findSchedules();
@@ -150,6 +167,8 @@ class ManagerTest extends DatabaseKernelTestCase
     public function testJobCanManageJobs()
     {
         $job = $this->getJobManager()->addJob('manage_job');
+
+        $this->processJobs();
 
         $ticket = $job->getResponse();
 
@@ -167,6 +186,8 @@ class ManagerTest extends DatabaseKernelTestCase
         $controllerFactory->addController(new DoExitController());
 
         $job = $this->getJobManager()->addJob('cancel');
+
+        $this->processJobs();
 
         $this->assertContains('cancelled', $job->getResponse());
         $this->assertEquals(Status::CANCELLED(), $job->getStatus());
@@ -196,6 +217,17 @@ class ManagerTest extends DatabaseKernelTestCase
     {
         return $this->getContainer()->get('abc.job.manager');
     }
+
+    protected function processJobs() {
+        /**
+         * @var ConsumerInterface $consumer
+         */
+        $consumer = $this->getContainer()->get('abc.job.consumer');
+        $consumer->consume('default', [
+            'exit-on-empty' => true
+        ]);
+    }
+
 
     /**
      * @return ScheduleManagerInterface

@@ -12,10 +12,10 @@ namespace Abc\Bundle\JobBundle\Tests\Logger\Factory;
 
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Job\Queue\QueueConfig;
 use Abc\Bundle\JobBundle\Logger\Factory\FileLoggerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Metadata\MetadataFactoryInterface;
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -54,11 +54,11 @@ class FileFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->directory = dirname(__FILE__) .'/../../../build/tests';
+        $this->directory       = dirname(__FILE__) . '/../../../build/tests';
         $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);
 
-        $this->registry = new JobTypeRegistry($this->metadataFactory);
-        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->registry = new JobTypeRegistry($this->metadataFactory, new QueueConfig());
+        $this->logger   = $this->getMock(LoggerInterface::class);
 
         $this->setUpTestDir($this->directory);
 
@@ -108,9 +108,11 @@ class FileFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateWithProcessor()
     {
-        $processor = function() {};
+        $processor = function () {
+        };
 
-        $this->registry->register(new JobType('service-id', 'job-type', function(){}, Logger::DEBUG));
+        $this->registry->register(new JobType('service-id', 'job-type', function () {
+        }, Logger::DEBUG));
 
         $this->subject->addProcessor($processor);
 
@@ -118,7 +120,7 @@ class FileFactoryTest extends \PHPUnit_Framework_TestCase
         $job->setTicket('job-ticket');
         $job->setType('job-type');
 
-        $logger = $this->subject->create($job);
+        $logger   = $this->subject->create($job);
         $handlers = $logger->getHandlers();
 
         /**
@@ -145,8 +147,8 @@ class FileFactoryTest extends \PHPUnit_Framework_TestCase
     public function getInvalidConstructorArgs()
     {
         return [
-            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class)), 'path/to/nowhere'],
-            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class)), sys_get_temp_dir(), ['foo']]
+            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class), new QueueConfig()), 'path/to/nowhere'],
+            [new JobTypeRegistry($this->getMock(MetadataFactoryInterface::class), new QueueConfig()), sys_get_temp_dir(), ['foo']]
         ];
     }
 
@@ -154,8 +156,7 @@ class FileFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $filesystem = new Filesystem();
 
-        if(is_dir($path))
-        {
+        if (is_dir($path)) {
             $filesystem->remove($path);
         }
 

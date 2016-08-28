@@ -33,8 +33,8 @@ class Message {
      */
     function __construct($type, $ticket)
     {
-        $this->type     = $type;
-        $this->ticket   = $ticket;
+        $this->type   = $type;
+        $this->ticket = $ticket;
     }
 
     /**

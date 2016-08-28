@@ -49,7 +49,7 @@ class AbcJobExtension extends Extension
         }
 
         if ('custom' !== $config['adapter']) {
-            $loader->load(sprintf('%s.xml', $config['adapter']));
+            $loader->load(sprintf('adapter_%s.xml', $config['adapter']));
         }
 
         $this->remapParametersNamespaces(
@@ -59,6 +59,8 @@ class AbcJobExtension extends Extension
                 '' => array(
                     'model_manager_name'    => 'abc.job.model_manager_name',
                     'register_default_jobs' => 'abc.job.register_default_jobs',
+                    'queues'                => 'abc.job.queue_config',
+                    'default_queue'         => 'abc.job.default_queue',
                 )
             )
         );
@@ -109,7 +111,7 @@ class AbcJobExtension extends Extension
     protected function configureServices(ContainerBuilder $container, array $config, array $services)
     {
         foreach ($services as $name) {
-            $container->setAlias('abc.job.'. $name, $config['service'][$name]);
+            $container->setAlias('abc.job.' . $name, $config['service'][$name]);
         }
     }
 
@@ -160,13 +162,14 @@ class AbcJobExtension extends Extension
      * @param XmlFileLoader    $loader
      * @return void
      */
-    private function registerDefaultJobs(ContainerBuilder $container, XmlFileLoader $loader) {
+    private function registerDefaultJobs(ContainerBuilder $container, XmlFileLoader $loader)
+    {
         $container->setParameter('abc.job.form.form_type_message', method_exists(AbstractType::class, 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
         $container->setParameter('abc.job.form.form_type_seconds', method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
 
         $loader->load('default_jobs.xml');
 
-        if(!method_exists(AbstractType::class, 'getBlockPrefix')){
+        if (!method_exists(AbstractType::class, 'getBlockPrefix')) {
             $loader->load('default_jobs_forms.xml');
         }
     }

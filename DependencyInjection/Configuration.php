@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('abc_job');
 
         $supportedDrivers = array('orm', 'custom');
-        $supportedAdapters = array('sonata', 'custom');
+        $supportedAdapters = array('sonata', 'bernard', 'custom');
         $supportedLoggingHandlers = array('file', 'orm', 'custom');
 
         $rootNode
@@ -50,6 +50,13 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeOverwritten()
                     ->defaultValue('sonata')
                 ->end()
+                ->arrayNode('queues')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
+                ->scalarNode('default_queue')->defaultValue('default')->end()
                 ->booleanNode('register_default_jobs')
                     ->defaultTrue()
                 ->end()

@@ -8,19 +8,17 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Sonata;
+namespace Abc\Bundle\JobBundle\Adapter\Sonata;
+
+use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 
 /**
- * Exception thrown to abort continuous iteration over messages.
- *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class IterationStoppedException extends \Exception
+class ConsumerAdapter implements ConsumerInterface
 {
-    const CODE = 0;
-
-    public final function __construct()
+    public function consume($queue, array $options = [])
     {
-        return parent::__construct('Iteration stopped by process control', self::CODE);
+        // @ToDo implement this
     }
 }

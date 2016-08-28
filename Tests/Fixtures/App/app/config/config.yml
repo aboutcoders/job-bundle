@@ -24,7 +24,7 @@ monolog:
         abc_job:
             type:     stream
             path:     "%kernel.logs_dir%/abc_job_%kernel.environment%.log"
-            channels: ["abc.job.manager", "abc.job.queue_engine", "abc.job.eraser", "abc.job.listener.schedule"]
+            channels: ["abc.job.manager", "abc.job.producer", "abc.job.eraser", "abc.job.listener.schedule"]
 
 # Twig Configuration
 twig:
@@ -78,9 +78,8 @@ fos_rest:
         messages:
             'Exception': true
 
-sonata_notification:
-    consumers:
-        register_default: false
+bernard_bernard:
+    driver: doctrine
 
 yz_supervisor:
     default_environment: dev
@@ -100,6 +99,11 @@ abc_scheduler:
 
 abc_job:
     db_driver: orm
+    adapter: sonata
     logging:
         default_level: debug
         handler: orm
+    default_queue: default
+    queues:
+        my_queue:
+            - another_job

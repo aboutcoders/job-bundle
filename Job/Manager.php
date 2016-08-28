@@ -15,11 +15,10 @@ use Abc\Bundle\JobBundle\Event\TerminationEvent;
 use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
+use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface as LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
@@ -44,9 +43,9 @@ class Manager implements ManagerInterface
     protected $registry;
 
     /**
-     * @var SonataAdapter
+     * @var ProducerInterface
      */
-    protected $queueEngine;
+    protected $producer;
 
     /**
      * @var JobManagerInterface
@@ -122,12 +121,12 @@ class Manager implements ManagerInterface
     }
 
     /**
-     * @param QueueEngineInterface $queueEngine
+     * @param ProducerInterface $producer
      * @return void
      */
-    public function setQueueEngine(QueueEngineInterface $queueEngine)
+    public function setProducer(ProducerInterface $producer)
     {
-        $this->queueEngine = $queueEngine;
+        $this->producer = $producer;
     }
 
     /**
@@ -359,7 +358,7 @@ class Manager implements ManagerInterface
                 ]
             );
 
-            $this->queueEngine->publish($message);
+            $this->producer->produce($message);
         } catch (\Exception $e) {
             $this->logger->critical('Failed to publish message to queue backend: {exception}', ['exception' => $e]);
 

@@ -20,8 +20,8 @@
             <argument type="service" id="abc.job.helper"/>
             <argument type="service" id="abc.job.lock_manager"/>
             <argument type="service" id="logger" on-invalid="null"/>
-            <call method="setQueueEngine">
-                <argument type="service" id="abc.job.queue_engine"/>
+            <call method="setProducer">
+                <argument type="service" id="abc.job.producer"/>
             </call>
             <tag name="monolog.logger" channel="abc.job.manager"/>
         </service>
@@ -42,6 +42,12 @@
 
         <service id="abc.job.registry" class="Abc\Bundle\JobBundle\Job\JobTypeRegistry" public="false">
             <argument type="service" id="abc.job.metadata_factory"/>
+            <argument type="service" id="abc.job.queue_config" />
+        </service>
+
+        <service id="abc.job.queue_config" class="Abc\Bundle\JobBundle\Job\Queue\QueueConfig" public="false">
+            <argument>%abc.job.queue_config%</argument>
+            <argument>%abc.job.default_queue%</argument>
         </service>
 
         <service id="abc.job.type.prototype" class="Abc\Bundle\JobBundle\Job\JobType" abstract="false">
