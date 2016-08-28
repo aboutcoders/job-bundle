@@ -23,7 +23,7 @@
             <call method="setProducer">
                 <argument type="service" id="abc.job.producer"/>
             </call>
-            <tag name="monolog.logger" channel="abc.job.manager"/>
+            <tag name="monolog.logger" channel="abc.job"/>
         </service>
 
         <service id="abc.job.invoker" class="Abc\Bundle\JobBundle\Job\Invoker" public="false">
@@ -45,7 +45,7 @@
             <argument type="service" id="abc.job.queue_config" />
         </service>
 
-        <service id="abc.job.queue_config" class="Abc\Bundle\JobBundle\Job\Queue\QueueConfig" public="false">
+        <service id="abc.job.queue_config.default" class="Abc\Bundle\JobBundle\Job\Queue\QueueConfig" public="false">
             <argument>%abc.job.queue_config%</argument>
             <argument>%abc.job.default_queue%</argument>
         </service>

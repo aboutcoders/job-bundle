@@ -12,7 +12,13 @@ This bundle provides the following features:
 - Asynchronous job processing
 - Scheduled execution of jobs
 - RESTful API
-- Message Queue Backend based on RabbitMQ or Doctrine
+- Supported message queue backends:
+  - Predis / PhpRedis
+  - Amazon SQS
+  - Iron MQ
+  - Doctrine DBAL
+  - Pheanstalk
+  - PhpAmqp / RabbitMQ
 
 ## Disclaimer
 
@@ -222,9 +228,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## ToDo:
 - Unit test both sonata and bernard integration tests
-- Make QueueConfig configurable & document
 - Add unit tests for bernard and sonata adapters
-- Remove all logging channels except abc.job
 - Update documentation
 - Add consumer command
 - Test setting queue for job types in registry

@@ -41,7 +41,8 @@ class AbcJobExtension extends Extension
             'schedule_manager',
             'schedule_iterator',
             'schedule_manager_iterator',
-            'controller_factory'
+            'controller_factory',
+            'queue_config'
         ]);
 
         if ('custom' !== $config['db_driver']) {
@@ -89,7 +90,6 @@ class AbcJobExtension extends Extension
         $loader->load('manager.xml');
         $loader->load('schedule.xml');
         $loader->load('listener.xml');
-        $loader->load('eraser.xml');
         $loader->load('metadata.xml');
         $loader->load('forms.xml');
         $loader->load('process_control.xml');

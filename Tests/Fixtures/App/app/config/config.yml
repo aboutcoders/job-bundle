@@ -24,7 +24,7 @@ monolog:
         abc_job:
             type:     stream
             path:     "%kernel.logs_dir%/abc_job_%kernel.environment%.log"
-            channels: ["abc.job.manager", "abc.job.producer", "abc.job.eraser", "abc.job.listener.schedule"]
+            channels: ["abc.job"]
 
 # Twig Configuration
 twig:

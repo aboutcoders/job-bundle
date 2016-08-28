@@ -16,7 +16,7 @@
             <argument type="service" id="abc.job.producer" />
             <argument type="service" id="logger" on-invalid="null"/>
             <tag name="abc.scheduler.event_listener" method="onSchedule"/>
-            <tag name="monolog.logger" channel="abc.job.listener.schedule"/>
+            <tag name="monolog.logger" channel="abc.job"/>
         </service>
 
     </services>

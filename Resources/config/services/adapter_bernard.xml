@@ -13,7 +13,7 @@
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>
             </call>
-            <tag name="monolog.logger" channel="abc.job.producer"/>
+            <tag name="monolog.logger" channel="abc.job"/>
             <tag name="bernard.receiver" message="ConsumeJob" />
         </service>
 

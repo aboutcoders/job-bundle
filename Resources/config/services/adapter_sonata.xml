@@ -14,7 +14,7 @@
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>
             </call>
-            <tag name="monolog.logger" channel="abc.job.producer"/>
+            <tag name="monolog.logger" channel="abc.job"/>
         </service>
 
         <service id="abc.job.consumer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ConsumerAdapter" public="true">

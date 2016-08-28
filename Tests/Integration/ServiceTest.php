@@ -21,14 +21,12 @@ use Abc\Bundle\JobBundle\Job\Mailer\Mailer;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
-use Abc\Bundle\JobBundle\Job\Report\EraserInterface;
 use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
-use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
@@ -88,7 +86,6 @@ class ServiceTest extends KernelTestCase
     {
         return [
             ['abc.job.agent_manager', AgentManagerInterface::class],
-            ['abc.job.eraser', EraserInterface::class],
             ['abc.job.form.type.job', JobType::class],
             ['abc.job.job_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],

@@ -27,9 +27,9 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('abc_job');
 
-        $supportedDrivers = array('orm', 'custom');
-        $supportedAdapters = array('sonata', 'bernard', 'custom');
-        $supportedLoggingHandlers = array('file', 'orm', 'custom');
+        $supportedDrivers = ['orm', 'custom'];
+        $supportedAdapters = ['bernard', 'sonata', 'custom'];
+        $supportedLoggingHandlers = ['file', 'orm', 'custom'];
 
         $rootNode
             ->children()
@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                         ->thenInvalid('The adapter %s is not supported. Please choose one of ' . json_encode($supportedAdapters))
                     ->end()
                     ->cannotBeOverwritten()
-                    ->defaultValue('sonata')
+                    ->isRequired()
                 ->end()
                 ->arrayNode('queues')
                     ->useAttributeAsKey('name')
@@ -83,7 +83,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('directory')->defaultValue('%kernel.logs_dir%')->end()
                         ->scalarNode('default_level')->defaultValue('info')->end()
-                        ->scalarNode('formatter')->end()
                         ->arrayNode('processor')
                             ->canBeUnset()
                             ->useAttributeAsKey('name')
@@ -120,6 +119,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('schedule_iterator')->defaultValue('abc.job.schedule_iterator.default')->end()
                             ->scalarNode('schedule_manager_iterator')->defaultValue('abc.job.schedule_manager_iterator.default')->end()
                             ->scalarNode('controller_factory')->defaultValue('abc.job.controller_factory.default')->end()
+                            ->scalarNode('queue_config')->defaultValue('abc.job.queue_config.default')->end()
                         ->end()
                     ->end()
                 ->end()
