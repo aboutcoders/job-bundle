@@ -44,6 +44,14 @@ class QueueConfig implements QueueConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getDefaultQueue()
+    {
+        return $this->defaultQueue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getQueue($type)
     {
         return isset($this->map[$type]) ? $this->map[$type] : $this->defaultQueue;

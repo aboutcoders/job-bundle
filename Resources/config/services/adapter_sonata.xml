@@ -9,6 +9,7 @@
         <service id="abc.job.producer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter" public="false">
             <argument type="service" id="sonata.notification.backend"/>
             <argument type="service" id="sonata.notification.dispatcher"/>
+            <argument type="service" id="abc.job.registry"/>
             <argument type="service" id="logger" on-invalid="null"/>
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>
@@ -17,6 +18,11 @@
         </service>
 
         <service id="abc.job.consumer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ConsumerAdapter" public="true">
+            <argument type="service" id="sonata.notification.backend"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="sonata.notification.dispatcher"/>
+            <argument type="service" id="abc.process_control.controller"/>
+            <argument>%abc.job.default_queue%</argument>
         </service>
 
         <service id="abc.job.sonata.notification.manager.message" class="Abc\Bundle\JobBundle\Adapter\Sonata\ControlledMessageManager" public="true">

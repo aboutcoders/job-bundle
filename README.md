@@ -222,11 +222,10 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 
 ## ToDo:
 - Unit test both sonata and bernard integration tests
-- Make QueuConfig configurable & document
-- Add unit tests for bernard adapters
+- Make QueueConfig configurable & document
+- Add unit tests for bernard and sonata adapters
 - Remove all logging channels except abc.job
-- Update documenation
-- Configure sonata queues & invoke & implement consumer
+- Update documentation
 - Add consumer command
 - Test setting queue for job types in registry
 

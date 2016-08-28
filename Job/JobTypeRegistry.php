@@ -97,6 +97,13 @@ class JobTypeRegistry
     }
 
     /**
+     * @return string The name of the default queue
+     */
+    public function getDefaultQueue() {
+        return $this->queueConfig->getDefaultQueue();
+    }
+
+    /**
      * @return string[] An array containing all registered type keys
      */
     public function getTypeChoices()

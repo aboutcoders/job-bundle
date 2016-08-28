@@ -16,6 +16,11 @@ namespace Abc\Bundle\JobBundle\Job\Queue;
 interface QueueConfigInterface
 {
     /**
+     * @return string The name of the default queue
+     */
+    public function getDefaultQueue();
+
+    /**
      * Returns the name of a queue of a job.
      * 
      * @param string $type The job type
