@@ -12,9 +12,9 @@ namespace Abc\Bundle\JobBundle\Adapter\Bernard;
 
 use Abc\ProcessControl\ControllerInterface;
 use Bernard\Consumer as BaseConsumer;
-use Bernard\Middleware\MiddlewareBuilder;
 use Bernard\Queue;
 use Bernard\Router;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A custom implementation of Consumer that is controlled by a process controller and allows to set
@@ -38,19 +38,19 @@ class ControlledConsumer extends BaseConsumer
      * @var integer
      */
     private $iterations;
-    
+
     /**
-     * @param Router            $router
-     * @param MiddlewareBuilder $middleware
+     * @param Router                   $router
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(Router $router, MiddlewareBuilder $middleware, ControllerInterface $controller)
+    public function __construct(Router $router, EventDispatcherInterface $dispatcher, ControllerInterface $controller)
     {
-        parent::__construct($router, $middleware);
+        parent::__construct($router, $dispatcher);
 
         $this->controller = $controller;
-        $this->options = [
+        $this->options    = [
             'max-iterations' => PHP_INT_MAX,
-            'exit-on-empty' => false
+            'exit-on-empty'  => false
         ];
     }
 
@@ -113,7 +113,7 @@ class ControlledConsumer extends BaseConsumer
             return;
         }
 
-        $this->options = array_merge($this->options, $options);
+        $this->options    = array_merge($this->options, $options);
         $this->configured = true;
     }
 }

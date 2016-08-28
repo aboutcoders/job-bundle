@@ -78,7 +78,7 @@ fos_rest:
         messages:
             'Exception': true
 
-bernard_bernard:
+bernard:
     driver: doctrine
 
 yz_supervisor:
@@ -99,7 +99,7 @@ abc_scheduler:
 
 abc_job:
     db_driver: orm
-    adapter: sonata
+    adapter: bernard
     logging:
         default_level: debug
         handler: orm
