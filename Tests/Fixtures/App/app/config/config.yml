@@ -99,7 +99,7 @@ abc_scheduler:
 
 abc_job:
     db_driver: orm
-    adapter: bernard
+    adapter: sonata
     logging:
         default_level: debug
         handler: orm
