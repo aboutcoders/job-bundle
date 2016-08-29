@@ -107,11 +107,19 @@ class ServiceTest extends KernelTestCase
 
     public function testJobListenerListensToJobPrepare()
     {
-        /** @var EventDispatcherInterface $dispatcher */
+        /**
+         * @var EventDispatcherInterface $dispatcher
+         */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $listener = $this->getMockBuilder(JobListener::class)->disableOriginalConstructor()->getMock();
-        /** @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $event = $this->getMockBuilder(ExecutionEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.job', $listener);
