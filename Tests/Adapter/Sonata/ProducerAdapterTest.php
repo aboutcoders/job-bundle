@@ -8,8 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Sonata;
+namespace Abc\Bundle\JobBundle\Tests\Adapter\Sonata;
 
+use Abc\Bundle\JobBundle\Adapter\Sonata\BackendProvider;
 use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
@@ -17,7 +18,6 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
-use Sonata\NotificationBundle\Backend\QueueBackendDispatcher;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
 use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,9 +28,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var BackendProvider|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $backend;
+    private $backendProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -59,7 +59,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->backend         = $this->getMockBuilder(QueueBackendDispatcher::class)->disableOriginalConstructor()->getMock();
+        $this->backendProvider = $this->getMockBuilder(BackendProvider::class)->disableOriginalConstructor()->getMock();
         $this->manager         = $this->getMock(ManagerInterface::class);
         $this->registry        = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
@@ -69,7 +69,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('getDefaultQueue')
             ->willReturn('default');
 
-        $this->subject = new ProducerAdapter($this->backend, $this->eventDispatcher, $this->registry, $this->logger);
+        $this->subject = new ProducerAdapter($this->backendProvider, $this->eventDispatcher, $this->registry, $this->logger);
         $this->subject->setManager($this->manager);
     }
 
@@ -80,50 +80,30 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeSame($this->manager, 'manager', $this->subject);
     }
 
-    public function testProduceWithDefaultQueue()
+    public function testProduce()
     {
-        $message = new Message('type', 'ticket', 'callback');
-
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
-        $jobType->expects($this->any())
-            ->method('getQueue')
-            ->willReturn('default');
-
-        $this->registry->expects($this->any())
-            ->method('get')
-            ->with('type')
-            ->willReturn($jobType);
-
-        $this->backend->expects($this->once())
-            ->method('createAndPublish')
-            ->with(ProducerAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
-
-        $this->subject->produce($message);
-    }
-
-    public function testProduceWithDifferentQueue()
-    {
+        $queue   = 'foobar';
         $message = new Message('type', 'ticket', 'callback');
         $backend = $this->getMock(BackendInterface::class);
 
         $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
         $jobType->expects($this->any())
             ->method('getQueue')
-            ->willReturn('other_queue');
-
-        $this->backend->expects($this->once())
-            ->method('getBackend')
-            ->with('other_queue')
-            ->willReturn($backend);
+            ->willReturn($queue);
 
         $this->registry->expects($this->any())
             ->method('get')
             ->with('type')
             ->willReturn($jobType);
 
+        $this->backendProvider->expects($this->once())
+            ->method('getBackend')
+            ->with($queue)
+            ->willReturn($backend);
+
         $backend->expects($this->once())
             ->method('createAndPublish')
-            ->with(ProducerAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
+            ->with('type', ['ticket' => 'ticket']);
 
         $this->subject->produce($message);
     }
@@ -133,19 +113,26 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testProduceThrowsExceptionsThrownByBackend()
     {
+        $queue   = 'foobar';
         $message = new Message('type', 'ticket', 'callback');
+        $backend = $this->getMock(BackendInterface::class);
 
         $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
         $jobType->expects($this->any())
             ->method('getQueue')
-            ->willReturn('default');
+            ->willReturn($queue);
 
         $this->registry->expects($this->any())
             ->method('get')
             ->with('type')
             ->willReturn($jobType);
 
-        $this->backend->expects($this->once())
+        $this->backendProvider->expects($this->once())
+            ->method('getBackend')
+            ->with($queue)
+            ->willReturn($backend);
+
+        $backend->expects($this->once())
             ->method('createAndPublish')
             ->willThrowException(new \Exception);
 

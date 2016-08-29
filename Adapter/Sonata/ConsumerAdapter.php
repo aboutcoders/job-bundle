@@ -12,7 +12,9 @@ namespace Abc\Bundle\JobBundle\Adapter\Sonata;
 
 use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 use Abc\ProcessControl\ControllerInterface;
+use Sonata\NotificationBundle\Backend\AMQPBackendDispatcher;
 use Sonata\NotificationBundle\Backend\BackendInterface;
+use Sonata\NotificationBundle\Backend\MessageManagerBackendDispatcher;
 use Sonata\NotificationBundle\Backend\QueueDispatcherInterface;
 use Sonata\NotificationBundle\Event\IterateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -23,9 +25,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ConsumerAdapter implements ConsumerInterface
 {
     /**
-     * @var BackendInterface
+     * @var BackendProvider
      */
-    private $backend;
+    private $backendProvider;
 
     /**
      * @var EventDispatcherInterface
@@ -43,35 +45,27 @@ class ConsumerAdapter implements ConsumerInterface
     private $controller;
 
     /**
-     * @var string
-     */
-    private $defaultQueue;
-
-    /**
      * @var array
      */
     protected $options;
 
     /**
-     * @param BackendInterface         $backend
+     * @param BackendProvider          $backendProvider
      * @param EventDispatcherInterface $evendDispatcher
      * @param EventDispatcherInterface $notificationDispatcher
      * @param ControllerInterface      $controller
-     * @param string                   $defaultQueue The name of the default queue
      */
     public function __construct(
-        BackendInterface $backend,
+        BackendProvider $backendProvider,
         EventDispatcherInterface $evendDispatcher,
         EventDispatcherInterface $notificationDispatcher,
-        ControllerInterface $controller,
-        $defaultQueue
+        ControllerInterface $controller
     )
     {
-        $this->backend                = $backend;
+        $this->backendProvider        = $backendProvider;
         $this->eventDispatcher        = $evendDispatcher;
         $this->notificationDispatcher = $notificationDispatcher;
         $this->controller             = $controller;
-        $this->defaultQueue           = $defaultQueue;
         $this->options                = ['max-iterations' => PHP_INT_MAX];
     }
 
@@ -79,7 +73,7 @@ class ConsumerAdapter implements ConsumerInterface
     {
         $this->configure($options);
 
-        $backend = $this->getBackend($queue);
+        $backend = $this->backendProvider->getBackend($queue);
 
         $backend->initialize();
 
@@ -95,7 +89,6 @@ class ConsumerAdapter implements ConsumerInterface
                 return;
             }
 
-
             if (!$message->getType()) {
                 continue;
             }
@@ -106,30 +99,6 @@ class ConsumerAdapter implements ConsumerInterface
 
             $iterations++;
         }
-    }
-
-    /**
-     * Within SonataNotificationBundle multiple backends are created if multiple queues are defined where
-     * each backend is registered with a certain $type key.
-     *
-     * @param string|null $queue
-     * @return BackendInterface
-     */
-    protected function getBackend($queue = null)
-    {
-        if($queue == $this->defaultQueue) {
-            $queue = null;
-        }
-
-        if ($queue != null) {
-            if (!$this->backend instanceof QueueDispatcherInterface) {
-                throw new \RuntimeException(sprintf('Unable to use the provided type %s with a non QueueDispatcherInterface backend', $queue));
-            }
-
-            return $this->backend->getBackend($queue);
-        }
-
-        return $this->backend;
     }
 
     /**

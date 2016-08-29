@@ -67,13 +67,13 @@ public function registerBundles()
 
 ## Configuration
 
-__Configure doctrine orm__
+__Configure backend adapter__
 
-At the current point only doctrine is supported as ORM. However by changing the configuration you can use a different persistence layer.
+You can choose between `sonata` and `bernard`.
 
 ```yaml
 abc_job:
-  db_driver: orm
+  adapter: sonata
 ```
 
 __Register a doctrine mapping type for the job status__

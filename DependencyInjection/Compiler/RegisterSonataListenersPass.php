@@ -70,7 +70,7 @@ class RegisterSonataListenersPass implements CompilerPassInterface
                 $dispatcher->addMethodCall(
                     'addListenerService',
                     array(
-                        ProducerAdapter::MESSAGE_PREFIX . $tag['type'],
+                        $tag['type'],
                         array($this->queueEngineService, 'process')
                     )
                 );

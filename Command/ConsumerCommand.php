@@ -32,9 +32,8 @@ class ConsumerCommand extends Command
      */
     public function __construct(ConsumerInterface $consumer)
     {
+        parent::__construct();
         $this->consumer = $consumer;
-
-        parent::__construct('abc:consume');
     }
 
     /**
@@ -42,6 +41,10 @@ class ConsumerCommand extends Command
      */
     public function configure()
     {
+        $this->setName('abc:job:consume');
+        $this->setDescription('Consume jobs from a queue');
+
+
         $this
             ->addOption('max-iterations', null, InputOption::VALUE_OPTIONAL, 'Maximum time in seconds the consumer will run.', null)
             ->addArgument('queue', InputArgument::REQUIRED, 'Name of queue that will be consumed.');

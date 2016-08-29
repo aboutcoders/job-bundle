@@ -29,12 +29,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ProducerAdapter implements ProducerInterface, ConsumerInterface
 {
-    const MESSAGE_PREFIX = 'abc.job.';
-
     /**
      * @var BackendInterface
      */
-    protected $backend;
+    protected $backendProvider;
 
     /**
      * @var EventDispatcherInterface
@@ -57,17 +55,17 @@ class ProducerAdapter implements ProducerInterface, ConsumerInterface
     protected $logger;
 
     /**
-     * @param BackendInterface         $backend
+     * @param BackendProvider          $backendProvider
      * @param EventDispatcherInterface $dispatcher
      * @param JobTypeRegistry          $registry
      * @param LoggerInterface          $logger
      */
-    function __construct(BackendInterface $backend, EventDispatcherInterface $dispatcher, JobTypeRegistry $registry, LoggerInterface $logger)
+    function __construct(BackendProvider $backendProvider, EventDispatcherInterface $dispatcher, JobTypeRegistry $registry, LoggerInterface $logger)
     {
-        $this->backend    = $backend;
-        $this->dispatcher = $dispatcher;
-        $this->registry   = $registry;
-        $this->logger     = $logger;
+        $this->backendProvider = $backendProvider;
+        $this->dispatcher      = $dispatcher;
+        $this->registry        = $registry;
+        $this->logger          = $logger;
     }
 
     /**
@@ -87,18 +85,16 @@ class ProducerAdapter implements ProducerInterface, ConsumerInterface
      */
     public function produce(Message $message)
     {
-        $type = self::MESSAGE_PREFIX . $message->getType();
+        $type = $message->getType();
         $body = array('ticket' => $message->getTicket());
 
         try {
             $this->logger->debug('Create and publish message of type {type} and body {body} to backend', array('type' => $type, 'body' => $body));
 
             $queue = $this->registry->get($message->getType())->getQueue();
-            if ($queue != $this->registry->getDefaultQueue() && $this->backend instanceof QueueDispatcherInterface) {
-                $this->backend->getBackend($queue)->createAndPublish($type, $body);
-            } else {
-                $this->backend->createAndPublish($type, $body);
-            }
+
+            $this->backendProvider->getBackend($queue)->createAndPublish($type, $body);
+
         } catch (\Exception $e) {
             $this->logger->error('Failed to publish message {exception}', array('exception' => $e));
 

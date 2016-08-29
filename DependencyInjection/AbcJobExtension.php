@@ -94,6 +94,7 @@ class AbcJobExtension extends Extension
         $loader->load('forms.xml');
         $loader->load('process_control.xml');
         $loader->load('validator.xml');
+        $loader->load('commands.xml');
 
         if ($config['register_default_jobs']) {
             $this->registerDefaultJobs($container, $loader);
