@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
+use Abc\Bundle\JobBundle\Job\Queue\QueueConfigInterface;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJob;
 use Metadata\ClassHierarchyMetadata;
 use Metadata\MetadataFactoryInterface;
@@ -29,6 +30,11 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
     private $metadataFactory;
 
     /**
+     * @var QueueConfigInterface
+     */
+    private $queueConfig;
+
+    /**
      * @var JobTypeRegistry
      */
     private $subject;
@@ -36,7 +42,8 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);
-        $this->subject         = new JobTypeRegistry($this->metadataFactory);
+        $this->queueConfig     = $this->getMock(QueueConfigInterface::class);
+        $this->subject         = new JobTypeRegistry($this->metadataFactory, $this->queueConfig);
     }
 
     public function testAll()

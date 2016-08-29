@@ -21,10 +21,11 @@ abc_job:
             - my_service_id         # An array of service ids of processors
     service:
         manager:                    abc.job.manager.default
-        job_manager:         abc.job.job_manager.default
-        agent_manager:       abc.job.agent_manager.default
-        schedule_manager:    abc.job.schedule_manager.default
+        job_manager:                abc.job.job_manager.default
+        agent_manager:              abc.job.agent_manager.default
+        schedule_manager:           abc.job.schedule_manager.default
         schedule_iterator:          abc.job.schedule_iterator.default
         schedule_manager_iterator:  abc.job.schedule_manager_iterator.default
         controller_factory:         abc.job.controller_factory.default
+        queue_config:               abc.job.queue_config.default
 ```

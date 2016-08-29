@@ -10,11 +10,14 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Sonata;
 
+use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
+use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Sonata\SonataAdapter;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
+use Sonata\NotificationBundle\Backend\QueueBackendDispatcher;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
 use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -22,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class SonataAdapterTest extends \PHPUnit_Framework_TestCase
+class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var BackendInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -30,14 +33,19 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
     private $backend;
 
     /**
-     * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $manager;
-
-    /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $eventDispatcher;
+
+    /**
+     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $registry;
+
+    /**
+     * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $manager;
 
     /**
      * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -45,18 +53,23 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var SonataAdapter
+     * @var ProducerAdapter
      */
     private $subject;
 
     public function setUp()
     {
-        $this->backend         = $this->getMock(BackendInterface::class);
+        $this->backend         = $this->getMockBuilder(QueueBackendDispatcher::class)->disableOriginalConstructor()->getMock();
         $this->manager         = $this->getMock(ManagerInterface::class);
+        $this->registry        = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
         $this->logger          = $this->getMock(LoggerInterface::class);
 
-        $this->subject = new SonataAdapter($this->backend, $this->eventDispatcher, $this->logger);
+        $this->registry->expects($this->any())
+            ->method('getDefaultQueue')
+            ->willReturn('default');
+
+        $this->subject = new ProducerAdapter($this->backend, $this->eventDispatcher, $this->registry, $this->logger);
         $this->subject->setManager($this->manager);
     }
 
@@ -67,34 +80,81 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeSame($this->manager, 'manager', $this->subject);
     }
 
-    public function testPublish()
+    public function testProduceWithDefaultQueue()
     {
         $message = new Message('type', 'ticket', 'callback');
 
+        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType->expects($this->any())
+            ->method('getQueue')
+            ->willReturn('default');
+
+        $this->registry->expects($this->any())
+            ->method('get')
+            ->with('type')
+            ->willReturn($jobType);
+
         $this->backend->expects($this->once())
             ->method('createAndPublish')
-            ->with(SonataAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
+            ->with(ProducerAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
 
-        $this->subject->publish($message);
+        $this->subject->produce($message);
+    }
+
+    public function testProduceWithDifferentQueue()
+    {
+        $message = new Message('type', 'ticket', 'callback');
+        $backend = $this->getMock(BackendInterface::class);
+
+        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType->expects($this->any())
+            ->method('getQueue')
+            ->willReturn('other_queue');
+
+        $this->backend->expects($this->once())
+            ->method('getBackend')
+            ->with('other_queue')
+            ->willReturn($backend);
+
+        $this->registry->expects($this->any())
+            ->method('get')
+            ->with('type')
+            ->willReturn($jobType);
+
+        $backend->expects($this->once())
+            ->method('createAndPublish')
+            ->with(ProducerAdapter::MESSAGE_PREFIX . 'type', array('ticket' => 'ticket'));
+
+        $this->subject->produce($message);
     }
 
     /**
      * @expectedException \Exception
      */
-    public function testPublishThrowsExceptionsThrownByBackend()
+    public function testProduceThrowsExceptionsThrownByBackend()
     {
         $message = new Message('type', 'ticket', 'callback');
+
+        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType->expects($this->any())
+            ->method('getQueue')
+            ->willReturn('default');
+
+        $this->registry->expects($this->any())
+            ->method('get')
+            ->with('type')
+            ->willReturn($jobType);
 
         $this->backend->expects($this->once())
             ->method('createAndPublish')
             ->willThrowException(new \Exception);
 
-        $this->subject->publish($message);
+        $this->subject->produce($message);
     }
 
     /**
-     * @param string      $type
-     * @param string      $ticket
+     * @param string $type
+     * @param string $ticket
      * @dataProvider getEventData
      */
     public function testProcess($type, $ticket)
@@ -154,10 +214,8 @@ class SonataAdapterTest extends \PHPUnit_Framework_TestCase
         $message->expects($this->any())
             ->method('getValue')
             ->willReturnCallback(
-                function ($key, $default) use ($messageBody)
-                {
-                    if(is_array($messageBody) && isset($messageBody[$key]))
-                    {
+                function ($key, $default) use ($messageBody) {
+                    if (is_array($messageBody) && isset($messageBody[$key])) {
                         return $messageBody[$key];
                     }
 

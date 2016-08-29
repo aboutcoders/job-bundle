@@ -81,6 +81,17 @@ interface JobTypeInterface
     public function setLogLevel($logLevel);
 
     /**
+     * @param $name string The name of the queue this job is assigned to
+     * @return void
+     */
+    public function setQueue($name);
+
+    /**
+     * @return string The name of the queue this job is assigned to
+     */
+    public function getQueue();
+
+    /**
      * Returns the name of the form class to enter the parameters of this job
      *
      * @param string $class The fully qualified class name

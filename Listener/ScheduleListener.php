@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Listener;
 
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Abc\Bundle\JobBundle\Job\Queue\QueueEngineInterface;
+use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
 use Psr\Log\LoggerInterface;
@@ -25,7 +25,7 @@ use Psr\Log\NullLogger;
 class ScheduleListener
 {
     /**
-     * @var QueueEngineInterface
+     * @var ProducerInterface
      */
     private $queueEngine;
 
@@ -35,10 +35,10 @@ class ScheduleListener
     private $logger;
 
     /**
-     * @param QueueEngineInterface $queueEngine
+     * @param ProducerInterface    $queueEngine
      * @param LoggerInterface|null $logger
      */
-    function __construct(QueueEngineInterface $queueEngine, LoggerInterface $logger = null)
+    function __construct(ProducerInterface $queueEngine, LoggerInterface $logger = null)
     {
         $this->queueEngine = $queueEngine;
         $this->logger      = $logger == null ? new NullLogger() : $logger;
@@ -58,7 +58,7 @@ class ScheduleListener
             {
                 $message = new Message($job->getType(), $job->getTicket(), $job->getTicket());
 
-                $this->queueEngine->publish($message);
+                $this->queueEngine->produce($message);
 
                 return;
             }

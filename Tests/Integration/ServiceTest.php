@@ -21,14 +21,12 @@ use Abc\Bundle\JobBundle\Job\Mailer\Mailer;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
-use Abc\Bundle\JobBundle\Job\Report\EraserInterface;
 use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
-use Abc\Bundle\JobBundle\Sonata\ControlledMessageManager;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
@@ -88,7 +86,6 @@ class ServiceTest extends KernelTestCase
     {
         return [
             ['abc.job.agent_manager', AgentManagerInterface::class],
-            ['abc.job.eraser', EraserInterface::class],
             ['abc.job.form.type.job', JobType::class],
             ['abc.job.job_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],
@@ -101,7 +98,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
             ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
-            ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
+            # ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
             ['abc.job.lock_manager', LockManagerInterface::class],
             ['abc.job.controller_factory', Factory::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]
@@ -110,11 +107,19 @@ class ServiceTest extends KernelTestCase
 
     public function testJobListenerListensToJobPrepare()
     {
-        /** @var EventDispatcherInterface $dispatcher */
+        /**
+         * @var EventDispatcherInterface $dispatcher
+         */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $listener = $this->getMockBuilder(JobListener::class)->disableOriginalConstructor()->getMock();
-        /** @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Event\ExecutionEvent|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $event = $this->getMockBuilder(ExecutionEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.job', $listener);
@@ -128,11 +133,19 @@ class ServiceTest extends KernelTestCase
 
     public function testScheduleListenerListensToSchedule()
     {
-        /** @var EventDispatcherInterface $dispatcher */
+        /**
+         * @var EventDispatcherInterface $dispatcher
+         */
         $dispatcher = $this->container->get('event_dispatcher');
-        /** @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\JobBundle\Listener\JobListener|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $listener = $this->getMockBuilder(ScheduleListener::class)->disableOriginalConstructor()->getMock();
-        /** @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener */
+
+        /**
+         * @var \Abc\Bundle\SchedulerBundle\Event\SchedulerEvent|\PHPUnit_Framework_MockObject_MockObject $listener
+         */
         $event = $this->getMockBuilder(SchedulerEvent::class)->disableOriginalConstructor()->getMock();
 
         $this->container->set('abc.job.listener.schedule', $listener);
@@ -146,7 +159,9 @@ class ServiceTest extends KernelTestCase
 
     public function testScheduleIteratorIsRegistered()
     {
-        /** @var IteratorRegistryInterface $registry */
+        /**
+         * @var IteratorRegistryInterface $registry
+         */
         $registry = $this->container->get('abc.scheduler.iterator_registry');
 
         $this->assertCount(1, $registry->all());

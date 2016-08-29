@@ -6,17 +6,26 @@
 
     <services>
 
-        <service id="abc.job.queue_engine" class="Abc\Bundle\JobBundle\Sonata\SonataAdapter" public="false">
+        <service id="abc.job.producer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter" public="false">
             <argument type="service" id="sonata.notification.backend"/>
             <argument type="service" id="sonata.notification.dispatcher"/>
+            <argument type="service" id="abc.job.registry"/>
             <argument type="service" id="logger" on-invalid="null"/>
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>
             </call>
-            <tag name="monolog.logger" channel="abc.job.queue_engine"/>
+            <tag name="monolog.logger" channel="abc.job"/>
         </service>
 
-        <service id="abc.job.sonata.notification.manager.message" class="Abc\Bundle\JobBundle\Sonata\ControlledMessageManager" public="true">
+        <service id="abc.job.consumer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ConsumerAdapter" public="true">
+            <argument type="service" id="sonata.notification.backend"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="sonata.notification.dispatcher"/>
+            <argument type="service" id="abc.process_control.controller"/>
+            <argument>%abc.job.default_queue%</argument>
+        </service>
+
+        <service id="abc.job.sonata.notification.manager.message" class="Abc\Bundle\JobBundle\Adapter\Sonata\ControlledMessageManager" public="true">
             <argument type="service" id="abc.process_control.controller"/>
             <argument type="service" id="sonata.notification.manager.message.default" />
         </service>

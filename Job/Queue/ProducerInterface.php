@@ -10,19 +10,19 @@
 
 namespace Abc\Bundle\JobBundle\Job\Queue;
 
+use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
+
 /**
- * Defines a queue engine where messages can be pushed to.
- *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-interface QueueEngineInterface
+interface ProducerInterface extends ManagerAwareInterface
 {
     /**
-     * Publishes a message to the backend.
+     * Sends a message to the queue.
      *
      * @param Message $message
      * @return void
      * @throws \RuntimeException If publishing fails
      */
-    public function publish(Message $message);
+    public function produce(Message $message);
 }

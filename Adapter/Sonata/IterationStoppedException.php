@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Sonata;
+namespace Abc\Bundle\JobBundle\Adapter\Sonata;
 
 /**
  * Exception thrown to abort continuous iteration over messages.

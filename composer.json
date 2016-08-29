@@ -35,8 +35,11 @@
         "yzalis/supervisor-bundle": "~1",
         "zendframework/zendxml": "~1",
         "friendsofsymfony/rest-bundle": "~1.0|~2.0",
-        "sensio/framework-extra-bundle": "~3"
+        "sensio/framework-extra-bundle": "~3",
+        "bernard/bernard-bundle" : "dev-master"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": { "Abc\\Bundle\\JobBundle\\": "" }
     }

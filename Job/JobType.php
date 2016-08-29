@@ -62,6 +62,11 @@ class JobType implements JobTypeInterface
     /**
      * @var string
      */
+    private $queue;
+
+    /**
+     * @var string
+     */
     private $formType;
 
     /**
@@ -205,6 +210,22 @@ class JobType implements JobTypeInterface
     public function setResponseType($responseType = null)
     {
         $this->responseType = $responseType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueue()
+    {
+        return $this->queue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setQueue($queue)
+    {
+        $this->queue = $queue;
     }
 
     /**

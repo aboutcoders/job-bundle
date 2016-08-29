@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
+use Abc\Bundle\JobBundle\Job\Queue\QueueConfig;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\LoggerAwareJob;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ControllerAwareJob;
@@ -61,7 +62,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->metadataFactory   = $this->getMock(MetadataFactoryInterface::class);
-        $this->registry          = new JobTypeRegistry($this->metadataFactory);
+        $this->registry          = new JobTypeRegistry($this->metadataFactory, new QueueConfig());
         $this->manager           = $this->getMock(ManagerInterface::class);
         $this->controllerFactory = $this->getMockBuilder(Factory::class)->disableOriginalConstructor()->getMock();
         $this->subject           = new Invoker($this->registry);

@@ -126,9 +126,4 @@ abc_job:
 
 ## Internal logging channels
 
-Besides the dedicated logger for jobs the bundle also uses the logger registered within the service container. To ease debugging different internal services are logging to different log channels. The following log channels are used:
-
-- `abc.job.eraser`
-- `abc.job.manager`
-- `abc.job.listener.schedule`
-- `abc.job.queue_engine`
+Besides the dedicated logger for jobs the bundle also uses the logger registered within the service container. The logger is configured to use the channel `abc.job`

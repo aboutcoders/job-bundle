@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="abc.job.producer" class="Abc\Bundle\JobBundle\Adapter\Bernard\ProducerAdapter" public="false">
+            <argument type="service" id="bernard.producer"/>
+            <argument type="service" id="abc.job.registry"/>
+            <argument type="service" id="logger" on-invalid="null"/>
+            <call method="setManager">
+                <argument type="service" id="abc.job.manager"/>
+            </call>
+            <tag name="monolog.logger" channel="abc.job"/>
+            <tag name="bernard.receiver" message="ConsumeJob" />
+        </service>
+
+        <service id="abc.job.consumer" class="Abc\Bundle\JobBundle\Adapter\Bernard\ConsumerAdapter" public="true">
+            <argument type="service" id="abc.job.queue.bernard.controlled_consumer" />
+            <argument type="service" id="bernard.queue_factory" />
+        </service>
+
+        <service id="abc.job.queue.bernard.controlled_consumer" class="Abc\Bundle\JobBundle\Adapter\Bernard\ControlledConsumer" public="true">
+            <argument type="service" id="bernard.router" />
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="abc.process_control.controller"/>
+        </service>
+
+    </services>
+
+</container>
