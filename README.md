@@ -1,7 +1,7 @@
 AbcJobBundle
 ============
 
-A symfony bundle that allows you to process jobs asynchronously, by simply annotating the method of a class and registering it within the service container.
+A symfony bundle to process methods asynchronously as jobs by simply annotating the method and registering the class as a service within the service container.
 
 Build Status: [![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?branch=master)](https://travis-ci.org/aboutcoders/job-bundle)
 
@@ -9,9 +9,9 @@ Build Status: [![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?
 
 This bundle provides the following features:
 
-- Asynchronous job processing
-- Scheduled execution of jobs
-- RESTful API
+- Asynchronous execution of jobs
+- Repeated (scheduled) execution of jobs
+- RESTful JSON API
 - Supported message queue backends:
   - Predis / PhpRedis
   - Amazon SQS

@@ -91,7 +91,7 @@ class BackendProvider
      */
     private function getQueueConfig(QueueDispatcherInterface $queueDispatcher, $queue)
     {
-        foreach ($queueDispatcher as $queueConfig) {
+        foreach ($queueDispatcher->getQueues() as $queueConfig) {
             if ($queue == $queueConfig['queue']) {
                 return $queueConfig;
             }

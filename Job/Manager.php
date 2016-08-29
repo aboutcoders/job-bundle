@@ -350,14 +350,6 @@ class Manager implements ManagerInterface
         $message = new Message($type, $ticket, $callerTicket);
 
         try {
-            $this->logger->debug(
-                'Published message with ticket {ticket} type {type} callerTicket {callerTicket} to queue backed', [
-                    'ticket'       => $ticket,
-                    'type'         => $type,
-                    'callerTicket' => $callerTicket
-                ]
-            );
-
             $this->producer->produce($message);
         } catch (\Exception $e) {
             $this->logger->critical('Failed to publish message to queue backend: {exception}', ['exception' => $e]);

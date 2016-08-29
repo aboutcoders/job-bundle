@@ -12,11 +12,9 @@ namespace Abc\Bundle\JobBundle\Adapter\Sonata;
 
 use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 use Abc\ProcessControl\ControllerInterface;
-use Sonata\NotificationBundle\Backend\AMQPBackendDispatcher;
 use Sonata\NotificationBundle\Backend\BackendInterface;
-use Sonata\NotificationBundle\Backend\MessageManagerBackendDispatcher;
-use Sonata\NotificationBundle\Backend\QueueDispatcherInterface;
 use Sonata\NotificationBundle\Event\IterateEvent;
+use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -78,15 +76,27 @@ class ConsumerAdapter implements ConsumerInterface
         $backend->initialize();
 
         $iterations = 0;
-        $iterator   = $backend->getIterator();
-        foreach ($iterator as $message) {
 
-            if ($this->controller->doExit()) {
-                return;
+        do {
+            if ($iterations > 0) {
+                usleep(500000);
             }
 
-            if ($iterations >= $this->options['max-iterations']) {
-                return;
+            $iterations++;
+            $this->iterate($backend);
+        } while (!$this->controller->doExit() && ($iterations < (int)$this->options['max-iterations']));
+    }
+
+    /**
+     * @param BackendInterface $backend
+     */
+    protected function iterate(BackendInterface $backend)
+    {
+        $iterator = $backend->getIterator();
+        foreach ($iterator as $message) {
+
+            if (!$message instanceof MessageInterface) {
+                throw new \RuntimeException('The iterator must return a MessageInterface instance');
             }
 
             if (!$message->getType()) {
@@ -96,8 +106,6 @@ class ConsumerAdapter implements ConsumerInterface
             $backend->handle($message, $this->notificationDispatcher);
 
             $this->eventDispatcher->dispatch(IterateEvent::EVENT_NAME, new IterateEvent($iterator, $backend, $message));
-
-            $iterations++;
         }
     }
 

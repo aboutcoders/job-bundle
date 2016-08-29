@@ -89,7 +89,7 @@ class ProducerAdapter implements ProducerInterface, ConsumerInterface
         $body = array('ticket' => $message->getTicket());
 
         try {
-            $this->logger->debug('Create and publish message of type {type} and body {body} to backend', array('type' => $type, 'body' => $body));
+            $this->logger->debug('Publish message of type {type} and body {body} to sonata backend', array('type' => $type, 'body' => $body));
 
             $queue = $this->registry->get($message->getType())->getQueue();
 
