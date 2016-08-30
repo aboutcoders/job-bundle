@@ -33,10 +33,12 @@ $manager->add('abc_mailer', [$message]);
 You can now trigger processing of the job by invoking the consumer command:
 
 ```bash
-php bin/console abc:job:consume default --max-iterations=1
+php bin/console abc:job:consume default --stop-when-empty
 ```
 
-This will consume one message from the default queue and process associated job.
+This will consume all messages from the default queue and process associated job.
+
+__Note:__ If you are using the job `abc.mailer` be aware that depending on the spool configuration emails are not sent until the kernel terminates.
 
 ## Defining a custom job
 

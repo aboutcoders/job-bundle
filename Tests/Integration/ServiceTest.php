@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Integration;
 
+use Abc\Bundle\JobBundle\Adapter\Sonata\ControlledMessageManager;
 use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Event\JobEvents;
@@ -98,7 +99,6 @@ class ServiceTest extends KernelTestCase
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
             ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
-            # ['abc.job.sonata.notification.manager.message', ControlledMessageManager::class],
             ['abc.job.lock_manager', LockManagerInterface::class],
             ['abc.job.controller_factory', Factory::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]

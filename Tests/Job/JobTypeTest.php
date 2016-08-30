@@ -95,6 +95,14 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('response', $this->subject->getResponseType());
     }
 
+    public function testGetSetQueue()
+    {
+        $this->assertNull($this->subject->getQueue());
+
+        $this->subject->setQueue('queue');
+        $this->assertEquals('queue', $this->subject->getQueue());
+    }
+
     public function testGetSetFormType()
     {
         $this->assertNull($this->subject->getFormType());

@@ -224,7 +224,7 @@ class ManagerTest extends DatabaseKernelTestCase
          */
         $consumer = $this->getContainer()->get('abc.job.consumer');
         $consumer->consume('default', [
-            'exit-on-empty' => true
+            'stop-when-empty' => true
         ]);
     }
 

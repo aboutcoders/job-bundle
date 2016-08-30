@@ -14,7 +14,6 @@ use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 use Abc\ProcessControl\ControllerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Event\IterateEvent;
-use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -45,7 +44,12 @@ class ConsumerAdapter implements ConsumerInterface
     /**
      * @var array
      */
-    protected $options;
+    protected $options = [
+        'max-runtime'     => PHP_INT_MAX,
+        'max-messages'    => null,
+        'stop-when-empty' => false,
+        'stop-on-error'   => false,
+    ];
 
     /**
      * @param BackendProvider          $backendProvider
@@ -64,52 +68,53 @@ class ConsumerAdapter implements ConsumerInterface
         $this->eventDispatcher        = $evendDispatcher;
         $this->notificationDispatcher = $notificationDispatcher;
         $this->controller             = $controller;
-        $this->options                = [
-            'max-iterations' => PHP_INT_MAX,
-            'exit-on-empty' => false
-        ];
     }
 
+    /**
+     * Starts an infinite loop calling Consumer::tick();
+     *
+     * @param string $queue
+     * @param array  $options
+     */
     public function consume($queue, array $options = [])
     {
-        $this->configure($options);
-
         $backend = $this->backendProvider->getBackend($queue);
 
         $backend->initialize();
 
-        $iterations = 0;
+        declare (ticks = 1);
 
-        do {
-            if ($iterations > 0) {
-                usleep(500000);
-            }
-
-            $iterations++;
-            $this->iterate($backend);
-        } while (!$this->controller->doExit() && ($iterations < (int)$this->options['max-iterations']) && !$this->options['exit-on-empty']);
+        while ($this->tick($backend, $options)) {
+            // NO op
+        }
     }
 
-    /**
-     * @param BackendInterface $backend
-     */
-    protected function iterate(BackendInterface $backend)
+    protected function tick(BackendInterface $backend, array $options = [])
     {
+
+        $this->configure($options);
+
         $iterator = $backend->getIterator();
+
         foreach ($iterator as $message) {
-
-            if (!$message instanceof MessageInterface) {
-                throw new \RuntimeException('The iterator must return a MessageInterface instance');
-            }
-
-            if (!$message->getType()) {
-                continue;
-            }
-
             $backend->handle($message, $this->notificationDispatcher);
 
             $this->eventDispatcher->dispatch(IterateEvent::EVENT_NAME, new IterateEvent($iterator, $backend, $message));
+
+            if ($this->controller->doExit()) {
+                return false;
+            }
+
+            if (microtime(true) > $this->options['max-runtime']) {
+                return false;
+            }
+
+            if (null !== $this->options['max-messages'] && !(boolean)--$this->options['max-messages']) {
+                return false;
+            }
         }
+
+        return !$this->options['stop-when-empty'];
     }
 
     /**
@@ -118,6 +123,8 @@ class ConsumerAdapter implements ConsumerInterface
      */
     protected function configure(array $options)
     {
-        $this->options = array_merge($this->options, $options);
+        $this->options = array_filter($options) + $this->options;
+        $this->options['max-runtime'] += microtime(true);
+        $this->configured = true;
     }
 }

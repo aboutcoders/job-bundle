@@ -30,7 +30,7 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
     private $metadataFactory;
 
     /**
-     * @var QueueConfigInterface
+     * @var QueueConfigInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $queueConfig;
 
@@ -104,5 +104,24 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetThrowsJobTypeNotFoundException()
     {
         $this->subject->get('foo');
+    }
+
+    public function testGetDefaultQueue()
+    {
+        $this->queueConfig->expects($this->once())
+            ->method('getDefaultQueue')
+            ->willReturn('DefaultQueue');
+
+        $this->assertEquals('DefaultQueue', $this->subject->getDefaultQueue());
+    }
+
+    public function testGetTypeChoices()
+    {
+        $callable = array(new TestJob(), 'log');
+        $jobType  = new JobType('service-id', 'JobType', $callable);
+
+        $this->subject->register($jobType);
+
+        $this->assertEquals(['JobType'], $this->subject->getTypeChoices());
     }
 }

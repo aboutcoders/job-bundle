@@ -30,90 +30,37 @@ class ControlledConsumer extends BaseConsumer
     private $controller;
 
     /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * @var integer
-     */
-    private $iterations;
-
-    /**
      * @param Router                   $router
      * @param EventDispatcherInterface $dispatcher
+     * @param ControllerInterface      $controller
      */
     public function __construct(Router $router, EventDispatcherInterface $dispatcher, ControllerInterface $controller)
     {
         parent::__construct($router, $dispatcher);
 
         $this->controller = $controller;
-        $this->options    = [
-            'max-iterations' => PHP_INT_MAX,
-            'exit-on-empty'  => false
-        ];
     }
 
     /**
-     * Starts an infinite loop calling Consumer::tick();
-     *
-     * Following options can be set:
-     *  * max-iterations: The maximum number of iterations
-     *  * exit-on-empty: Whether to exit the loop when queue is empty
-     *
-     * @param Queue $queue
-     * @param array $options
+     * {@inheritdoc}
      */
-    public function consume(Queue $queue, array $options = array())
+    public function tick(Queue $queue, array $options = [])
     {
-        $this->iterations = 0;
-
-        while ($this->tick($queue, $options)) {
-            // NO op
-        }
-    }
-
-    /**
-     * Returns true or false to indicate whether this method should be invoked again.
-     *
-     * @param  Queue $queue
-     * @param  array $options
-     * @return boolean Whether this method should be invoked again
-     */
-    public function tick(Queue $queue, array $options = array())
-    {
-        $this->configure($options);
+        // weired, no clue why this is necessary, but somehow configure is not invoked otherwise
+        $this->doConfigure($options);
 
         if ($this->controller->doExit()) {
             return false;
         }
 
-        if ($this->iterations >= $this->options['max-iterations']) {
-            return false;
-        }
-
-        if (!$envelope = $queue->dequeue()) {
-            return !$this->options['exit-on-empty'];
-        }
-
-        $this->invoke($envelope, $queue);
-
-        $this->iterations++;
-
-        return true;
+        return parent::tick($queue, $options);
     }
 
     /**
-     * @param array $options
-     * @return void
+     * {@inheritdoc}
      */
-    protected function configure(array $options)
+    protected function doConfigure(array $options)
     {
-        if ($this->configured) {
-            return;
-        }
-
-        $this->options    = array_merge($this->options, $options);
-        $this->configured = true;
+        parent::configure($options);
     }
 }

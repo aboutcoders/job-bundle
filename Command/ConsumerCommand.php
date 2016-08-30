@@ -44,11 +44,11 @@ class ConsumerCommand extends Command
         $this->setName('abc:job:consume');
         $this->setDescription('Consume jobs from a queue');
 
-
         $this
-            ->addOption('max-iterations', null, InputOption::VALUE_OPTIONAL, 'Maximum time in seconds the consumer will run.', null)
-            ->addOption('exit-on-empty', null, InputOption::VALUE_OPTIONAL, 'Whether to exit when there are no jobs to process', false)
-            ->addArgument('queue', InputArgument::REQUIRED, 'Name of queue that will be consumed.');
+            ->addArgument('queue', InputArgument::REQUIRED, 'Name of queue that will be consumed.')
+            ->addOption('max-runtime', null, InputOption::VALUE_OPTIONAL, 'Maximum time in seconds the consumer will run.', null)
+            ->addOption('max-messages', null, InputOption::VALUE_OPTIONAL, 'Maximum number of messages that should be consumed.', null)
+            ->addOption('stop-when-empty', null, InputOption::VALUE_NONE, 'Stop consumer when queue is empty.', null);
     }
 
     /**
@@ -56,6 +56,10 @@ class ConsumerCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->consumer->consume($input->getArgument('queue'), $input->getOptions());
+        $this->consumer->consume($input->getArgument('queue'), [
+            'max-runtime'     => $input->getOption('max-runtime'),
+            'max-messages'    => $input->getOption('max-messages'),
+            'stop-when-empty' => $input->getOption('stop-when-empty')
+        ]);
     }
 }

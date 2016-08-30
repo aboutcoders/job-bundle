@@ -52,11 +52,9 @@ Finally you need to update your database schema in order to create the required 
 php bin/console doctrine:schema:update --force
 ```
 
-### Check swiftmailer configuration
+### Create a dedicated environment (Optional)
 
-If you are using the mailer job that is shipped with this bundle you have to make sure that the spool configuration is changed so that mails are sent at once and not only if the kernel terminates, which is the default behavior (see: [How to Spool Emails](http://symfony.com/doc/current/email/spool.html)).
-
-To change this configuration only for the job processing and leave the default configuration as is you have to run the job processing in a dedicated environment (see: [How to Master and Create new Environments](http://symfony.com/doc/current/configuration/environments.html))).
+It is recommended to run the job processing in a different environment that the production or dev environment. Please refer to the [official documentation](http://symfony.com/doc/current/configuration/environments.html) to see how this can be done.
 
 ## Advanced Configuration
 

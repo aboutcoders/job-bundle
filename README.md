@@ -43,16 +43,12 @@ Please note that this bundle is still in development and thus we might need to c
 
 ### ToDo Stable Release:
 - Unit test both sonata and bernard integration tests
-- Add unit tests for bernard and sonata adapters
-- Solve sending emails in job processing environment
+- Add option to register custom handlers for job logs
 - Get rid of forms and use validation service inside manager to validate job parameters
-- Document how to manage queues within soanta (abc.job prefix)
 - Define & document a clear serializer interface
 - Provider a TestCase for jobs
 - Cleanup & document agent management
 - Cleanup & document queue management
-- Cleanup & document supervisor integration
-- Cleanup/document Eraser
 
 ### Planned Features:
 - Utilize stopwatch to detect bottle necks
