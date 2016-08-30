@@ -15,10 +15,11 @@ namespace Abc\Bundle\JobBundle\Annotation;
  * @Target({"METHOD"})
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-final class JobParameters
+class ReturnType
 {
     /**
-     * @var array<string> @Required
+     * @Required
+     * @var string
      */
-    public $typeList;
-}
+    public $type;
+} 

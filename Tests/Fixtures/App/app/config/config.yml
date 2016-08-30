@@ -98,7 +98,7 @@ abc_scheduler:
     db_driver: orm
 
 abc_job:
-    db_driver: orm
+    register_default_jobs: true
     adapter: sonata
     logging:
         default_level: debug

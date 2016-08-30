@@ -92,13 +92,10 @@ class JobHelper
      */
     public function copyJob(JobInterface $original, \Abc\Bundle\JobBundle\Model\JobInterface $copy)
     {
-
-
         $copy->setType($original->getType());
         $copy->setStatus($original->getStatus());
         $copy->setResponse($original->getResponse());
         $copy->setParameters(['JobParameters']);
-
 
         foreach ($original->getSchedules() as $schedule) {
             $copy->addSchedule($schedule);

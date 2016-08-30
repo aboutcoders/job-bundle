@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Job;
 
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
 use Abc\ProcessControl\ControllerAwareInterface;
 use Abc\ProcessControl\ControllerInterface;
 use Psr\Log\LoggerInterface;
@@ -38,7 +38,7 @@ class Sleeper implements ControllerAwareInterface
     /**
      * @param                 $seconds
      * @param LoggerInterface $logger
-     * @JobParameters({"integer", "@logger"})
+     * @ParamType({"integer", "@logger"})
      */
     public function sleep($seconds, LoggerInterface $logger)
     {

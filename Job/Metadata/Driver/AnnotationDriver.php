@@ -10,8 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Job\Metadata\Driver;
 
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
-use Abc\Bundle\JobBundle\Annotation\JobResponse;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
+use Abc\Bundle\JobBundle\Annotation\ReturnType;
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
 use Doctrine\Common\Annotations\Reader;
 use Metadata\Driver\DriverInterface;
@@ -54,12 +54,12 @@ class AnnotationDriver implements DriverInterface
 
             foreach($methodAnnotations as $annot)
             {
-                if($annot instanceof JobParameters)
+                if($annot instanceof ParamType)
                 {
                     $classMetadata->setMethodArgumentTypes($method->getName(), $annot->typeList);
                 }
 
-                if($annot instanceof JobResponse)
+                if($annot instanceof ReturnType)
                 {
                     $classMetadata->setMethodReturnType($method->getName(), $annot->type);
                 }

@@ -10,8 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Fixtures\Annotation;
 
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
-use Abc\Bundle\JobBundle\Annotation\JobResponse;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
+use Abc\Bundle\JobBundle\Annotation\ReturnType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -20,21 +20,21 @@ class AnnotatedJob {
 
 
     /**
-     * @JobParameters("string")
+     * @ParamType("string")
      */
     public function methodWithSingleParameters($string)
     {
     }
 
     /**
-     * @JobParameters({"string","boolean"})
+     * @ParamType({"string","boolean"})
      */
     public function methodWithMultipleParameters($string, $boolean)
     {
     }
 
     /**
-     * @JobResponse("string")
+     * @ReturnType("string")
      */
     public function methodWithResponse()
     {

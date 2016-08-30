@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Fixtures\Job;
 use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Psr\Log\LoggerInterface;
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>

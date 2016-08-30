@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Job\Mailer;
 
 use Abc\Bundle\JobBundle\Job\JobAwareInterface;
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Psr\Log\LoggerInterface;
 
@@ -52,7 +52,7 @@ class Mailer implements JobAwareInterface
      * @param Message         $message
      * @param LoggerInterface $logger
      * @throws \Exception Rethrows exceptions thrown by mailer
-     * @JobParameters({"Abc\Bundle\JobBundle\Job\Mailer\Message", "@logger"})
+     * @ParamType({"Abc\Bundle\JobBundle\Job\Mailer\Message", "@logger"})
      */
     public function send(Message $message, LoggerInterface $logger)
     {

@@ -57,7 +57,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('default_queue')->defaultValue('default')->end()
                 ->booleanNode('register_default_jobs')
-                    ->defaultTrue()
+                    ->defaultFalse()
                 ->end()
                 ->scalarNode('model_manager_name')
                     ->defaultNull()

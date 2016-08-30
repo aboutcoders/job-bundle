@@ -3,7 +3,7 @@ Lifecycle Events
 
 During the lifecycle of a job events are dispatched using the [Symfony Event Dispatcher](http://symfony.com/doc/current/components/event_dispatcher/index.html).
 
-### Pre Execute Event
+## Pre Execute Event
 
 Before every execution of a job an event with the name `abc.job.pre_execute` is dispatched.
 
@@ -20,7 +20,7 @@ services:
 
 The dispatched event is of type [ExecutionEvent](../../Event/ExecutionEvent.php) which gives listeners the option to modify the job or to [provide runtime parameters](./howto-inject-runtime-parameters.md).
 
-### Post Execute Event
+## Post Execute Event
 
 After every execution of a job an event with the name `abc.job.pre_execute` is dispatched.
 
@@ -38,7 +38,7 @@ services:
 Like the Pre Execution Event the dispatched event is of type [ExecutionEvent](../../Event/ExecutionEvent.php).
 
 
-### Terminate Event
+## Terminate Event
 
 Whenever a job terminates an event with the name `abc.job.terminated` and of type [TerminationEvent](../../Event/TerminationEvent.php) is dispatched.
 

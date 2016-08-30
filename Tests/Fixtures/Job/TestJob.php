@@ -16,8 +16,8 @@ use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Tests\Fixtures\App\Bundle\TestBundle\Entity\Entity;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
-use Abc\Bundle\JobBundle\Annotation\JobParameters;
-use Abc\Bundle\JobBundle\Annotation\JobResponse;
+use Abc\Bundle\JobBundle\Annotation\ParamType;
+use Abc\Bundle\JobBundle\Annotation\ReturnType;
 use Abc\ProcessControl\ControllerAwareInterface;
 use Abc\ProcessControl\ControllerInterface;
 use Doctrine\DBAL\Driver\PDOException;
@@ -90,7 +90,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      * @param                 $maxIterations
      * @param int             $iterations
      * @param LoggerInterface $logger
-     * @JobParameters({"integer","integer", "@logger"})
+     * @ParamType({"integer","integer", "@logger"})
      */
     public function schedule($maxIterations, $iterations = 0, LoggerInterface $logger)
     {
@@ -112,7 +112,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      *
      * @param string $type
      * @param string $expression
-     * @JobParameters({"string","string"})
+     * @ParamType({"string","string"})
      */
     public function createSchedule($type, $expression)
     {
@@ -128,7 +128,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      * Removes a schedule
      *
      * @param LoggerInterface $logger
-     * @JobParameters({"@logger"})
+     * @ParamType({"@logger"})
      */
     public function removeSchedule(LoggerInterface $logger)
     {
@@ -142,7 +142,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      *
      * @param string $type
      * @param string $expression
-     * @JobParameters({"string","string"})
+     * @ParamType({"string","string"})
      */
     public function updateSchedule($type, $expression)
     {
@@ -157,8 +157,8 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * @param mixed $response
      * @return mixed $response
-     * @JobParameters("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
-     * @JobResponse("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
+     * @ParamType("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
+     * @ReturnType("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
      */
     public function setResponse(TestResponse $response)
     {
@@ -167,8 +167,8 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
 
     /**
      * @param ManagerInterface $manager
-     * @JobParameters("@manager")
-     * @JobResponse("string")
+     * @ParamType("@manager")
+     * @ReturnType("string")
      * @return null|string
      */
     public function manageJob(ManagerInterface $manager)
@@ -179,7 +179,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     }
 
     /**
-     * @JobResponse("string")
+     * @ReturnType("string")
      * @return string|null
      */
     public function cancel()
@@ -195,7 +195,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      * @param $message
      * @param $code
      * @throws \Exception
-     * @JobParameters({"string","integer"})
+     * @ParamType({"string","integer"})
      */
     public function throwException($message, $code)
     {
@@ -205,7 +205,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * @param string          $message
      * @param LoggerInterface $logger
-     * @JobParameters({"string", "@logger"})
+     * @ParamType({"string", "@logger"})
      */
     public function log($message, LoggerInterface $logger)
     {
@@ -215,7 +215,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * Logs the info message 'invoked parameterless'.
      *
-     * @JobParameters({"string", "@logger"})
+     * @ParamType({"string", "@logger"})
      *
      * @param LoggerInterface $logger
      * @return void
