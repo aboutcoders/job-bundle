@@ -22,7 +22,7 @@ This bundle provides the following features:
 
 ## Disclaimer
 
-Please note that this bundle is still in development and thus we feel free to change things including the external API if necessary. We are planning to release the first stable release the next weeks.
+Please note that this bundle is still in development and thus we might change things including the external API if necessary. We are planning to release the first stable release the next weeks.
 
 We appreciate if you decide to use this bundle and we appreciate your feedback, suggestions or contributions.
 
@@ -230,8 +230,7 @@ This will create a job that is executed every 5 minutes. Please take a look at t
 - Unit test both sonata and bernard integration tests
 - Add unit tests for bernard and sonata adapters
 - Update documentation
-- Add consumer command
-- Test setting queue for job types in registry
+- Solve sending emails in job processing environment
 
 ### Stable release:
 - Get rid of forms and use validation service inside manager to validate job parameters

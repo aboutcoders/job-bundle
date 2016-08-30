@@ -64,7 +64,10 @@ class ConsumerAdapter implements ConsumerInterface
         $this->eventDispatcher        = $evendDispatcher;
         $this->notificationDispatcher = $notificationDispatcher;
         $this->controller             = $controller;
-        $this->options                = ['max-iterations' => PHP_INT_MAX];
+        $this->options                = [
+            'max-iterations' => PHP_INT_MAX,
+            'exit-on-empty' => false
+        ];
     }
 
     public function consume($queue, array $options = [])
@@ -84,7 +87,7 @@ class ConsumerAdapter implements ConsumerInterface
 
             $iterations++;
             $this->iterate($backend);
-        } while (!$this->controller->doExit() && ($iterations < (int)$this->options['max-iterations']));
+        } while (!$this->controller->doExit() && ($iterations < (int)$this->options['max-iterations']) && !$this->options['exit-on-empty']);
     }
 
     /**

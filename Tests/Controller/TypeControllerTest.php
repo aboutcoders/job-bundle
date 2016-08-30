@@ -37,6 +37,6 @@ class TypeControllerTest extends WebTestCase
 
         $data = $client->getResponse()->getContent();
 
-        $this->assertContains('mailer', $data);
+        $this->assertContains('abc.mailer', $data);
     }
 }

@@ -47,6 +47,7 @@ class ConsumerCommand extends Command
 
         $this
             ->addOption('max-iterations', null, InputOption::VALUE_OPTIONAL, 'Maximum time in seconds the consumer will run.', null)
+            ->addOption('exit-on-empty', null, InputOption::VALUE_OPTIONAL, 'Whether to exit when there are no jobs to process', false)
             ->addArgument('queue', InputArgument::REQUIRED, 'Name of queue that will be consumed.');
     }
 

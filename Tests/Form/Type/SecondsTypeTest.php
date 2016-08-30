@@ -23,7 +23,7 @@ class SecondsTypeTest extends TypeTestCase
      */
     public function getType()
     {
-        return 'sleeper';
+        return 'abc.sleeper';
     }
 
     /**

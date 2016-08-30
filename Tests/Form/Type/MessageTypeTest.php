@@ -24,7 +24,7 @@ class MessageTypeTest extends TypeTestCase
      */
     public function getType()
     {
-        return 'mailer';
+        return 'abc.mailer';
     }
 
     /**

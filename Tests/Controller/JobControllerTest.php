@@ -413,7 +413,7 @@ class JobControllerTest extends DatabaseWebTestCase
         return [
             [
                 [
-                    'type'       => 'mailer',
+                    'type'       => 'abc.mailer',
                     'parameters' => [
                         'to'      => 'to@domain.tld',
                         'from'    => 'from@domain.tld',
@@ -425,7 +425,7 @@ class JobControllerTest extends DatabaseWebTestCase
             ],
             [
                 [
-                    'type'       => 'mailer',
+                    'type'       => 'abc.mailer',
                     'parameters' => [
                         'to'      => 'to@domain.tld',
                         'from'    => 'from@domain.tld',
@@ -443,7 +443,7 @@ class JobControllerTest extends DatabaseWebTestCase
             ],
             [
                 [
-                    'type'       => 'mailer',
+                    'type'       => 'abc.mailer',
                     'parameters' => [
                         'to'      => 'foobar',
                         'from'    => 'from@domain.tld',
@@ -481,7 +481,7 @@ class JobControllerTest extends DatabaseWebTestCase
             [
                 'JobTicket',
                 [
-                    'type'       => 'mailer',
+                    'type'       => 'abc.mailer',
                     'parameters' => [
                         'to'      => 'to@domain.tld',
                         'from'    => 'from@domain.tld',
