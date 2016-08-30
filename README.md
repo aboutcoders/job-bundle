@@ -42,13 +42,11 @@ Please note that this bundle is still in development and thus we might need to c
 - [Configuration Reference](./Resources/docs/12-configuration-reference.md)
 
 ### ToDo Stable Release:
-- Unit test both sonata and bernard integration tests
 - Add option to register custom handlers for job logs
+- Add option to force cancellation of a job
 - Get rid of forms and use validation service inside manager to validate job parameters
-- Define & document a clear serializer interface
 - Provider a TestCase for jobs
 - Cleanup & document agent management
-- Cleanup & document queue management
 
 ### Planned Features:
 - Utilize stopwatch to detect bottle necks

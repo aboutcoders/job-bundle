@@ -31,11 +31,16 @@ abstract class DatabaseKernelTestCase extends KernelTestCase
     private $application;
 
     /**
+     * @var array
+     */
+    private $kernelOptions = [];
+
+    /**
      * {@inheritDoc}
      */
     public function setUp()
     {
-        self::bootKernel();
+        self::bootKernel($this->kernelOptions);
 
         $this->em = static::$kernel->getContainer()
             ->get('doctrine')
@@ -59,6 +64,10 @@ abstract class DatabaseKernelTestCase extends KernelTestCase
         {
             $this->em->close();
         }
+    }
+
+    public function setKernelOptions(array $options) {
+        $this->kernelOptions = $options;
     }
 
     /**

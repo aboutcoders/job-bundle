@@ -31,7 +31,6 @@ class AgentControllerTest extends WebTestCase
      */
     private $serializer;
 
-
     /**
      * {@inheritDoc}
      */

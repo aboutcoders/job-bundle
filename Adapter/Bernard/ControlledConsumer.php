@@ -17,8 +17,7 @@ use Bernard\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A custom implementation of Consumer that is controlled by a process controller and allows to set
- * maximum number of iterations
+ * A custom implementation of Consumer that is controlled by a process controller.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */

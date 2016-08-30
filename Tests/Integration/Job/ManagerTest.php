@@ -228,7 +228,6 @@ class ManagerTest extends DatabaseKernelTestCase
         ]);
     }
 
-
     /**
      * @return ScheduleManagerInterface
      */

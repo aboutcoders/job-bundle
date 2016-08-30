@@ -1,0 +1,12 @@
+imports:
+    - { resource: config.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    profiler:
+        collect: false
+
+abc_job:
+    adapter: bernard

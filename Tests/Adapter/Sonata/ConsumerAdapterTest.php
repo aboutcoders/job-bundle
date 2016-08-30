@@ -10,7 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Adapter\Sonata;
 
-
 use Abc\Bundle\JobBundle\Adapter\Sonata\BackendProvider;
 use Abc\Bundle\JobBundle\Adapter\Sonata\ConsumerAdapter;
 use Abc\Bundle\JobBundle\Tests\Adapter\Sonata\Fixtures\TestIterator;

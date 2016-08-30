@@ -16,7 +16,6 @@ namespace Abc\Bundle\JobBundle\Model;
  */
 interface AgentManagerInterface
 {
-
     /**
      * Refreshes the persistent state of an agent from an external API
      *
