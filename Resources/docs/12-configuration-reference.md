@@ -2,7 +2,7 @@ Configuration Reference
 =======================
 
 ```yaml
-# app/config.yml
+# app/config/config.yml
 abc_job:
     adapter: ~                      # Set it to "sonata", "bernard" or "custom"
     db_driver: orm                  # Set it to "orm" or "custom"

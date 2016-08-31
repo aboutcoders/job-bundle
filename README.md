@@ -41,14 +41,16 @@ Please note that this bundle is still in development and thus we might need to c
 - [REST-API](./Resources/docs/11-rest-api.md)
 - [Configuration Reference](./Resources/docs/12-configuration-reference.md)
 
-### ToDo Stable Release:
-- Add option to register custom handlers for job logs
+### Mising Features For The Stable Release
+- Provide a TestCase for jobs
+- Get rid of forms to serialize/desiralize jobs in controllers
+- Add option to validate parameters inside job manager
 - Add option to force cancellation of a job
-- Get rid of forms and use validation service inside manager to validate job parameters
-- Provider a TestCase for jobs
-- Cleanup & document agent management
+- Add option to register custom handlers for job logs
 
-### Planned Features:
-- Utilize stopwatch to detect bottle necks
+### Planned Features
+- Cleanup & document agent management
+- Consider consumer management (start, stop, pause)
+- Utilize stopwatch
 - Monitoring
 - Support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
