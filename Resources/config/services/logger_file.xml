@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="abc.job.logger.factory" class="Abc\Bundle\JobBundle\Logger\Factory\FileFactory" public="true">
+        <service id="abc.job.logger.factory" class="Abc\Bundle\JobBundle\Logger\Factory\FileLoggerFactory" public="true">
             <argument type="service" id="abc.job.registry"/>
             <argument>%abc.job.logging.directory%</argument>
         </service>
