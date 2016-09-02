@@ -90,19 +90,4 @@ interface JobTypeInterface
      * @return string The name of the queue this job is assigned to
      */
     public function getQueue();
-
-    /**
-     * Returns the name of the form class to enter the parameters of this job
-     *
-     * @param string $class The fully qualified class name
-     * @return void
-     */
-    public function setFormType($class);
-
-    /**
-     * Sets the name of the form class to enter the parameters of this job
-     *
-     * @return string|null The fully qualified class name
-     */
-    public function getFormType();
 }

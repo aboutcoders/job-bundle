@@ -22,16 +22,24 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
  */
 class Job extends BaseJob
 {
-    /** @var SerializerInterface */
+    /**
+     * @var SerializerInterface
+     */
     protected static $serializer;
 
-    /** @var JobTypeRegistry */
+    /**
+     * @var JobTypeRegistry
+     */
     protected static $registry;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected $serializedParameters;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected $serializedResponse;
 
     /**
@@ -137,7 +145,6 @@ class Job extends BaseJob
      */
     public function getResponse()
     {
-
         if(is_null(parent::getResponse()) && !is_null($this->getSerializedResponse()))
         {
             // deserialize

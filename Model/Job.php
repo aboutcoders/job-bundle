@@ -14,6 +14,7 @@ use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\PostDeserialize;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Type;
 use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
@@ -30,49 +31,50 @@ class Job implements JobInterface
     protected $ticket;
 
     /**
-     * @var string
      * @Type("string")
      * @AbcJobAssert\JobType
+     * @var string
      */
     protected $type;
 
     /**
-     * @var Status
      * @Type("Abc\Bundle\JobBundle\Job\Status")
+     * @var Status
      */
     protected $status;
 
     /**
-     * @var array|null
+     * @Type("Abc\Bundle\JobBundle\Job\JobParameterArray");
+     * @var array
      */
     protected $parameters;
 
     /**
-     * @var double
      * @Type("double")
+     * @var double
      */
     protected $processingTime;
 
     /**
-     * @var \DateTime
      * @Type("DateTime")
+     * @var \DateTime
      */
     protected $createdAt;
 
     /**
-     * @var \DateTime|null
      * @Type("DateTime")
+     * @var \DateTime|null
      */
     protected $terminatedAt;
 
     /**
-     * @var mixed|null
+     * @var mixed
      */
     protected $response;
 
     /**
-     * @var ArrayCollection
-     * @Type("array<Abc\Bundle\JobBundle\Model\Schedule>")
+     * @Type("ArrayCollection<Abc\Bundle\JobBundle\Model\Schedule>")
+     * @var ArrayCollection|Schedule[]
      */
     protected $schedules;
 
@@ -83,8 +85,6 @@ class Job implements JobInterface
     public function __construct($type = null, $parameters = null)
     {
         $this->schedules      = new ArrayCollection();
-        $this->status         = Status::REQUESTED();
-        $this->processingTime = 0;
         $this->type           = $type;
         $this->parameters     = $parameters;
     }
@@ -292,5 +292,17 @@ class Job implements JobInterface
     public function __clone()
     {
         $this->ticket = null;
+
+    }
+
+    /**
+     * Ensures that member variable $schedules is an ArrayCollection after deserialization
+     *
+     * @PostDeserialize
+     */
+    private function postSerialize() {
+        if($this->schedules == null) {
+            $this->schedules = new ArrayCollection();
+        }
     }
 }

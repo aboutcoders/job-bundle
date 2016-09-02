@@ -23,23 +23,23 @@ use JMS\Serializer\Annotation\Type;
 class Schedule extends BaseSchedule implements ScheduleInterface
 {
     /**
-     * @var string|null
-     * @Type("string")
      * @Expose
+     * @Type("string")
+     * @var string|null
      */
     protected $type;
 
     /**
-     * @var string|null
-     * @Type("string")
      * @Expose
+     * @Type("string")
+     * @var string|null
      */
     protected $expression;
 
     /**
-     * @var bool
      * @Type("boolean")
      * @Expose
+     * @var boolean
      */
     protected $isActive;
 

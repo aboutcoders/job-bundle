@@ -159,6 +159,7 @@ class Manager implements ManagerInterface
         }
 
         $job->setStatus(Status::REQUESTED());
+        $job->setProcessingTime(0);
 
         $this->jobManager->save($job);
 

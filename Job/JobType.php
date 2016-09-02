@@ -65,32 +65,23 @@ class JobType implements JobTypeInterface
     private $queue;
 
     /**
-     * @var string
-     */
-    private $formType;
-
-    /**
      * @param string            $serviceId The name of the service within the container
-     * @param string            $name The job type
-     * @param callback|callable $callable The callable associated with the type
-     * @param int|null          $logLevel The Monolog\Logger log level
+     * @param string            $name      The job type
+     * @param callback|callable $callable  The callable associated with the type
+     * @param int|null          $logLevel  The Monolog\Logger log level
      */
     function __construct($serviceId, $name, $callable, $logLevel = null)
     {
-        if(!is_string($name) || strlen((string)$name) == 0)
-        {
+        if (!is_string($name) || strlen((string)$name) == 0) {
             throw new \InvalidArgumentException('$type must be a string');
         }
-        if(!is_callable($callable))
-        {
+        if (!is_callable($callable)) {
             throw new \InvalidArgumentException(sprintf('The callable defined for type "%s" is not callable', $name));
         }
-        if($logLevel !== null && !is_int($logLevel))
-        {
+        if ($logLevel !== null && !is_int($logLevel)) {
             throw new \InvalidArgumentException('$logLevel must be an integer value');
         }
-        if($logLevel !== null && !in_array($logLevel, Logger::getLevels()))
-        {
+        if ($logLevel !== null && !in_array($logLevel, Logger::getLevels())) {
             throw new \InvalidArgumentException('$logLevel must be valid Monolog\Logger log level');
         }
 
@@ -171,21 +162,18 @@ class JobType implements JobTypeInterface
      */
     public function getParametersType()
     {
-        if(is_null($this->parameterTypes) || empty($this->parameterTypes))
-        {
+        if (is_null($this->parameterTypes) || empty($this->parameterTypes)) {
             return null;
         }
 
         $serializedParams = [];
-        foreach($this->getParameterTypes() as $parameterType)
-        {
-            if(0 !== strpos($parameterType, '@'))
-            {
+        foreach ($this->getParameterTypes() as $parameterType) {
+            if (0 !== strpos($parameterType, '@')) {
                 $serializedParams[] = $parameterType;
             }
         }
 
-        return sprintf('GenericArray<%s>', implode($serializedParams, ','));
+        return sprintf(JobParameterArray::class . '<%s>', implode($serializedParams, ','));
     }
 
     /**
@@ -226,21 +214,5 @@ class JobType implements JobTypeInterface
     public function setQueue($queue)
     {
         $this->queue = $queue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFormType($class)
-    {
-        $this->formType = $class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
-    {
-        return $this->formType;
     }
 }

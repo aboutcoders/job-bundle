@@ -10,17 +10,15 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Controller;
 
-use Abc\Bundle\JobBundle\Entity\Job;
+use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobInterface;
-use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Job\Status;
+use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Test\DatabaseWebTestCase;
-use JMS\Serializer\SerializerBuilder;
-use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -29,19 +27,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class JobControllerTest extends DatabaseWebTestCase
 {
     /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
      * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $manager;
 
     /**
-     * @var bool
+     * @var JobManagerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private static $initialized = false;
+    private $entityManager;
 
     /**
      * {@inheritDoc}
@@ -51,49 +44,48 @@ class JobControllerTest extends DatabaseWebTestCase
         parent::setUp();
 
         $this->manager    = $this->getMock(ManagerInterface::class);
-        $this->serializer = SerializerBuilder::create()->build();
-
-        // setup serializer (otherwise ->equalTo will)
-        if (!static::$initialized) {
-            /** @var SerializerInterface $serializer */
-            $serializer       = static::$kernel->getContainer()->get('jms_serializer');
-            $this->serializer = $serializer;
-            Job::setSerializer($this->serializer);
-            static::$initialized = true;
-        }
+        $this->entityManager = $this->getMock(JobManagerInterface::class);
     }
 
     /**
-     * @param array $parameters
-     * @param int   $expectedNumOfItems
-     * @param int   $expectedTotalCount
      * @dataProvider provideCgetData
+     * @param array $parameters
      */
-    public function testCgetAction($parameters = null, $expectedNumOfItems, $expectedTotalCount)
+    public function testCgetAction($parameters)
     {
-        $client = static::createClient();
-
-        /** @var JobManagerInterface $manager */
-        $manager = static::$kernel->getContainer()->get('abc.job.job_manager');
-
-        $job1 = $manager->create('foo');
-        $job1->setStatus(Status::REQUESTED());
-        $manager->save($job1);
-
-        $job2 = $manager->create('bar');
-        $job2->setStatus(Status::PROCESSING());
-        $manager->save($job2);
-
-        $job3 = $manager->create('foobar');
-        $job3->setStatus(Status::PROCESSED());
-        $job3->setTerminatedAt(new \DateTime);
-        $manager->save($job3);
-
         $url = '/api/jobs';
-
         if (!is_null($parameters)) {
             $url .= '?' . http_build_query($parameters);
         }
+
+        // expected parameters passed to the manager
+        $criteria = isset($parameters['criteria']) ? $parameters['criteria'] : [];
+        $sortCol  = isset($parameters['sortCol']) ? $parameters['sortCol'] : 'createdAt';
+        $sortDir  = isset($parameters['sortDir']) ? $parameters['sortDir'] : 'DESC';
+        $orderBy  = [$sortCol => $sortDir];
+        $limit    = isset($parameters['limit']) ? $parameters['limit'] : 10;
+        $page     = isset($parameters['page']) ? $parameters['page'] : 1;
+        $page     = (int)$page - 1;
+        $offset   = ($page > 0) ? ($page) * $limit : 0;
+
+        $job = new Job();
+        $job->setTicket('JobTicket');
+
+        $this->entityManager->expects($this->once())
+            ->method('findBy')
+            ->with($criteria, $orderBy, $limit, $offset)
+            ->willReturn([$job]);
+
+        $this->entityManager->expects($this->once())
+            ->method('findByCount')
+            ->with($criteria)
+            ->willReturn(5);
+
+        $client = static::createClient();
+
+        $this->mockServices([
+            'abc.job.job_manager' => $this->entityManager
+        ]);
 
         $client->request(
             'GET',
@@ -109,19 +101,41 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $data = $client->getResponse()->getContent();
 
-        /** @var JobList $list */
-        // we need the initialized serializer here, since we have custom handlers initialized
-        $serializer = static::$kernel->getContainer()->get('jms_serializer');
-        $list       = $serializer->deserialize($data, JobList::class, 'json');
+        /**
+         * @var JobList $deserializedList
+         */
+        $deserializedList = $this->getContainer()->get('jms_serializer')->deserialize($data, JobList::class, 'json');
+        $items            = $deserializedList->getItems();
 
-        $this->assertCount($expectedNumOfItems, $list->getItems());
-        $this->assertEquals($expectedTotalCount, $list->getTotalCount());
+        /**
+         * @var Job $deserializedEntity ;
+         */
+        $deserializedEntity = $items[0];
+
+        $this->assertEquals(5, $deserializedList->getTotalCount());
+        $this->assertEquals($job->getTicket(), $deserializedEntity->getTicket());
     }
 
-    public function testCgetActionValidatesStatus()
+    public function testActionCgetWithInvalidCriteria()
     {
-        $url    = '/api/jobs?' . http_build_query(['criteria' => ['status' => 'foo']]);
+        $parameters = ['criteria' => 'foobar'];
+
+        $url = '/api/jobs';
+        if (!is_null($parameters)) {
+            $url .= '?' . http_build_query($parameters);
+        }
+
+        $this->entityManager->expects($this->never())
+            ->method('findBy');
+
+        $this->entityManager->expects($this->never())
+            ->method('findByCount');
+
         $client = static::createClient();
+
+        $this->mockServices([
+            'abc.job.job_manager' => $this->entityManager
+        ]);
 
         $client->request(
             'GET',
@@ -135,6 +149,29 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
+
+    /**
+     * @return array An array of GET parameters
+     */
+    public function provideCgetData()
+    {
+        return [
+            [
+                null
+            ],
+            [
+                ['page' => 1, 'sortCol' => 'type', 'sortDir' => 'ASC', 'limit' => 2]
+            ],
+            [
+                ['criteria' => ['name' => 'foobar']]
+            ],
+            [
+                ['criteria' => ['status' => 'PROCESSING']]
+            ]
+        ];
+    }
+
+
 
     public function testGetAction()
     {
@@ -181,114 +218,64 @@ class JobControllerTest extends DatabaseWebTestCase
 
     /**
      * @param $parameters
-     * @dataProvider providePostData
+     * @dataProvider provideValidPostParameters
      */
-    public function testPostAction($parameters, $expectedStatusCode)
+    public function testPostAction($parameters)
     {
+        $url = '/api/jobs';
         $job = $this->buildJobFromArray($parameters);
 
-        if ($expectedStatusCode >= 200 && $expectedStatusCode < 400) {
-            $this->manager->expects($this->once())
-                ->method('add')
-                ->with($this->equalTo($job))
-                ->willReturnCallback(function () use ($job) {
-                    $job = clone $job;
-                    $job->setTicket('JobTicket');
+        $this->manager->expects($this->once())
+            ->method('add')
+            ->with()
+            ->willReturnCallback(function () use ($job) {
+                $job = clone $job;
+                $job->setTicket('JobTicket');
 
-                    return $job;
-                });
-        }
+                return $job;
+            });
 
         $client = static::createClient();
 
-        $this->mockServices(['abc.job.manager' => $this->manager]);
+        $this->mockServices([
+            'abc.job.manager' => $this->manager
+        ]);
 
-        $client->request(
-            'POST',
-            '/api/jobs',
-            $parameters,
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            null,
-            'json'
-        );
+        $client->request('POST', $url, $parameters, [], ['CONTENT_TYPE' => 'application/json'], null, 'json');
 
-        $this->assertEquals($expectedStatusCode, $client->getResponse()->getStatusCode());
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-
-        if ($expectedStatusCode >= 200 && $expectedStatusCode < 400) {
-            $this->assertEquals('JobTicket', $data['ticket']);
-        }
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
     /**
-     * @param string $ticket
-     * @param $parameters
-     * @param $expectedStatusCode
-     * @dataProvider providePutData
+     * @param        $parameters
+     * @dataProvider provideValidPostParameters
      */
-    public function testPutAction($ticket, $parameters, $expectedStatusCode)
+    public function testPutAction($parameters)
     {
-        $url = '/api/jobs/' . $ticket;
+        $url = '/api/jobs';
         $job = $this->buildJobFromArray($parameters);
-        $job->setTicket($ticket);
-
-        $this->manager->expects($this->once())
-            ->method('get')
-            ->with($ticket)
-            ->willReturn($job);
 
         $this->manager->expects($this->once())
             ->method('update')
-            ->with($this->equalTo($job))
-            ->willReturnArgument(0);
+            ->with()
+            ->willReturnCallback(function () use ($job) {
+                $job = clone $job;
+                $job->setTicket('JobTicket');
+
+                return $job;
+            });
 
         $client = static::createClient();
 
-        $this->mockServices(['abc.job.manager' => $this->manager]);
+        $this->mockServices([
+            'abc.job.manager' => $this->manager
+        ]);
 
-        $client->request(
-            'PUT',
-            $url,
-            $parameters,
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            null,
-            'json'
-        );
+        $client->request('PUT', $url, $parameters, [], ['CONTENT_TYPE' => 'application/json'], null, 'json');
 
-        $this->assertEquals($expectedStatusCode, $client->getResponse()->getStatusCode());
-
-        $data = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertEquals($ticket, $data['ticket']);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testPutActionReturns404IfJobNotFound()
-    {
-        $url = '/api/jobs/JobTicket';
-
-        $this->manager->expects($this->once())
-            ->method('get')
-            ->willReturn(null);
-
-        $client = static::createClient();
-
-        $this->mockServices(['abc.job.manager' => $this->manager]);
-
-        $client->request(
-            'PUT',
-            $url,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            null,
-            'json'
-        );
-
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
-    }
 
     public function testGetLogsAction()
     {
@@ -408,29 +395,32 @@ class JobControllerTest extends DatabaseWebTestCase
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    public static function providePostData()
+    public static function provideValidPostParameters()
     {
         return [
             [
                 [
                     'type'       => 'abc.mailer',
                     'parameters' => [
-                        'to'      => 'to@domain.tld',
-                        'from'    => 'from@domain.tld',
-                        'message' => 'message body',
-                        'subject' => 'subject',
+                        [
+                            'to'      => 'to@domain.tld',
+                            'from'    => 'from@domain.tld',
+                            'message' => 'message body',
+                            'subject' => 'subject'
+                        ]
                     ]
-                ],
-                200
+                ]
             ],
             [
                 [
                     'type'       => 'abc.mailer',
                     'parameters' => [
-                        'to'      => 'to@domain.tld',
-                        'from'    => 'from@domain.tld',
-                        'message' => 'message body',
-                        'subject' => 'subject',
+                        [
+                            'to'      => 'to@domain.tld',
+                            'from'    => 'from@domain.tld',
+                            'message' => 'message body',
+                            'subject' => 'subject'
+                        ]
                     ],
                     'schedules'  => [
                         [
@@ -438,92 +428,18 @@ class JobControllerTest extends DatabaseWebTestCase
                             'expression' => '* * * * *',
                         ]
                     ]
-                ],
-                200
-            ],
-            [
-                [
-                    'type'       => 'abc.mailer',
-                    'parameters' => [
-                        'to'      => 'foobar',
-                        'from'    => 'from@domain.tld',
-                        'message' => 'message body',
-                        'subject' => 'subject',
-                    ]
-                ],
-                400
+                ]
             ],
             [
                 [
                     'type' => 'parameterless'
-                ],
-                200
+                ]
             ],
             [
                 [
                     'type'       => 'parameterless',
                     'parameters' => null
-                ],
-                200
-            ],
-            [
-                [
-                    'type' => 'undefined'
-                ],
-                400
-            ]
-        ];
-    }
-
-    public static function providePutData()
-    {
-        return [
-            [
-                'JobTicket',
-                [
-                    'type'       => 'abc.mailer',
-                    'parameters' => [
-                        'to'      => 'to@domain.tld',
-                        'from'    => 'from@domain.tld',
-                        'message' => 'message body',
-                        'subject' => 'subject',
-                    ]
-                ],
-                200
-            ]
-        ];
-    }
-
-    /**
-     * @return array An array [parameters, expectedNumberOfItems, expectedTotalCount]
-     */
-    public function provideCgetData()
-    {
-        return [
-            [
-                null,
-                3,
-                3
-            ],
-            [
-                ['page' => 1, 'sortCol' => 'type', 'sortDir' => 'ASC'],
-                3,
-                3
-            ],
-            [
-                ['criteria' => ['type' => 'foo']],
-                1,
-                1
-            ],
-            [
-                ['criteria' => ['type' => 'foo', 'status' => 'REQUESTED']],
-                1,
-                1
-            ],
-            [
-                ['page' => 3, 'sortCol' => 'type', 'sortDir' => 'DESC', 'limit' => 1],
-                1,
-                3
+                ]
             ]
         ];
     }
@@ -559,10 +475,10 @@ class JobControllerTest extends DatabaseWebTestCase
 
         if (isset($parameters['parameters'])) {
             $message = new Message(
-                $parameters['parameters']['to'],
-                $parameters['parameters']['from'],
-                $parameters['parameters']['subject'],
-                $parameters['parameters']['message']
+                $parameters['parameters'][0]['to'],
+                $parameters['parameters'][0]['from'],
+                $parameters['parameters'][0]['subject'],
+                $parameters['parameters'][0]['message']
             );
 
             $job->setParameters([$message]);

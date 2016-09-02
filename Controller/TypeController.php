@@ -23,18 +23,16 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class TypeController extends FOSRestController
 {
     /**
-     * @return array
-     *
      * @ApiDoc(
      * description="Returns a collection of job types",
      * section="AbcJobBundle",
      * requirements={},
-     * output="array<String>",
+     * output="array<string>",
      *   statusCodes = {
      *     200 = "Returned when successful"
      *   }
      * )
-     *
+     * @return array
      */
     public function cgetAction()
     {

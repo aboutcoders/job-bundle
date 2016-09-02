@@ -18,6 +18,9 @@ abc_job:
             - job_type_B2
     controller:
         refresh_interval: 1         # The interval in seconds the database is checked if job has been cancelled
+    rest:
+        enable: true                # Set to false to disable loading of REST API related services
+        validate: false             # Set to true to enable validation of jobs (ignored if validation for manager is enabled)
     logging:                        
         handler: file               # Choose "orm" if you want to store job logs in the database instead of files
         directory: 'path/to/dir'    # The directory where job logs are saved (ignored if handler is "orm")
@@ -35,4 +38,5 @@ abc_job:
         schedule_manager_iterator:  abc.job.schedule_manager_iterator.default
         controller_factory:         abc.job.controller_factory.default
         queue_config:               abc.job.queue_config.default
+        validator:                  validator
 ```

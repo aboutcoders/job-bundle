@@ -98,12 +98,8 @@ abc_scheduler:
     db_driver: orm
 
 abc_job:
-    register_default_jobs: true
     adapter: sonata
+    register_default_jobs: true
     logging:
         default_level: debug
         handler: orm
-    default_queue: default
-    queues:
-        my_queue:
-            - another_job

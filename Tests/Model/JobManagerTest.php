@@ -46,8 +46,6 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Job::class, $entity);
         $this->assertEquals($type, $entity->getType());
-        $this->assertEquals(Status::REQUESTED(), $entity->getStatus());
-        $this->assertEquals(0, $entity->getProcessingTime());
 
         if(!is_null($schedule))
         {

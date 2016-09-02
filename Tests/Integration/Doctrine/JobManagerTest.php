@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Doctrine;
 use Abc\Bundle\JobBundle\Doctrine\JobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\JobBundle\Entity\Job;
+use Abc\Bundle\JobBundle\Job\JobParameterArray;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Status;
@@ -105,7 +106,7 @@ class JobManagerTest extends DatabaseKernelTestCase
     {
         $type        = 'foobar';
         $parameters     = [['foo' => 'bar'], 'foobar'];
-        $parameterTypes = ['Array<String,String>', 'String'];
+        $parameterTypes = ['array<String,String>', 'String'];
         $jobType     = $this->setUpJobType($type, $parameterTypes);
 
         // persist object with parameters being an array
@@ -115,6 +116,7 @@ class JobManagerTest extends DatabaseKernelTestCase
             ->willReturn('SerializedParameter');
 
         $job = $this->subject->create($type);
+        $job->setStatus(Status::REQUESTED());
         $job->setParameters($parameters);
         $this->subject->save($job);
 
@@ -129,7 +131,7 @@ class JobManagerTest extends DatabaseKernelTestCase
 
         $this->serializer->expects($this->once())
             ->method('deserialize')
-            ->with('SerializedParameter', 'GenericArray<Array<String,String>,String>', 'json')
+            ->with('SerializedParameter', JobParameterArray::class . '<array<String,String>,String>', 'json')
             ->willReturn($parameters);
 
         $persistedJob = $this->subject->findByTicket($job->getTicket());
@@ -151,6 +153,7 @@ class JobManagerTest extends DatabaseKernelTestCase
             ->willReturn('SerializedResponse');
 
         $job = $this->subject->create($type);
+        $job->setStatus(Status::REQUESTED());
         $job->setResponse($response);
         $this->subject->save($job);
 
@@ -175,8 +178,8 @@ class JobManagerTest extends DatabaseKernelTestCase
 
     public function testCascadesScheduleOperations()
     {
-        // CREATE
         $job = $this->subject->create('JobType', null, new Schedule('Type', 'Expression'));
+        $job->setStatus(Status::REQUESTED());
 
         $this->subject->save($job);
 
@@ -229,6 +232,7 @@ class JobManagerTest extends DatabaseKernelTestCase
         $schedule->setExpression('ScheduleExpression');
 
         $job = $this->subject->create('JobType');
+        $job->setStatus(Status::REQUESTED());
         $job->addSchedule($schedule);
 
         $this->subject->save($job);

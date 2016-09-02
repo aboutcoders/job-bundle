@@ -103,14 +103,6 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('queue', $this->subject->getQueue());
     }
 
-    public function testGetSetFormType()
-    {
-        $this->assertNull($this->subject->getFormType());
-
-        $this->subject->setFormType('form-service-id');
-        $this->assertEquals('form-service-id', $this->subject->getFormType());
-    }
-
     public static function getInvalidConstructorArgs()
     {
         $callable = function () {

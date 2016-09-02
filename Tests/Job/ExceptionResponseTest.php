@@ -11,8 +11,6 @@
 namespace Abc\Bundle\JobBundle\Tests\Job\Response;
 
 use Abc\Bundle\JobBundle\Job\ExceptionResponse;
-use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
-use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
 
@@ -28,11 +26,7 @@ class ExceptionResponseTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->serializer = SerializerBuilder::create()->configureHandlers(
-            function (HandlerRegistry $registry) {
-                $registry->registerSubscribingHandler(new GenericArrayHandler());
-            }
-        )->build();
+        $this->serializer = SerializerBuilder::create()->build();
     }
 
     public function testGetCode()

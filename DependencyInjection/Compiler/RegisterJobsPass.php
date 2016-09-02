@@ -93,8 +93,7 @@ class RegisterJobsPass implements CompilerPassInterface
                     $id,
                     $tag['type'],
                     array(new Reference($id), $tag['method']),
-                    $logLevel,
-                    isset($tag['formType']) ? $tag['formType'] : null
+                    $logLevel
                 );
 
                 $container->setDefinition($jobTypeId, $definition);
@@ -103,8 +102,11 @@ class RegisterJobsPass implements CompilerPassInterface
             }
         }
 
-        $pass = new RegisterSonataListenersPass();
-        $pass->process($container);
+        // there as a reason this listener was registered here, what was it?
+        if($container->hasParameter('abc.job.adapter') && $container->getParameter('abc.job.adapter') == 'sonata') {
+            $pass = new RegisterSonataListenersPass();
+            $pass->process($container);
+        }
     }
 
     /**
@@ -125,11 +127,6 @@ class RegisterJobsPass implements CompilerPassInterface
         $jobType->replaceArgument(1, $type);
         $jobType->replaceArgument(2, $callable);
         $jobType->replaceArgument(3, $logLevel);
-
-        if($formType != null)
-        {
-            $jobType->addMethodCall('setFormType', array($formType));
-        }
 
         return $jobType;
     }

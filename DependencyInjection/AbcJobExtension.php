@@ -10,14 +10,11 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection;
 
-use Abc\Bundle\JobBundle\Form\Type\MessageType;
-use Abc\Bundle\JobBundle\Form\Type\SecondsType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Form\AbstractType;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -31,19 +28,13 @@ class AbcJobExtension extends Extension
     {
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
-
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config/services'));
 
-        $this->configureServices($container, $config, [
-            'manager',
-            'job_manager',
-            'agent_manager',
-            'schedule_manager',
-            'schedule_iterator',
-            'schedule_manager_iterator',
-            'controller_factory',
-            'queue_config'
-        ]);
+        foreach ($config['service'] as $key => $service) {
+            if (null !== $service) {
+                $container->setAlias('abc.job.'.$key, $service);
+            }
+        }
 
         if ('custom' !== $config['db_driver']) {
             $loader->load(sprintf('%s.xml', $config['db_driver']));
@@ -58,6 +49,7 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 '' => array(
+                    'adapter'               => 'abc.job.adapter',
                     'model_manager_name'    => 'abc.job.model_manager_name',
                     'register_default_jobs' => 'abc.job.register_default_jobs',
                     'queues'                => 'abc.job.queue_config',
@@ -91,28 +83,68 @@ class AbcJobExtension extends Extension
         $loader->load('schedule.xml');
         $loader->load('listener.xml');
         $loader->load('metadata.xml');
-        $loader->load('forms.xml');
         $loader->load('process_control.xml');
         $loader->load('validator.xml');
         $loader->load('commands.xml');
+        $loader->load('serializer.xml');
 
-        if ($config['register_default_jobs']) {
-            $this->registerDefaultJobs($container, $loader);
-        }
-
-        $this->loadLogger($config['logging'], $container, $loader, $config['db_driver']);
+        $this->loadRest($config, $loader, $container);
+        $this->loadDefaultJobs($config, $loader, $container);
+        $this->loadLogger($config, $loader, $container);
     }
 
     /**
-     * @param ContainerBuilder $container
      * @param array            $config
-     * @param array            $services
-     * @return void
+     * @param XmlFileLoader    $loader
+     * @param ContainerBuilder $container
      */
-    protected function configureServices(ContainerBuilder $container, array $config, array $services)
+    private function loadLogger(array $config, XmlFileLoader $loader, ContainerBuilder $container)
     {
-        foreach ($services as $name) {
-            $container->setAlias('abc.job.' . $name, $config['service'][$name]);
+        if ('custom' !== $config['logging']['handler']) {
+            $loader->load('logger_' . $config['logging']['handler'] . '.xml');
+
+            if ('orm' == $config['logging']['handler']) {
+                $container->setParameter('abc.job.register_mapping.' . $config['db_driver'], true);
+            }
+        }
+
+        if (!empty($config['logging']['processor'])) {
+            $factory = $container->getDefinition('abc.job.logger.factory');
+
+            foreach ($config['logging']['processor'] as $serviceId) {
+                $factory->addMethodCall('addProcessor', array(new Reference($serviceId)));
+            }
+        }
+
+        $container->setParameter('abc.job.logging.default_level', $config['logging']['default_level']);
+        $container->setParameter('abc.job.logging.custom_level', $config['logging']['custom_level']);
+    }
+
+    /**
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     * @param ContainerBuilder $container
+     */
+    private function loadRest(array $config, XmlFileLoader $loader, ContainerBuilder $container)
+    {
+        $container->setParameter('abc.job.rest', $config['rest']['enable']);
+
+        if ($config['rest']) {
+            $loader->load('job_param_converter.xml');
+        }
+
+        $container->getDefinition('abc.job.job_param_converter')->replaceArgument(1, !$config['rest']['validate'] ? null : new Reference('abc.job.validator'));
+    }
+
+    /**
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     * @param ContainerBuilder $container
+     */
+    private function loadDefaultJobs(array $config, XmlFileLoader $loader, ContainerBuilder $container)
+    {
+        if ($config['register_default_jobs']) {
+            $loader->load('default_jobs.xml');
         }
     }
 
@@ -122,7 +154,7 @@ class AbcJobExtension extends Extension
      * @param array            $map
      * @return void
      */
-    protected function remapParameters(array $config, ContainerBuilder $container, array $map)
+    private function remapParameters(array $config, ContainerBuilder $container, array $map)
     {
         foreach ($map as $name => $paramName) {
             if (array_key_exists($name, $config)) {
@@ -137,7 +169,7 @@ class AbcJobExtension extends Extension
      * @param array            $namespaces $supportedAdapters
      * @return void
      */
-    protected function remapParametersNamespaces(array $config, ContainerBuilder $container, array $namespaces)
+    private function remapParametersNamespaces(array $config, ContainerBuilder $container, array $namespaces)
     {
         foreach ($namespaces as $ns => $map) {
             if ($ns) {
@@ -156,44 +188,5 @@ class AbcJobExtension extends Extension
                 }
             }
         }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     * @param XmlFileLoader    $loader
-     * @return void
-     */
-    private function registerDefaultJobs(ContainerBuilder $container, XmlFileLoader $loader)
-    {
-        $container->setParameter('abc.job.form.form_type_message', method_exists(AbstractType::class, 'getBlockPrefix') ? MessageType::class : 'abc_job_message');
-        $container->setParameter('abc.job.form.form_type_seconds', method_exists(AbstractType::class, 'getBlockPrefix') ? SecondsType::class : 'abc_job_seconds');
-
-        $loader->load('default_jobs.xml');
-
-        if (!method_exists(AbstractType::class, 'getBlockPrefix')) {
-            $loader->load('default_jobs_forms.xml');
-        }
-    }
-
-    private function loadLogger(array $config, ContainerBuilder $container, XmlFileLoader $loader, $dbDriver)
-    {
-        if ('custom' !== $config['handler']) {
-            $loader->load('logger_' . $config['handler'] . '.xml');
-
-            if ('orm' == $config['handler']) {
-                $container->setParameter('abc.job.register_mapping.' . $dbDriver, true);
-            }
-        }
-
-        if (!empty($config['processor'])) {
-            $factory = $container->getDefinition('abc.job.logger.factory');
-
-            foreach ($config['processor'] as $serviceId) {
-                $factory->addMethodCall('addProcessor', array(new Reference($serviceId)));
-            }
-        }
-
-        $container->setParameter('abc.job.logging.default_level', $config['default_level']);
-        $container->setParameter('abc.job.logging.custom_level', $config['custom_level']);
     }
 }

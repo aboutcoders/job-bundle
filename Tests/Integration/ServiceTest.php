@@ -10,11 +10,9 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Integration;
 
-use Abc\Bundle\JobBundle\Adapter\Sonata\ControlledMessageManager;
 use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Event\JobEvents;
-use Abc\Bundle\JobBundle\Form\Type\JobType;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\LogManagerInterface;
@@ -27,7 +25,6 @@ use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Serializer\Handler\GenericArrayHandler;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
@@ -87,7 +84,6 @@ class ServiceTest extends KernelTestCase
     {
         return [
             ['abc.job.agent_manager', AgentManagerInterface::class],
-            ['abc.job.form.type.job', JobType::class],
             ['abc.job.job_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],
             ['abc.job.listener.schedule', ScheduleListener::class],
@@ -98,7 +94,6 @@ class ServiceTest extends KernelTestCase
             ['abc.job.metadata_factory', MetadataFactory::class],
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
-            ['abc.job.serializer.generic_array_handler', GenericArrayHandler::class],
             ['abc.job.lock_manager', LockManagerInterface::class],
             ['abc.job.controller_factory', Factory::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]

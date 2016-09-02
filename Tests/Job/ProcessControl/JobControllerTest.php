@@ -43,6 +43,7 @@ class JobControllerTest extends \PHPUnit_Framework_TestCase
         $this->controller = $this->getMock(ControllerInterface::class);
         $this->manager    = $this->getMock(JobManagerInterface::class);
         $this->job        = new Job();
+        $this->job->setStatus(Status::REQUESTED());
 
         $this->manager->expects($this->any())
             ->method('isManagerOf')

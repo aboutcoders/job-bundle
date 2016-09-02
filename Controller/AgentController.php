@@ -28,8 +28,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 class AgentController extends FOSRestController
 {
     /**
-     * @return array data
-     *
      * @ApiDoc(
      * description="Returns a collection of agents",
      * section="AbcJobBundle",
@@ -39,6 +37,7 @@ class AgentController extends FOSRestController
      *   }
      * )
      *
+     * @return array data
      */
     public function cgetAction()
     {
@@ -46,9 +45,6 @@ class AgentController extends FOSRestController
     }
 
     /**
-     * @param int $id
-     * @return AgentInterface
-     *
      * @ApiDoc(
      * description="Returns an agent",
      * section="AbcJobBundle",
@@ -58,6 +54,9 @@ class AgentController extends FOSRestController
      *     404 = "Returned when agent not found",
      *   }
      * )
+     *
+     * @param string $id The agent id
+     * @return AgentInterface
      */
     public function getAction($id)
     {
@@ -70,14 +69,7 @@ class AgentController extends FOSRestController
         return $agent;
     }
 
-
     /**
-     * @param int $id
-     * @param boolean $wait Whether to wait until agent is started (optional, true by default)
-     * @return AgentInterface
-     *
-     * @Post
-     *
      * @ApiDoc(
      * description="Starts an agent",
      * section="AbcJobBundle",
@@ -90,6 +82,12 @@ class AgentController extends FOSRestController
      *     404 = "Returned when agent not found",
      *   }
      * )
+     *
+     * @Post
+     *
+     * @param string $id
+     * @param boolean $wait Whether to wait until agent is started (optional, true by default)
+     * @return AgentInterface
      */
     public function startAction($id, $wait = true)
     {
@@ -109,12 +107,6 @@ class AgentController extends FOSRestController
     }
 
     /**
-     * @param int $id
-     * @param boolean $wait Whether to wait until agent is stopped (optional, true by default)
-     * @return AgentInterface
-     *
-     * @Post
-     *
      * @ApiDoc(
      * description="Stops an agent",
      * section="AbcJobBundle",
@@ -128,6 +120,12 @@ class AgentController extends FOSRestController
      *     404 = "Returned when agent not found",
      *   }
      * )
+     *
+     * @Post
+     *
+     * @param int $id
+     * @param boolean $wait Whether to wait until agent is stopped (optional, true by default)
+     * @return AgentInterface
      */
     public function stopAction($id, $wait = true)
     {

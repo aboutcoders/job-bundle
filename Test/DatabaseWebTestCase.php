@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -62,5 +63,14 @@ class DatabaseWebTestCase extends WebTestCase
         }
 
         return self::$application;
+    }
+
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        return static::$kernel->getContainer();
     }
 }
