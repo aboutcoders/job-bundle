@@ -4,11 +4,16 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <parameter key="abc.job.model.job.class">Abc\Bundle\JobBundle\Entity\Job</parameter>
+        <parameter key="abc.job.model.schedule.class">Abc\Bundle\JobBundle\Entity\Schedule</parameter>
+    </parameters>
+
     <services>
 
         <service id="abc.job.job_manager.default" class="Abc\Bundle\JobBundle\Entity\JobManager" public="true">
             <argument type="service" id="abc.job.entity_manager" />
-            <argument>Abc\Bundle\JobBundle\Entity\Job</argument>
+            <argument>%abc.job.model.job.class%</argument>
             <argument type="service" id="abc.job.schedule_manager" />
             <argument type="service" id="jms_serializer" />
             <argument type="service" id="abc.job.registry" />
@@ -16,7 +21,7 @@
 
         <service id="abc.job.schedule_manager.default" class="Abc\Bundle\JobBundle\Doctrine\ScheduleManager" public="true">
             <argument type="service" id="abc.job.entity_manager"/>
-            <argument>Abc\Bundle\JobBundle\Entity\Schedule</argument>
+            <argument>%abc.job.model.schedule.class%</argument>
         </service>
 
         <service id="abc.job.entity_manager" class="Doctrine\ORM\EntityManager" public="false">
