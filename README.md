@@ -45,10 +45,10 @@ Please note that this bundle is still in development and thus we might need to c
 
 - Provide a TestCase for jobs
 - Add option to validate parameters inside job manager (define add-validation-group, update-validation-group)
-- Make AbcResourceLockBundle optional
 - Make FOSRestBundle optional
 - Add option to force cancellation of a job
 - Add option to register custom handlers for job logs
+- Add option to configure entity class names
 
 ### Planned Features
 

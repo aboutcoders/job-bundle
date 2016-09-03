@@ -26,7 +26,7 @@ use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
-use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
+use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvents;
@@ -94,7 +94,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.metadata_factory', MetadataFactory::class],
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
-            ['abc.job.lock_manager', LockManagerInterface::class],
+            ['abc.job.locker', LockInterface::class],
             ['abc.job.controller_factory', Factory::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]
         ];

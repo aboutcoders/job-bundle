@@ -7,9 +7,7 @@ Make sure the following bundles are installed and configured:
 
 * [DoctrineBundle](http://symfony.com/doc/master/bundles/DoctrineBundle/index.html)
 * [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle)
-* [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle)
 * [AbcSchedulerBundle](https://github.com/aboutcoders/scheduler-bundle)
-* [AbcResourceLockBundle](https://github.com/aboutcoders/resource-lock-bundle)
 * [AbcEnumSerializerBundle](https://github.com/aboutcoders/enum-serializer-bundle)
 
 ## Install Message Queue Bundle

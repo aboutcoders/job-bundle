@@ -37,11 +37,6 @@ final class ConfigurationCheckPass implements CompilerPassInterface
             throw new \RuntimeException('You need to enable the AbcSchedulerBundle');
         }
 
-        // AbcResourceLockBundle
-        if(!$container->hasParameter('abc.resource_lock.model.resource_lock.class')) {
-            throw new \RuntimeException('You need to enable the AbcResourceLockBundle');
-        }
-
         // if Rest API is enabled
         if ($container->hasParameter('abc.job.rest') && $container->getParameter('abc.job.rest')) {
 

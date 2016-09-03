@@ -39,6 +39,7 @@ class AbcJobExtension extends Extension
         }
 
         $container->setParameter('abc.job.controller_service', $config['service']['controller']);
+        $container->setParameter('abc.job.locker_service', $config['service']['locker']);
 
         $this->remapParametersNamespaces(
             $config,
@@ -92,6 +93,7 @@ class AbcJobExtension extends Extension
         $loader->load('validator.xml');
         $loader->load('commands.xml');
         $loader->load('serializer.xml');
+        $loader->load('locker.xml');
     }
 
     /**

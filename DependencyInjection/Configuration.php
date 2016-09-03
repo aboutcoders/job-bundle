@@ -130,6 +130,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('schedule_manager_iterator')->defaultValue('abc.job.schedule_manager_iterator.default')->end()
                             ->scalarNode('controller_factory')->defaultValue('abc.job.controller_factory.default')->end()
                             ->scalarNode('controller')->defaultValue('abc.process_control.controller')->end()
+                            ->scalarNode('locker')->defaultValue('abc.job.locker.default')->end()
                             ->scalarNode('queue_config')->defaultValue('abc.job.queue_config.default')->end()
                             ->scalarNode('validator')->defaultValue('validator')->end()
                         ->end()

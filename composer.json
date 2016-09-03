@@ -40,7 +40,8 @@
         "aboutcoders/process-control-bundle": "~1.2"
     },
     "suggest": {
-        "aboutcoders/process-control-bundle": "Adds process control requires ^1.2"
+        "aboutcoders/process-control-bundle": "Adds process control, requires ^1.2",
+        "aboutcoders/resource-lock-bundle": "Adds resource locking for for a setup with multiple job processing nodes, requires dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -24,12 +24,6 @@
             <argument>%abc.job.model_manager_name%</argument>
         </service>
 
-        <service id="abc.job.lock_manager" class="%abc.resource_lock.lock_manager.class%">
-            <argument type="service" id="abc.resource_lock.entity_manager"/>
-            <argument>%abc.resource_lock.model.resource_lock.class%</argument>
-            <argument>abc-job-lock</argument>
-        </service>
-
     </services>
 
 </container>
