@@ -12,20 +12,14 @@ namespace Abc\Bundle\JobBundle\Controller;
 
 use Abc\Bundle\JobBundle\Model\AgentInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\Put;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("Agent")
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class AgentController extends FOSRestController
+class AgentController extends BaseController
 {
     /**
      * @ApiDoc(
@@ -37,11 +31,12 @@ class AgentController extends FOSRestController
      *   }
      * )
      *
-     * @return array data
+     * @param Request $request
+     * @return Response
      */
-    public function cgetAction()
+    public function listAction(Request $request)
     {
-        return $this->getAgentManager()->findAll();
+        return $this->serialize($this->getAgentManager()->findAll());
     }
 
     /**
@@ -66,7 +61,7 @@ class AgentController extends FOSRestController
             throw $this->createNotFoundException('Unable to find agent');
         }
 
-        return $agent;
+        return $this->serialize($agent);
     }
 
     /**
@@ -83,11 +78,9 @@ class AgentController extends FOSRestController
      *   }
      * )
      *
-     * @Post
-     *
      * @param string $id
      * @param boolean $wait Whether to wait until agent is started (optional, true by default)
-     * @return AgentInterface
+     * @return Response
      */
     public function startAction($id, $wait = true)
     {
@@ -103,7 +96,7 @@ class AgentController extends FOSRestController
         $manager->start($agent, $wait);
         $manager->refresh($agent);
 
-        return $agent;
+        return $this->serialize($agent);
     }
 
     /**
@@ -121,11 +114,9 @@ class AgentController extends FOSRestController
      *   }
      * )
      *
-     * @Post
-     *
      * @param int $id
      * @param boolean $wait Whether to wait until agent is stopped (optional, true by default)
-     * @return AgentInterface
+     * @return Response
      */
     public function stopAction($id, $wait = true)
     {
@@ -141,7 +132,7 @@ class AgentController extends FOSRestController
         $manager->stop($agent, $wait);
         $manager->refresh($agent);
 
-        return $agent;
+        return $this->serialize($agent);
     }
 
     /**

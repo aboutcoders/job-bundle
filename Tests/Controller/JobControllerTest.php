@@ -43,15 +43,15 @@ class JobControllerTest extends DatabaseWebTestCase
     {
         parent::setUp();
 
-        $this->manager    = $this->getMock(ManagerInterface::class);
+        $this->manager       = $this->getMock(ManagerInterface::class);
         $this->entityManager = $this->getMock(JobManagerInterface::class);
     }
 
     /**
-     * @dataProvider provideCgetData
+     * @dataProvider provideListData
      * @param array $parameters
      */
-    public function testCgetAction($parameters)
+    public function testListAction($parameters)
     {
         $url = '/api/jobs';
         if (!is_null($parameters)) {
@@ -116,7 +116,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $this->assertEquals($job->getTicket(), $deserializedEntity->getTicket());
     }
 
-    public function testActionCgetWithInvalidCriteria()
+    public function testListActionWithInvalidCriteria()
     {
         $parameters = ['criteria' => 'foobar'];
 
@@ -153,7 +153,7 @@ class JobControllerTest extends DatabaseWebTestCase
     /**
      * @return array An array of GET parameters
      */
-    public function provideCgetData()
+    public function provideListData()
     {
         return [
             [
@@ -171,11 +171,8 @@ class JobControllerTest extends DatabaseWebTestCase
         ];
     }
 
-
-
     public function testGetAction()
     {
-
         $job = new Job();
         $job->setTicket('12345');
         $job->setStatus(Status::PROCESSING());
@@ -220,7 +217,7 @@ class JobControllerTest extends DatabaseWebTestCase
      * @param $parameters
      * @dataProvider provideValidPostParameters
      */
-    public function testPostAction($parameters)
+    public function testAddAction($parameters)
     {
         $url = '/api/jobs';
         $job = $this->buildJobFromArray($parameters);

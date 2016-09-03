@@ -42,7 +42,7 @@ class AgentControllerTest extends WebTestCase
         $this->serializer   = SerializerBuilder::create()->build();
     }
 
-    public function testCgetAction()
+    public function testListAction()
     {
         $client = static::createClient();
 
@@ -68,7 +68,7 @@ class AgentControllerTest extends WebTestCase
         $this->assertEquals([$agent], $deserializedArray);
     }
 
-    public function testGetActionReturns200()
+    public function testListActionReturns200()
     {
         $client = static::createClient();
 

@@ -10,17 +10,13 @@
 
 namespace Abc\Bundle\JobBundle\Controller;
 
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\Get;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("Type")
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TypeController extends FOSRestController
+class JobTypeController extends BaseController
 {
     /**
      * @ApiDoc(
@@ -32,18 +28,11 @@ class TypeController extends FOSRestController
      *     200 = "Returned when successful"
      *   }
      * )
-     * @return array
+     * @return Response
      */
-    public function cgetAction()
+    public function listAction()
     {
-        return $this->getRegistry()->getTypeChoices();
+        return $this->serialize($this->getRegistry()->getTypeChoices());
     }
 
-    /**
-     * @return JobTypeRegistry
-     */
-    protected function getRegistry()
-    {
-        return $this->get('abc.job.registry');
-    }
 }

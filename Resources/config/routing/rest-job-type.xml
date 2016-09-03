@@ -4,8 +4,10 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <import resource="@AbcJobBundle/Resources/config/routing/rest-job.xml" />
-    <import resource="@AbcJobBundle/Resources/config/routing/rest-agent.xml" />
-    <import resource="@AbcJobBundle/Resources/config/routing/rest-job-type.xml" />
+    <route id="abc_job_type_list" path="/job-types" methods="GET">
+        <default key="_controller">AbcJobBundle:JobType:list</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
 
 </routes>

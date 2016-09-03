@@ -4,8 +4,28 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <import
-            resource="@AbcJobBundle/Controller/AgentController.php"
-            type="rest"
-            prefix="/" />
+    <route id="abc_agent_list" path="/agents" methods="GET">
+        <default key="_controller">AbcJobBundle:Agent:list</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_agent_get" path="/agents/{id}" methods="GET">
+        <default key="_controller">AbcJobBundle:Agent:get</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_agent_start" path="/agents/{id}/start" methods="POST">
+        <default key="_controller">AbcJobBundle:Agent:start</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_agent_stop" path="/agents/{id}/stop" methods="POST">
+        <default key="_controller">AbcJobBundle:Agent:stop</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
 </routes>

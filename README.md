@@ -44,11 +44,10 @@ Please note that this bundle is still in development and thus we might need to c
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
-### Mising Features For The Stable Release
+### Missing Features For The Stable Release
 
 - Provide a TestCase for jobs
 - Add validator (define add-validation-group, update-validation-group)
-- Make FOSRestBundle optional
 - Add option to force cancellation of a job
 - Add option to register custom handlers for job logs
 - Add option to configure entity class names

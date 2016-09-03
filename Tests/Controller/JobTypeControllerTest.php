@@ -15,13 +15,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TypeControllerTest extends WebTestCase
+class JobTypeControllerTest extends WebTestCase
 {
     public function testCgetAction()
     {
         $client = static::createClient();
 
-        $url = '/api/types';
+        $url = '/api/job-types';
 
         $client->request(
             'GET',

@@ -36,19 +36,5 @@ final class ConfigurationCheckPass implements CompilerPassInterface
         if(!$container->has('abc.scheduler.scheduler')) {
             throw new \RuntimeException('You need to enable the AbcSchedulerBundle');
         }
-
-        // if Rest API is enabled
-        if ($container->hasParameter('abc.job.rest') && $container->getParameter('abc.job.rest')) {
-
-            // SensioFrameworkExtraBundle
-            if(!$container->has('sensio_framework_extra.converter.listener')) {
-                throw new \RuntimeException('You need to enable the converters in SensioFrameworkExtraBundle when using AbcJobBundle REST API');
-            }
-
-            // FOSRestBundle
-            if(!$container->has('fos_rest.serializer')) {
-                throw new \RuntimeException('You need to enable the FOSRestBundle');
-            }
-        }
     }
 }

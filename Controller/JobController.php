@@ -12,33 +12,22 @@ namespace Abc\Bundle\JobBundle\Controller;
 
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\JobInterface;
-use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobList;
-use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use Abc\Bundle\JobBundle\Model\LogInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Request\ParamFetcherInterface;
-use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\Exception\Exception;
+use JMS\Serializer\Exception\UnsupportedFormatException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 /**
- * @RouteResource("Job")
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobController extends FOSRestController
+class JobController extends BaseController
 {
     /**
      * @ApiDoc(
@@ -52,32 +41,22 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @QueryParam(name="page", requirements="\d+", default="1", description="Page number of the result set")
-     * @QueryParam(name="limit", requirements="\d+", default="10", description="Page size")
-     * @QueryParam(name="sortCol", default="createdAt", description="Sort columns, valid values are [ticket|type|status|createdAt|terminatedAt]")
-     * @QueryParam(name="sortDir", default="DESC", description="Sort direction, valid values are [ASC|DESC]")
-     * @QueryParam(name="criteria", description="Search criteria defined as array, valid array keys are [ticket|type|status|createdAt|terminatedAt]")
-     *
-     * @param ParamFetcherInterface $paramFetcher
-     * @return JobList
+     * @param Request $request
+     * @return Response
      */
-    public function cgetAction(ParamFetcherInterface $paramFetcher)
+    public function listAction(Request $request)
     {
-        $page       = $paramFetcher->get('page');
-        $sortColumn = $paramFetcher->get('sortCol');
-        $sortDir    = $paramFetcher->get('sortDir');
-        $limit      = $paramFetcher->get('limit');
+        $page       = $request->query->get('page', 1);
+        $sortColumn = $request->query->get('sortCol', 'createdAt');
+        $sortDir    = $request->query->get('sortDir', 'DESC');
+        $limit      = $request->query->get('limit', 10);
         $page       = (int)$page - 1;
         $offset     = ($page > 0) ? ($page) * $limit : 0;
-        $criteria   = $paramFetcher->get('criteria');
-
-        if (!$criteria) {
-            $criteria = [];
-        }
+        $criteria   = $request->query->get('criteria', array());
 
         $criteria = $this->filterCriteria($criteria);
 
-        $manager = $this->getEntityManager();
+        $manager = $this->getJobManager();
 
         $entities = $manager->findBy($criteria, [$sortColumn => $sortDir], $limit, $offset);
 
@@ -87,7 +66,7 @@ class JobController extends FOSRestController
         $list->setItems($entities);
         $list->setTotalCount($count);
 
-        return $list;
+        return $this->serialize($list);
     }
 
     /**
@@ -102,17 +81,16 @@ class JobController extends FOSRestController
      * )
      *
      * @param string $ticket
-     * @return JobInterface
+     * @return Response
      */
     public function getAction($ticket)
     {
         try {
-            return $this->getJobManager()->get($ticket);
+            return $this->serialize($this->getManager()->get($ticket));
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
     }
-
 
     /**
      * Adds a new job
@@ -127,15 +105,14 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @ParamConverter("job", converter="abc.job.param_converter")
-     * @Post("/jobs")
-     *
-     * @param Job $job
-     * @return JobInterface
+     * @param Request $request
+     * @return Response
      */
-    public function postAction(Job $job)
+    public function addAction(Request $request)
     {
-        return $this->getJobManager()->add($job);
+        $job = $this->deserializeJob($request);
+
+        return $this->serialize($this->getManager()->add($job));
     }
 
     /**
@@ -152,15 +129,14 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @ParamConverter("job", converter="abc.job.param_converter")
-     * @Put("/jobs")
-     *
-     * @param Job $job
-     * @return JobInterface|Form
+     * @param Request $request
+     * @return Response
      */
-    public function putAction(Job $job)
+    public function updateAction(Request $request)
     {
-        return $this->getJobManager()->update($job);
+        $job = $this->deserializeJob($request);
+
+        return $this->serialize($this->getManager()->update($job));
     }
 
     /**
@@ -175,15 +151,13 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @Post
-     *
      * @param string $ticket
-     * @return JobInterface
+     * @return Response
      */
     public function cancelAction($ticket)
     {
         try {
-            return $this->getJobManager()->cancel($ticket);
+            return $this->serialize($this->getManager()->cancel($ticket));
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
@@ -201,15 +175,13 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @Post
-     *
      * @param string $ticket
-     * @return JobInterface
+     * @return Response
      */
     public function restartAction($ticket)
     {
         try {
-            return $this->getJobManager()->restart($ticket);
+            return $this->serialize($this->getManager()->restart($ticket));
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
@@ -229,20 +201,38 @@ class JobController extends FOSRestController
      *   }
      * )
      *
-     * @Get
-     *
      * @param string $ticket
-     * @return array|LogInterface[]
+     * @return Response
      */
-    public function getLogsAction($ticket)
+    public function logsAction($ticket)
     {
         try {
-            return $this->getJobManager()->getLogs($ticket);
+            return $this->serialize($this->getManager()->getLogs($ticket));
         } catch (TicketNotFoundException $e) {
             throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
         }
     }
 
+    /**
+     * @param Request $request
+     * @return JobInterface|mixed
+     * @throws UnsupportedMediaTypeHttpException
+     * @throws BadRequestHttpException
+     */
+    protected function deserializeJob(Request $request)
+    {
+        try {
+            return $this->getSerializer()->deserialize(
+                json_encode($request->request->all(), true),
+                Job::class,
+                $request->getContentType()
+            );
+        } catch (UnsupportedFormatException $e) {
+            throw new UnsupportedMediaTypeHttpException($e->getMessage(), $e);
+        } catch (Exception $e) {
+            throw new BadRequestHttpException($e->getMessage(), $e);
+        }
+    }
 
     /**
      * @param $criteria
@@ -264,29 +254,5 @@ class JobController extends FOSRestController
         }
 
         return $criteria;
-    }
-
-    /**
-     * @return ManagerInterface
-     */
-    protected function getJobManager()
-    {
-        return $this->get('abc.job.manager');
-    }
-
-    /**
-     * @return JobManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        return $this->get('abc.job.job_manager');
-    }
-
-    /**
-     * @return SerializerInterface
-     */
-    protected function getSerializer()
-    {
-        return $this->get('jms_serializer');
     }
 }

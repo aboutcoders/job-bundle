@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <routes xmlns="http://symfony.com/schema/routing"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://symfony.com/schema/routing
-        http://symfony.com/schema/routing/routing-1.0.xsd">
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <import
-            resource="@AbcJobBundle/Controller/JobController.php"
-            type="rest"
-            prefix="/" />
+    <route id="abc_job_list" path="/jobs" methods="GET">
+        <default key="_controller">AbcJobBundle:Job:list</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_get" path="/jobs/{ticket}" methods="GET">
+        <default key="_controller">AbcJobBundle:Job:get</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_add" path="/jobs" methods="POST">
+        <default key="_controller">AbcJobBundle:Job:add</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_update" path="/jobs" methods="PUT">
+        <default key="_controller">AbcJobBundle:Job:update</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_cancel" path="/jobs/{ticket}/cancel" methods="POST">
+        <default key="_controller">AbcJobBundle:Job:cancel</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_restart" path="/jobs/{ticket}/restart" methods="POST">
+        <default key="_controller">AbcJobBundle:Job:restart</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
+    <route id="abc_job_logs" path="/jobs/{ticket}/logs" methods="GET">
+        <default key="_controller">AbcJobBundle:Job:logs</default>
+        <default key="_format">json</default>
+        <requirement key="_format">json</requirement>
+    </route>
+
 </routes>

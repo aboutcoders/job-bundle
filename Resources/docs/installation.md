@@ -66,6 +66,4 @@ public function registerBundles()
 
 If you want to use the REST-API make sure the following additional bundles are installed and configured:
 
-* [SensioFrameworkExtraBundle](http://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle)
-* [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle)
 * [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
