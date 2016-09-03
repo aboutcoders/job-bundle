@@ -36,6 +36,7 @@ abc_job:
         schedule_manager:           abc.job.schedule_manager.default
         schedule_iterator:          abc.job.schedule_iterator.default
         schedule_manager_iterator:  abc.job.schedule_manager_iterator.default
+        controller:                 abc.process_control.controller
         controller_factory:         abc.job.controller_factory.default
         queue_config:               abc.job.queue_config.default
         validator:                  validator

@@ -44,7 +44,9 @@ Please note that this bundle is still in development and thus we might need to c
 ### Mising Features For The Stable Release
 
 - Provide a TestCase for jobs
-- Add option to validate parameters inside job manager
+- Add option to validate parameters inside job manager (define add-validation-group, update-validation-group)
+- Make AbcResourceLockBundle optional
+- Make FOSRestBundle optional
 - Add option to force cancellation of a job
 - Add option to register custom handlers for job logs
 

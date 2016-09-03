@@ -20,12 +20,13 @@ use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface as LoggerFactoryInterfa
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
-use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
+use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Manager
@@ -78,9 +79,14 @@ class Manager implements ManagerInterface
     protected $helper;
 
     /**
-     * @var LockManagerInterface
+     * @var LockInterface
      */
     protected $locker;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
 
     /**
      * @var LoggerInterface
@@ -95,7 +101,8 @@ class Manager implements ManagerInterface
      * @param LogManagerInterface      $logManager
      * @param EventDispatcherInterface $eventDispatcher
      * @param JobHelper                $helper
-     * @param LockManagerInterface     $locker
+     * @param LockInterface            $locker
+     * @param ValidatorInterface|null  $validator
      * @param LoggerInterface|null     $logger
      */
     public function __construct(
@@ -106,7 +113,8 @@ class Manager implements ManagerInterface
         LogManagerInterface $logManager,
         EventDispatcherInterface $eventDispatcher,
         JobHelper $helper,
-        LockManagerInterface $locker,
+        LockInterface $locker,
+        ValidatorInterface $validator = null,
         LoggerInterface $logger = null)
     {
         $this->registry      = $registry;
@@ -117,6 +125,7 @@ class Manager implements ManagerInterface
         $this->dispatcher    = $eventDispatcher;
         $this->helper        = $helper;
         $this->locker        = $locker;
+        $this->validator     = $validator;
         $this->logger        = $logger == null ? new NullLogger() : $logger;
     }
 
@@ -152,6 +161,10 @@ class Manager implements ManagerInterface
     {
         if (!$this->registry->has($job->getType())) {
             throw new \InvalidArgumentException(sprintf('A job of type "%s" is not registered', $job->getType()));
+        }
+
+        if(null != $this->validator) {
+            $this->validator->validate($job);
         }
 
         if (!$this->jobManager->isManagerOf($job)) {
@@ -242,7 +255,6 @@ class Manager implements ManagerInterface
             return;
         }
         try {
-            //check if job is not running
             $this->locker->lock($this->getLockName($job));
         } catch (LockException $e) {
             $this->logger->warning('Job {job} is already running: {exception}', ['job' => $job, 'exception' => $e]);
@@ -330,7 +342,7 @@ class Manager implements ManagerInterface
     {
         if (!$this->jobManager->isManagerOf($job)) {
             $managedJob = $this->findJob($job->getTicket());
-            $job = $this->helper->copyJob($job, $managedJob);
+            $job        = $this->helper->copyJob($job, $managedJob);
         }
 
         $this->jobManager->save($job);

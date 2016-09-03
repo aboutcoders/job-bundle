@@ -25,7 +25,7 @@
         <service id="abc.job.queue.bernard.controlled_consumer" class="Abc\Bundle\JobBundle\Adapter\Bernard\ControlledConsumer" public="true">
             <argument type="service" id="bernard.router" />
             <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="abc.process_control.controller"/>
+            <argument type="service" id="abc.job.controller"/>
         </service>
 
     </services>

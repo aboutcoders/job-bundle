@@ -33,16 +33,11 @@ final class ConfigurationCheckPass implements CompilerPassInterface
         }
 
         // AbcSchedulerBundle
-        if(!$container->has('abc.process_control.controller')) {
-            throw new \RuntimeException('You need to enable the AbcProcessControlBundle');
-        }
-
-        // AbcSchedulerBundle
         if(!$container->has('abc.scheduler.scheduler')) {
             throw new \RuntimeException('You need to enable the AbcSchedulerBundle');
         }
 
-        // AbcSchedulerBundle
+        // AbcResourceLockBundle
         if(!$container->hasParameter('abc.resource_lock.model.resource_lock.class')) {
             throw new \RuntimeException('You need to enable the AbcResourceLockBundle');
         }

@@ -35,6 +35,7 @@ use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -83,6 +84,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     private $locker;
 
     /**
+     * @var ValidatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $validator;
+
+    /**
      * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $logger;
@@ -107,6 +113,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher    = $this->getMock(EventDispatcherInterface::class);
         $this->helper        = $this->getMockBuilder(JobHelper::class)->disableOriginalConstructor()->getMock();
         $this->locker        = $this->getMock(LockManagerInterface::class);
+        $this->validator     = $this->getMock(ValidatorInterface::class);
         $this->logger        = $this->getMock(LoggerInterface::class);
         $this->producer      = $this->getMock(ProducerInterface::class);
 
@@ -122,6 +129,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             $this->dispatcher,
             $this->helper,
             $this->locker,
+            $this->validator,
             $this->logger
         );
 
@@ -275,7 +283,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
             ->with($job->getTicket())
-                ->willReturn($job);
+            ->willReturn($job);
 
         $this->helper->expects($this->once())
             ->method('updateJob')
@@ -905,6 +913,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 $this->dispatcher,
                 $this->helper,
                 $this->locker,
+                $this->validator,
                 $this->logger
             ])
             ->setMethods($mockedMethods)

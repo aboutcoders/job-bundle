@@ -6,7 +6,7 @@
     <services>
 
         <service id="abc.job.schedule_iterator.default" class="Abc\Bundle\SchedulerBundle\Iterator\ControlledScheduleIterator" public="false">
-            <argument type="service" id="abc.process_control.controller" />
+            <argument type="service" id="abc.job.controller" />
             <argument type="service" id="abc.job.schedule_manager_iterator"/>
             <tag name="abc.scheduler.iterator"/>
         </service>

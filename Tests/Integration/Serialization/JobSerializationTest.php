@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Integration\Serializer;
+namespace Abc\Bundle\JobBundle\Tests\Integration\Serialization;
 
 use Abc\Bundle\EnumSerializerBundle\Serializer\Handler\EnumHandler;
 use Abc\Bundle\JobBundle\Job\JobType;

@@ -11,13 +11,14 @@
 namespace Abc\Bundle\JobBundle\Model;
 
 use Abc\Bundle\JobBundle\Job\Status;
+use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\PostDeserialize;
 use JMS\Serializer\Annotation\SerializedName;
 use JMS\Serializer\Annotation\Type;
-use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -25,8 +26,10 @@ use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
 class Job implements JobInterface
 {
     /**
-     * @var string
+     * @Assert\Blank(groups={"add"})
+     * @Assert\NotBlank(groups={"update"})
      * @Type("string")
+     * @var string
      */
     protected $ticket;
 

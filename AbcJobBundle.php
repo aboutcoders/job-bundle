@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle;
 
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\ConfigurationCheckPass;
+use Abc\Bundle\JobBundle\DependencyInjection\Compiler\ControllerConfigurationPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterJobsPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterEventListenersPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
@@ -29,6 +30,7 @@ class AbcJobBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new ConfigurationCheckPass());
+        $container->addCompilerPass(new ControllerConfigurationPass());
         $container->addCompilerPass(new RegisterJobsPass());
         $container->addCompilerPass(new RegisterEventListenersPass());
 

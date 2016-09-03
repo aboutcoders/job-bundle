@@ -10,8 +10,10 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection;
 
+use Abc\ProcessControl\NullController;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -28,21 +30,15 @@ class AbcJobExtension extends Extension
     {
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config/services'));
+        $loader        = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config/services'));
 
         foreach ($config['service'] as $key => $service) {
             if (null !== $service) {
-                $container->setAlias('abc.job.'.$key, $service);
+                $container->setAlias('abc.job.' . $key, $service);
             }
         }
 
-        if ('custom' !== $config['db_driver']) {
-            $loader->load(sprintf('%s.xml', $config['db_driver']));
-        }
-
-        if ('custom' !== $config['adapter']) {
-            $loader->load(sprintf('adapter_%s.xml', $config['adapter']));
-        }
+        $container->setParameter('abc.job.controller_service', $config['service']['controller']);
 
         $this->remapParametersNamespaces(
             $config,
@@ -78,19 +74,38 @@ class AbcJobExtension extends Extension
             )
         );
 
-        $loader->load('agent.xml');
-        $loader->load('manager.xml');
-        $loader->load('schedule.xml');
-        $loader->load('listener.xml');
-        $loader->load('metadata.xml');
-        $loader->load('process_control.xml');
-        $loader->load('validator.xml');
-        $loader->load('commands.xml');
-        $loader->load('serializer.xml');
+        if ('custom' !== $config['db_driver']) {
+            $loader->load(sprintf('%s.xml', $config['db_driver']));
+        }
 
+        if ('custom' !== $config['adapter']) {
+            $loader->load(sprintf('adapter_%s.xml', $config['adapter']));
+        }
+
+        $this->loadManager($config, $loader, $container);
         $this->loadRest($config, $loader, $container);
         $this->loadDefaultJobs($config, $loader, $container);
         $this->loadLogger($config, $loader, $container);
+
+        $loader->load('agent.xml');
+        $loader->load('scheduler.xml');
+        $loader->load('validator.xml');
+        $loader->load('commands.xml');
+        $loader->load('serializer.xml');
+    }
+
+    /**
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     * @param ContainerBuilder $container
+     */
+    private function loadManager(array $config, XmlFileLoader $loader, ContainerBuilder $container)
+    {
+        $loader->load('registry.xml');
+        $loader->load('manager.xml');
+        $loader->load('listener.xml');
+
+        $container->getDefinition('abc.job.manager.default')->replaceArgument(8, !$config['manager']['validate'] ? null : new Reference('abc.job.validator'));
     }
 
     /**
@@ -129,7 +144,7 @@ class AbcJobExtension extends Extension
     {
         $container->setParameter('abc.job.rest', $config['rest']['enable']);
 
-        if ($config['rest']) {
+        if ($config['rest']['enable']) {
             $loader->load('job_param_converter.xml');
         }
 

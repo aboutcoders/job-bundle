@@ -19,6 +19,7 @@
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="abc.job.helper"/>
             <argument type="service" id="abc.job.lock_manager"/>
+            <argument/>
             <argument type="service" id="logger" on-invalid="null"/>
             <call method="setProducer">
                 <argument type="service" id="abc.job.producer"/>
@@ -40,25 +41,12 @@
             <argument type="service" id="abc.job.logger.factory"/>
         </service>
 
-        <service id="abc.job.registry" class="Abc\Bundle\JobBundle\Job\JobTypeRegistry" public="false">
-            <argument type="service" id="abc.job.metadata_factory"/>
-            <argument type="service" id="abc.job.queue_config" />
-        </service>
-
-        <service id="abc.job.queue_config.default" class="Abc\Bundle\JobBundle\Job\Queue\QueueConfig" public="true">
-            <argument>%abc.job.queue_config%</argument>
-            <argument>%abc.job.default_queue%</argument>
-        </service>
-
-        <service id="abc.job.type.prototype" class="Abc\Bundle\JobBundle\Job\JobType" abstract="false">
-            <!-- serviceId -->
-            <argument/>
-            <!-- type -->
-            <argument/>
-            <!-- callable -->
-            <argument/>
-            <!-- level -->
-            <argument/>
+        <service id="abc.job.controller_factory.default" class="Abc\Bundle\JobBundle\Job\ProcessControl\Factory" public="true">
+            <argument type="service" id="abc.job.job_manager"/>
+            <argument>%abc.job.controller.refresh_interval%</argument>
+            <call method="addController">
+                <argument type="service" id="abc.job.controller" on-invalid="null"/>
+            </call>
         </service>
 
     </services>
