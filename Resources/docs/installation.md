@@ -12,10 +12,11 @@ Make sure the following bundles are installed and configured:
 
 ## Install Message Queue Bundle
 
-The AbcJobBundle supports the following message queue backends by integrating with the following two bundles:
- 
-* [BernardBundle](https://github.com/bernardphp/BernardBundle) (Experimental)
-* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
+The AbcJobBundle supports multiple message queue backends by providing adapters for the following bundles:
+
+* [BernardBundle](https://github.com/bernardphp/BernardBundle)
+* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle).
+
 
 | Backend            | Sonata | Bernard |
 |--------------------|--------|---------|
@@ -27,19 +28,17 @@ The AbcJobBundle supports the following message queue backends by integrating wi
 | Iron MQ            |        |    x    |
 | Pheanstalk         |        |    x    |
 
-Please choose the preferred backend and install the corresponding bundle.
+Please install the bundle fr the preferred backend.
  
-### BernardBundle
+### Install BernardBundle
 
-The stable version of the [BernardBundle](https://github.com/bernardphp/BernardBundle) does not support Symfony 3 yet. If you want to setup the bundle in a Symfony 3 project you have to install the BernardBundle using the master branch.
- 
-### SonataNotificationBundle
- 
-In case you are decided to use [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle) please install the following additional bundle:
- 
-* [AbcNotificationBundle](https://github.com/aboutcoders/notification-bundle)
+Please follow the installation instructions of the  [BernardBundle](https://github.com/bernardphp/BernardBundle).
 
-The [AbcNotificationBundle](https://github.com/aboutcoders/notification-bundle) inherits from the [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle) to integrate [process control](https://github.com/aboutcoders/process-control-bundle) and thereby support starting and stopping the queue processing in a controlled way. This is especially helpful in a continuous deployment setup.
+__Note:__ If you want using Symfony 3, you have to install the [BernardBundle](https://github.com/bernardphp/BernardBundle) from the master branch. Otherwise you can use the latest stable version.
+ 
+### Install SonataNotificationBundle
+
+Please follow the installation instructions of the [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle).
 
 ## Install AbcJobBundle
 

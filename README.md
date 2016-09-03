@@ -1,7 +1,7 @@
 AbcJobBundle
 ============
 
-A symfony bundle to process methods asynchronously as jobs by simply annotating the method and registering the class as a service within the service container.
+A symfony bundle to process jobs asynchronously by simply annotating a method and registering the class within the service container.
 
 Build Status: [![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?branch=master)](https://travis-ci.org/aboutcoders/job-bundle)
 
@@ -10,10 +10,11 @@ Build Status: [![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?
 This bundle provides the following features:
 
 - Asynchronous execution of jobs
-- Cancel, Update, Restart jobs
-- Repeated execution of jobs with schedules
+- Status information about jobs
+- Functionality to cancel, update, restart a job
+- Repeated execution of jobs with schedules (cron based expressions)
 - JSON REST-Api
-- Supported message queue backends:
+- Support for multiple message queue systems:
   - Doctrine DBAL
   - PhpAmqp / RabbitMQ
   - InMemory
@@ -37,14 +38,16 @@ Please note that this bundle is still in development and thus we might need to c
 - [Cancel Jobs](./Resources/docs/cancel-jobs.md)
 - [Runtime Parameters](./Resources/docs/runtime-parameters.md)
 - [Logging](./Resources/docs/logging.md)
+- [Process Control](./Resources/docs/process-control.md)
 - [Lifecycle Events](./Resources/docs/lifecycle-events.md)
+- [Clustered Environment](./Resources/docs/clustered-environment.md)
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ### Mising Features For The Stable Release
 
 - Provide a TestCase for jobs
-- Add option to validate parameters inside job manager (define add-validation-group, update-validation-group)
+- Add validator (define add-validation-group, update-validation-group)
 - Make FOSRestBundle optional
 - Add option to force cancellation of a job
 - Add option to register custom handlers for job logs
