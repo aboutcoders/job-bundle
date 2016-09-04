@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="abc.job.model.job.class">Abc\Bundle\JobBundle\Entity\Job</parameter>
         <parameter key="abc.job.model.schedule.class">Abc\Bundle\JobBundle\Entity\Schedule</parameter>
+        <parameter key="abc.job.asdasdasd">default</parameter>
     </parameters>
 
     <services>

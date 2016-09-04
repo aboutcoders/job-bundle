@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
+use Gedmo\Timestampable\TimestampableListener;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -22,9 +23,15 @@ class RegisterDoctrineListenerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if ('orm' == $container->getParameter('abc.job.db_driver')) {
-            $definition = $container->register('gedmo.listener.timestampable', 'Gedmo\Timestampable\TimestampableListener');
-            $definition->addMethodCall('setAnnotationReader', [new Reference('annotation_reader')]);
-            $definition->addTag('doctrine.event_subscriber', ['connection' => 'sdfsdf']);
+
+            $connection = $container->getParameter('abc.job.connection');
+
+            $listener = $container->register('gedmo.listener.timestampable', TimestampableListener::class);
+            $listener->addMethodCall('setAnnotationReader', [new Reference('annotation_reader')]);
+            $listener->addTag('doctrine.event_subscriber', ['connection' => $connection]);
+
+            $em = $container->getDefinition(sprintf('doctrine.dbal.%s_connection.event_manager', $container->getParameter('abc.job.connection')));
+            $em->addMethodCall('addEventSubscriber', array($listener));
         }
     }
 }

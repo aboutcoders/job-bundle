@@ -28,10 +28,6 @@ doctrine:
             abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
 ```
 
-### Register GDMO Timestampable
-
-The bundle makes use of the GDMO Timestampable behavior. There are different approaches on how you can set up this behavior. Please refer to the [official symfony documentation](http://symfony.com/doc/current/cookbook/doctrine/common_extensions.html) and follow the instructions there.
-
 ### Import AbcJobBundle routing files (Optional)
 
 If you want to enable the JSON REST-API you have to import the routing files.

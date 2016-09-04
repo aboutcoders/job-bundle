@@ -1,5 +1,5 @@
 imports:
-    - { resource: services_dedicated_connection.yml }
+    - { resource: services.yml }
 
 framework:
     secret: Hell yeah!
