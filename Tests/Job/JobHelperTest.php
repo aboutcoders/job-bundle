@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\JobHelper;
 use Abc\Bundle\JobBundle\Job\Status;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
@@ -24,7 +24,7 @@ use Psr\Log\NullLogger;
 class JobHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $loggerFactory;
 
@@ -35,7 +35,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->loggerFactory = $this->getMock(FactoryInterface::class);
+        $this->loggerFactory = $this->getMock(LoggerFactoryInterface::class);
 
         $this->subject = new JobHelper($this->loggerFactory);
     }

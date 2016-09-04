@@ -22,7 +22,7 @@ use Abc\Bundle\JobBundle\Job\ProcessControl\Factory;
 use Abc\Bundle\JobBundle\Job\ProcessControl\JobController;
 use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Listener\ScheduleListener;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
@@ -87,7 +87,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.job_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],
             ['abc.job.listener.schedule', ScheduleListener::class],
-            ['abc.job.logger.factory', FactoryInterface::class],
+            ['abc.job.logger.factory', LoggerFactoryInterface::class],
             ['abc.job.log_manager', LogManagerInterface::class],
             ['abc.job.mailer', Mailer::class],
             ['abc.job.manager', ManagerInterface::class],

@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Logger\Factory;
+namespace Abc\Bundle\JobBundle\Logger;
 
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Psr\Log\LoggerInterface;
@@ -18,18 +18,11 @@ use Psr\Log\LoggerInterface;
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-interface FactoryInterface
+interface LoggerFactoryInterface
 {
     /**
      * @param JobInterface $job
      * @return LoggerInterface
      */
     public function create(JobInterface $job);
-
-    /**
-     * @param $callable
-     * @return void
-     * @throws \InvalidArgumentException
-     */
-    public function addProcessor($callable);
 }

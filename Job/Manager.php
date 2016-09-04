@@ -16,7 +16,7 @@ use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface as LoggerFactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface as LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Event\JobEvents;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Manager
+ * The job manager
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @author Wojciech Ciolko <wojciech.ciolko@aboutcoders.com>

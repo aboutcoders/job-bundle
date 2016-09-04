@@ -10,14 +10,15 @@
 
     <services>
 
+        <service id="abc.job.logger.storage_handler_factory" class="Abc\Bundle\JobBundle\Logger\Handler\OrmHandlerFactory" public="false">
+            <argument>%abc.job.logger.storage.level%</argument>
+            <argument>%abc.job.logger.storage.bubble%</argument>
+            <argument type="service" id="abc.job.log_manager"/>
+        </service>
+
         <service id="abc.job.log_manager" class="Abc\Bundle\JobBundle\Entity\LogManager" public="true">
             <argument type="service" id="abc.job.entity_manager"/>
             <argument>%abc.job.model.log.class%</argument>
-        </service>
-
-        <service id="abc.job.logger.factory" class="Abc\Bundle\JobBundle\Logger\Factory\OrmLoggerFactory" public="true">
-            <argument type="service" id="abc.job.registry"/>
-            <argument type="service" id="abc.job.log_manager"/>
         </service>
 
         <service id="abc.job.logger_entity_manager" class="Doctrine\ORM\EntityManager" public="false">

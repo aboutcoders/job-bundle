@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="abc.job.logger.factory" class="Abc\Bundle\JobBundle\Logger\LoggerFactory" public="true">
+            <argument type="service" id="abc.job.registry"/>
+            <argument type="service" id="abc.job.logger.handler_factory"/>
+        </service>
+
+        <service id="abc.job.logger.handler_factory" class="Abc\Bundle\JobBundle\Logger\Handler\HandlerFactory" public="false">
+            <call method="addFactory">
+                <argument type="service" id="abc.job.logger.storage_handler_factory"/>
+            </call>
+        </service>
+
+    </services>
+
+</container>

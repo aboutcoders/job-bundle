@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Logger;
+namespace Abc\Bundle\JobBundle\Logger\Manager;
 
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\LogManagerInterface;
@@ -87,6 +87,6 @@ class FileLogManager implements LogManagerInterface
      */
     private function buildPath($filename)
     {
-        return $this->directory . DIRECTORY_SEPARATOR . $filename . '.log';
+        return $this->directory . DIRECTORY_SEPARATOR . $filename . '.json';
     }
 }

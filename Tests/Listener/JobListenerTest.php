@@ -14,7 +14,7 @@ use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Listener\JobListener;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Psr\Log\NullLogger;
 
@@ -29,9 +29,10 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
     private $manager;
 
     /**
-     * @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $factory;
+
     /**
      * @var JobListener
      */
@@ -40,7 +41,7 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->manager = $this->getMock(ManagerInterface::class);
-        $this->factory = $this->getMock(FactoryInterface::class);
+        $this->factory = $this->getMock(LoggerFactoryInterface::class);
         $this->subject = new JobListener($this->manager, $this->factory);
     }
 

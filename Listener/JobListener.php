@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Listener;
 
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 
 /**
  * Registers the default runtime parameters "manager" and "logger".
@@ -27,15 +27,15 @@ class JobListener
     private $manager;
 
     /**
-     * @var FactoryInterface
+     * @var LoggerFactoryInterface
      */
     private $factory;
 
     /**
-     * @param ManagerInterface $manager
-     * @param FactoryInterface $factory
+     * @param ManagerInterface       $manager
+     * @param LoggerFactoryInterface $factory
      */
-    function __construct(ManagerInterface $manager, FactoryInterface $factory)
+    function __construct(ManagerInterface $manager, LoggerFactoryInterface $factory)
     {
         $this->manager = $manager;
         $this->factory    = $factory;

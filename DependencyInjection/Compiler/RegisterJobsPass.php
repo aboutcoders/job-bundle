@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
+use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -35,7 +36,7 @@ class RegisterJobsPass implements CompilerPassInterface
      * Constructor.
      *
      * @param string $registryService Service name of the definition registry in processed container
-     * @param string $jobTag The tag name used for jobs
+     * @param string $jobTag          The tag name used for jobs
      */
     public function __construct($registryService = 'abc.job.registry', $jobTag = 'abc.job')
     {
@@ -48,44 +49,29 @@ class RegisterJobsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if(!$container->hasDefinition($this->registryService) && !$container->hasAlias($this->registryService))
-        {
+        if (!$container->hasDefinition($this->registryService) && !$container->hasAlias($this->registryService)) {
             return;
         }
 
-        $defaultLogLevel = $container->getParameter('abc.job.logging.default_level');
-        $customLogLevels = $container->getParameter('abc.job.logging.custom_level');
+        $customLogLevels = $container->getParameter('abc.job.logging.level');
         $registry        = $container->findDefinition('abc.job.registry');
 
-        foreach($container->findTaggedServiceIds($this->jobTag) as $id => $tags)
-        {
+        foreach ($container->findTaggedServiceIds($this->jobTag) as $id => $tags) {
             $def = $container->getDefinition($id);
-            if(!$def->isPublic())
-            {
+            if (!$def->isPublic()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must be public as jobs are lazy-loaded.', $id));
             }
 
-            foreach($tags as $tag)
-            {
-                if(!isset($tag['type']))
-                {
+            foreach ($tags as $tag) {
+                if (!isset($tag['type'])) {
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "type" attribute on "%s" tags.', $id, $this->jobTag));
                 }
 
-                if(!isset($tag['method']))
-                {
+                if (!isset($tag['method'])) {
                     throw new \InvalidArgumentException(sprintf('Service "%s" must define the "method" attribute on "%s" tags.', $id, $this->jobTag));
                 }
 
-                /*if(isset($tag['formType']) &&  method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix') && !class_exists($tag['formType']))
-                {
-                    throw new \InvalidArgumentException(
-                        sprintf('The form "%s" specified in the tag "%s" of the service "%s" does not exist.', $tag['formType'], $this->jobTag, $id)
-                    );
-                }*/
-
-                $logLevel  = isset($customLogLevels[$tag['type']]) ? $customLogLevels[$tag['type']] : $defaultLogLevel;
-                $logLevel  = $this->levelToMonologConst($logLevel);
+                $logLevel  = isset($customLogLevels[$tag['type']]) ? $this->levelToMonologConst($customLogLevels[$tag['type']]) : null;
                 $jobTypeId = 'abc.job.type.' . $tag['type'];
 
                 $definition = $this->createType(
@@ -103,7 +89,7 @@ class RegisterJobsPass implements CompilerPassInterface
         }
 
         // there as a reason this listener was registered here, what was it?
-        if($container->hasParameter('abc.job.adapter') && $container->getParameter('abc.job.adapter') == 'sonata') {
+        if ($container->hasParameter('abc.job.adapter') && $container->getParameter('abc.job.adapter') == 'sonata') {
             $pass = new RegisterSonataListenersPass();
             $pass->process($container);
         }
@@ -137,6 +123,6 @@ class RegisterJobsPass implements CompilerPassInterface
      */
     private function levelToMonologConst($level)
     {
-        return is_int($level) ? $level : constant('Monolog\Logger::' . strtoupper($level));
+        return is_int($level) ? $level : constant(Logger::class . '::' . strtoupper($level));
     }
 }

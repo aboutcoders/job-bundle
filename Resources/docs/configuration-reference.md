@@ -22,13 +22,25 @@ abc_job:
         enable: true                # Set to false to disable loading of REST API related services
         validate: false             # Set to true to enable validation of jobs (ignored if validation for manager is enabled)
     logging:                        
-        handler: file               # Choose "orm" if you want to store job logs in the database instead of files
-        directory: 'path/to/dir'    # The directory where job logs are saved (ignored if handler is "orm")
-        default_level: info         # The default log level of all jobs, choose one of [debug|info|notice|warning|error|critical|alert]
-        custom_level:               
-            my_job_type: debug      # sets log level for a specific job type
-        processor:
-            - my_service_id         # An array of service ids of processors
+        storage_handler:
+            type: file         # Choose "orm" if you want to store job logs in the database instead of files
+            path: %kernel.logs_dir% # The directory where the json encoded logs are stored (ignored if handler is "orm")
+            level: info             # The minimum logging level
+            bubble: FALSE           # Whether the messages that are handled can bubble up the stack or not
+            processor:
+                - my_processor_id   # An array of service ids of additional processors to register
+        stream_handler:             # If defined a standard stream handler will be registered
+            path: %kernel.logs_dir% # The directory where log files are stored
+            level: ERROR            # The minimum logging level
+            bubble: false           # Whether the messages that are handled can bubble up the stack or not
+            formatter: ~            # Set a different formatter than LineFormattter
+            processor:
+                - my_processor_id   # An array of service ids of additional processors to register
+        handler:
+            - my_handler_id         # An array of service ids of additional handlers to register
+        level:               
+            my_job_type: DEBUG      # sets log level for a specific job type
+        
     service:
         manager:                    abc.job.manager.default
         job_manager:                abc.job.job_manager.default

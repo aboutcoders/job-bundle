@@ -8,9 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Logger;
+namespace Abc\Bundle\JobBundle\Tests\Logger\Manager;
 
-use Abc\Bundle\JobBundle\Logger\FileLogManager;
+use Abc\Bundle\JobBundle\Logger\Manager\FileLogManager;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -128,7 +128,7 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function buildFilename(JobInterface $job)
     {
-        return $this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.log';
+        return $this->directory . DIRECTORY_SEPARATOR . $job->getTicket() . '.json';
     }
 
     private function setUpDirectory($path)

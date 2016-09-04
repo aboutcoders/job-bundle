@@ -77,5 +77,5 @@ abc_job:
     adapter: sonata
     register_default_jobs: true
     logging:
-        default_level: debug
-        handler: orm
+        storage_handler:
+            type: orm               # Choose "orm" if you want to store job logs in the database instead of files

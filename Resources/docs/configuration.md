@@ -147,7 +147,7 @@ You can configure a specific log level for each job.
 # app/config/config.yml
 abc_job:
     logging:
-        custom_level:
+        level:
             my_job: debug
 ```
 

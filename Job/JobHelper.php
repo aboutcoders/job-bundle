@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Job;
 
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\JobInterface as EntityJobInterface;
 use Psr\Log\LoggerInterface;
 
@@ -22,14 +22,14 @@ use Psr\Log\LoggerInterface;
 class JobHelper
 {
     /**
-     * @var FactoryInterface
+     * @var LoggerFactoryInterface
      */
     protected $loggerFactory;
 
     /**
-     * @param FactoryInterface $loggerFactory
+     * @param LoggerFactoryInterface $loggerFactory
      */
-    function __construct(FactoryInterface $loggerFactory)
+    function __construct(LoggerFactoryInterface $loggerFactory)
     {
         $this->loggerFactory = $loggerFactory;
     }

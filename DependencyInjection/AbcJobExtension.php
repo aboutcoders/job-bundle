@@ -10,10 +10,9 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection;
 
-use Abc\ProcessControl\NullController;
+use Monolog\Logger;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -117,24 +116,50 @@ class AbcJobExtension extends Extension
      */
     private function loadLogger(array $config, XmlFileLoader $loader, ContainerBuilder $container)
     {
-        if ('custom' !== $config['logging']['handler']) {
-            $loader->load('logger_' . $config['logging']['handler'] . '.xml');
+        $storageConfig = $config['logging']['storage_handler'];
 
-            if ('orm' == $config['logging']['handler']) {
-                $container->setParameter('abc.job.register_mapping.' . $config['db_driver'], true);
-            }
+        $loader->load('logger.xml');
+        $loader->load('logger_storage_' . $storageConfig['type'] . '.xml');
+
+        if ('orm' == $storageConfig['type']) {
+            $container->setParameter('abc.job.register_mapping.' . $config['db_driver'], true);
+        } elseif('file' == $storageConfig['type']) {
+            $container->setParameter('abc.job.logger.storage.path', $storageConfig['path']);
         }
 
-        if (!empty($config['logging']['processor'])) {
-            $factory = $container->getDefinition('abc.job.logger.factory');
+        $container->setParameter('abc.job.logger.storage.level', $this->levelToMonologConst($storageConfig['level']));
+        $container->setParameter('abc.job.logger.storage.bubble', $storageConfig['bubble']);
 
-            foreach ($config['logging']['processor'] as $serviceId) {
-                $factory->addMethodCall('addProcessor', array(new Reference($serviceId)));
-            }
+        $definition = $container->getDefinition('abc.job.logger.storage_handler_factory');
+        foreach ($storageConfig['processor'] as $processor) {
+            $definition->addMethodCall('setProcessor', [new Reference($processor)]);
         }
 
-        $container->setParameter('abc.job.logging.default_level', $config['logging']['default_level']);
-        $container->setParameter('abc.job.logging.custom_level', $config['logging']['custom_level']);
+        if (isset($config['logging']['stream_handler'])) {
+            $loader->load('logger_stream.xml');
+            $streamConfig = $config['logging']['stream_handler'];
+            $container->setParameter('abc.job.logger.stream.path', $streamConfig['path']);
+            $container->setParameter('abc.job.logger.stream.level', $this->levelToMonologConst($streamConfig['level']));
+            $container->setParameter('abc.job.logger.stream.bubble', $streamConfig['bubble']);
+            if(isset($streamConfig['formatter'])) {
+                $container->setAlias('abc.job.logger.stream.formatter', $streamConfig['formatter']);
+            }
+
+            $definition = $container->getDefinition('abc.job.logger.stream_handler_factory');
+            foreach ($streamConfig['processor'] as $processor) {
+                $definition->addMethodCall('setProcessor', [new Reference($processor)]);
+            }
+
+            $definition = $container->getDefinition('abc.job.logger.handler_factory');
+            $definition->addMethodCall('addFactory', [new Reference('abc.job.logger.stream_handler_factory')]);
+        }
+
+        foreach ($config['logging']['handler'] as $handler) {
+            $definition = $container->getDefinition('abc.job.logger.factory');
+            $definition->addMethodCall('addHandler', [new Reference($handler)]);
+        }
+
+        $container->setParameter('abc.job.logging.level', $config['logging']['level']);
     }
 
     /**
@@ -205,5 +230,14 @@ class AbcJobExtension extends Extension
                 }
             }
         }
+    }
+
+    /**
+     * @param $level
+     * @return int|mixed
+     */
+    private function levelToMonologConst($level)
+    {
+        return is_int($level) ? $level : constant(Logger::class . '::' . strtoupper($level));
     }
 }

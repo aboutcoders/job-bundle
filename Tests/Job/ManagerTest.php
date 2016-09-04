@@ -23,7 +23,7 @@ use Abc\Bundle\JobBundle\Job\Manager;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Status;
-use Abc\Bundle\JobBundle\Logger\Factory\FactoryInterface;
+use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
@@ -59,7 +59,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     protected $invoker;
 
     /**
-     * @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $loggerFactory;
 
@@ -108,7 +108,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->registry      = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->jobManager    = $this->getMock(JobManagerInterface::class);
         $this->invoker       = $this->getMockBuilder(Invoker::class)->disableOriginalConstructor()->getMock();
-        $this->loggerFactory = $this->getMock(FactoryInterface::class);
+        $this->loggerFactory = $this->getMock(LoggerFactoryInterface::class);
         $this->logManager    = $this->getMock(LogManagerInterface::class);
         $this->dispatcher    = $this->getMock(EventDispatcherInterface::class);
         $this->helper        = $this->getMockBuilder(JobHelper::class)->disableOriginalConstructor()->getMock();

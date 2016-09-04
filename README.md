@@ -49,12 +49,11 @@ Please note that this bundle is still in development and thus we might need to c
 - Provide a TestCase for jobs
 - Add validator (define add-validation-group, update-validation-group)
 - Add option to force cancellation of a job
-- Add option to register custom handlers for job logs
+- Add consumer management
 
 ### Planned Features
 
-- Cleanup & document agent management
+- Integrate https://github.com/beberlei/metrics
 - Consider consumer management (start, stop, pause)
 - Utilize stopwatch
-- Monitoring
 - Support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
