@@ -29,7 +29,8 @@ class Configuration implements ConfigurationInterface
 
         $supportedDrivers = ['orm', 'custom'];
         $supportedAdapters = ['bernard', 'sonata', 'custom'];
-        $supportedLoggingStorages = ['file', 'orm', 'custom'];
+        $supportedLogStorages = ['file', 'orm', 'custom'];
+        $supportedLogLevels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert'];
 
         $rootNode
             ->children()
@@ -88,13 +89,19 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('type')
                                 ->defaultValue('file')
                                 ->validate()
-                                    ->ifNotInArray($supportedLoggingStorages)
-                                    ->thenInvalid('The storage type %s is not supported. Please choose one of ' . json_encode($supportedLoggingStorages))
+                                    ->ifNotInArray($supportedLogStorages)
+                                    ->thenInvalid('The storage type %s is not supported. Please choose one of ' . json_encode($supportedLogStorages))
                                 ->end()
                                 ->cannotBeEmpty()
                                 ->end()
                                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%')->end()
-                                ->scalarNode('level')->defaultValue('INFO')->end()
+                                ->scalarNode('level')
+                                    ->defaultValue('info')
+                                    ->validate()
+                                        ->ifNotInArray($supportedLogLevels)
+                                        ->thenInvalid('The level %s is not supported. Please choose one of ' . json_encode($supportedLogLevels))
+                                    ->end()
+                                ->end()
                                 ->booleanNode('bubble')->defaultValue(true)->end()
                                 ->arrayNode('processor')
                                     ->canBeUnset()
@@ -108,7 +115,13 @@ class Configuration implements ConfigurationInterface
                             ->canBeUnset()
                             ->children()
                                 ->scalarNode('path')->defaultValue('%kernel.logs_dir%')->end()
-                                ->scalarNode('level')->defaultValue('ERROR')->end()
+                                ->scalarNode('level')
+                                    ->defaultValue('info')
+                                    ->validate()
+                                        ->ifNotInArray($supportedLogLevels)
+                                        ->thenInvalid('The level %s is not supported. Please choose one of ' . json_encode($supportedLogLevels))
+                                    ->end()
+                                ->end()
                                 ->booleanNode('bubble')->defaultTrue()->end()
                                 ->scalarNode('formatter')->defaultNull()->end()
                                 ->arrayNode('processor')

@@ -106,40 +106,55 @@ sonata_notification:
 
 ### Logging
 
-#### Saving logs in the database
+The bundle provides dedicated logger for each job using the [monolog lobrary](http://symfony.com/doc/current/logging.html). Whenever a job is executed a dedicated handler referred to as `storage_handler` is created and [injected into the job](./logging.md). This handler preserves the original data structure of log records by storing the log entries either in the json format or in the database. 
 
-By default logs of jobs are written to files. In the production environment you might want to store the logs in the database instead. To do so you simply have to change the handler to `orm`:
+#### Storage Handler Configuration
 
-```yaml
-# app/config/config.yml
-abc_job:
-    logging:
-        handler: orm
-```
-
-#### Changing the directory where log files are stored
-
-By default log files are stored in the directory `%kernel.logs_dir%`. You can change the directory where log files are stored.
+You can choose whether to store logs on the filesystem or datbase, change the default log level, or assign custom processors:
 
 ```yaml
 # app/config/config.yml
 abc_job:
     logging:
-        directory: '/path/to/directory'
+        storage_handler:
+            type: file              # Choose "orm" if you want to store job logs in the database instead of files
+            path: %kernel.logs_dir% # The directory where the json encoded logs are stored (ignored if handler is "orm")
+            level: info             # The default log level
+            bubble: false           # Whether the messages that are handled can bubble up the stack or not
+            processor:
+                - my_processor_id   # An array of service ids of additional processors to register
 ```
 
-#### Changing the default log level of all jobs
+#### Stream Handler Configuration
 
-The default log level for all jobs is `info`. You can change the default level to the values `debug`, `info`, `notice`, `warning`, `error`, `critical` and `alert`.
+Besides the storage handler a regular stream handler can be enabled on top. This will create a regular log file for every job next to the logs that are stored on the filesystem or database by the storage_handler.
 
 ```yaml
 # app/config/config.yml
 abc_job:
     logging:
-        default_level: debug
+        stream_handler:             # If defined a standard stream handler will be registered
+            path: %kernel.logs_dir% # The directory where log files are stored
+            level: ERROR            # The minimum logging level
+            bubble: false           # Whether the messages that are handled can bubble up the stack or not
+            formatter: ~            # Set a different formatter than LineFormattter
+            processor:
+                - my_processor_id   # An array of service ids of additional processors to register
 ```
 
-#### Changing the log level of a specific job
+#### Registering Custom Handlers
+
+Besides the storage and log handler you can define additional handlers that will be registered in the logger.
+
+```yaml
+# app/config/config.yml
+abc_job:
+    logging:
+        handler:
+            - my_handler_id         # An array of service ids of additional handlers to register
+```
+
+#### Configuring a specific log level for a job
 
 You can configure a specific log level for each job.
 
@@ -151,21 +166,6 @@ abc_job:
             my_job: debug
 ```
 
-#### Register processors
-
-You can register custom processors for the job logger. To do so the processors must be registered as services within the service container and then referenced within the configuration.
-
-```yaml
-# app/config/config.yml
-abc_job:
-    logging:
-        processors:
-            - my_processor_id
-            - my_other_processor_id
-```
-
 #### Internal log channel
 
-Besides the dedicated logger for jobs the AbcJobBundle uses the default logger registered within the container.
-
-Besides the dedicated logger for jobs the bundle also uses the logger registered within the service container. This logger is configured to use the channel `abc.job`.
+Besides the dedicated logger for jobs the AbcJobBundle uses the default logger registered within the container. This logger is configured to use the channel `abc.job`.

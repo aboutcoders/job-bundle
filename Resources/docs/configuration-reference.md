@@ -26,12 +26,12 @@ abc_job:
             type: file         # Choose "orm" if you want to store job logs in the database instead of files
             path: %kernel.logs_dir% # The directory where the json encoded logs are stored (ignored if handler is "orm")
             level: info             # The minimum logging level
-            bubble: FALSE           # Whether the messages that are handled can bubble up the stack or not
+            bubble: false           # Whether the messages that are handled can bubble up the stack or not
             processor:
                 - my_processor_id   # An array of service ids of additional processors to register
         stream_handler:             # If defined a standard stream handler will be registered
             path: %kernel.logs_dir% # The directory where log files are stored
-            level: ERROR            # The minimum logging level
+            level: info            # The minimum logging level
             bubble: false           # Whether the messages that are handled can bubble up the stack or not
             formatter: ~            # Set a different formatter than LineFormattter
             processor:
@@ -39,7 +39,7 @@ abc_job:
         handler:
             - my_handler_id         # An array of service ids of additional handlers to register
         level:               
-            my_job_type: DEBUG      # sets log level for a specific job type
+            my_job_type: debug      # sets log level for a specific job type
         
     service:
         manager:                    abc.job.manager.default

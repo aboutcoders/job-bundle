@@ -49,3 +49,17 @@ class MyJob implements LoggerAwareInterface
     }
 }
 ```
+
+## Getting the logs of a job
+
+Use the following command to get to logs of a job:
+
+```php
+$records = $manager->getLogs($job->getTicket());
+```
+
+This will return an array of log entries that are available for this job.
+
+__Note:__ Internally, depending on the configuration, the logs are stored either on the filesystem in the JSON format or on the database. Thereby it is possible to preserve the original structure of a log record.
+
+Please refer to the chapter [Configuration](./configuration.md) to get information about store logs in the database instead of the filesystem, how to change log levels, register custom processors for formatters and more.
