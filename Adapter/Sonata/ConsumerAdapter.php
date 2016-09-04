@@ -91,7 +91,6 @@ class ConsumerAdapter implements ConsumerInterface
 
     protected function tick(BackendInterface $backend, array $options = [])
     {
-
         $this->configure($options);
 
         $iterator = $backend->getIterator();

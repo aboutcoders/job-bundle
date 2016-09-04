@@ -26,6 +26,8 @@ services:
 
     abc.job.log.processor:
         class: Monolog\Processor\PsrLogMessageProcessor
+        tags:
+            - { name: monolog.processor, handler: abc_job }
 
     agent_manager_mock:
         class: Abc\Bundle\JobBundle\Supervisor\AgentManager

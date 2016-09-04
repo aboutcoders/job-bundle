@@ -13,6 +13,8 @@ namespace Abc\Bundle\JobBundle\Listener;
 use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Registers the default runtime parameters "manager" and "logger".
@@ -32,13 +34,19 @@ class JobListener
     private $factory;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param ManagerInterface       $manager
      * @param LoggerFactoryInterface $factory
      */
-    function __construct(ManagerInterface $manager, LoggerFactoryInterface $factory)
+    function __construct(ManagerInterface $manager, LoggerFactoryInterface $factory, LoggerInterface $logger = null)
     {
         $this->manager = $manager;
-        $this->factory    = $factory;
+        $this->factory = $factory;
+        $this->logger  = $logger == null ? new NullLogger() : $logger;
     }
 
     /**
@@ -48,6 +56,13 @@ class JobListener
     public function onPreExecute(ExecutionEvent $event)
     {
         $event->getContext()->set('manager', $this->manager);
-        $event->getContext()->set('logger', $this->factory->create($event->getJob()));
+
+        $this->logger->debug('Added runtime parameter "manager" to context', ['manager' => $this->manager]);
+
+        $logger = $this->factory->create($event->getJob());
+
+        $event->getContext()->set('logger', $logger);
+
+        $this->logger->debug('Added runtime parameter "logger" to context', ['logger' => $logger]);
     }
 }

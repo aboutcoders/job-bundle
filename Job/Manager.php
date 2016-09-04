@@ -163,7 +163,7 @@ class Manager implements ManagerInterface
             throw new \InvalidArgumentException(sprintf('A job of type "%s" is not registered', $job->getType()));
         }
 
-        if(null != $this->validator) {
+        if (null != $this->validator) {
             $this->validator->validate($job);
         }
 
@@ -176,15 +176,10 @@ class Manager implements ManagerInterface
 
         $this->jobManager->save($job);
 
-        $this->logger->debug(
-            'Added job with ticket {ticket} of type {type} with parameters {parameters}, schedules {schedules}',
-            [
-                'ticket'     => $job->getTicket(),
-                'type'       => $job->getType(),
-                'parameters' => $job->getParameters(),
-                'schedules'  => $job->getSchedules()
-            ]
-        );
+        $this->logger->info(sprintf('Added job %s of type "%s"', $job->getTicket(), $job->getType()), [
+            'parameters' => $job->getParameters(),
+            'schedules'  => $job->getSchedules()
+        ]);
 
         if (!$job->hasSchedules()) {
             $this->publishJob($job->getType(), $job->getTicket());
@@ -198,8 +193,6 @@ class Manager implements ManagerInterface
      */
     public function cancel($ticket)
     {
-        $this->logger->debug('Cancel job with ticket {ticket}', ['ticket' => $ticket]);
-
         $job = $this->findJob($ticket);
 
         if (Status::isTerminated($job->getStatus())) {
@@ -207,13 +200,16 @@ class Manager implements ManagerInterface
         }
 
         $isProcessing = $job->getStatus() == Status::PROCESSING();
+        $status       = $isProcessing ? Status::CANCELLING() : Status::CANCELLED();
 
-        $this->helper->updateJob($job, $isProcessing ? Status::CANCELLING() : Status::CANCELLED());
+        $this->helper->updateJob($job, $status);
         $this->jobManager->save($job);
 
         if (!$isProcessing) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
-            $this->logger->info('Cancelled job with ticket {ticket}', ['ticket' => $job->getTicket()]);
+            $this->logger->info('Cancelled job ' . $job->getTicket());
+        } else {
+            $this->logger->info('Request cancellation of job ' . $job->getTicket());
         }
 
         return $job;
@@ -224,7 +220,7 @@ class Manager implements ManagerInterface
      */
     public function get($ticket)
     {
-        $this->logger->debug('Get job with ticket {ticket}', ['ticket' => $ticket]);
+        $this->logger->debug('Get job ' . $ticket);
 
         return $this->findJob($ticket);
     }
@@ -234,7 +230,7 @@ class Manager implements ManagerInterface
      */
     public function getLogs($ticket)
     {
-        $this->logger->debug('Get logs for ticket {ticket}', ['ticket' => $ticket]);
+        $this->logger->debug('Get logs of job ' . $ticket);
 
         return $this->logManager->findByJob($this->findJob($ticket));
     }
@@ -248,16 +244,14 @@ class Manager implements ManagerInterface
 
         if ($job->getStatus() == Status::PROCESSING() || $job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::ERROR()) {
 
-            $this->logger->debug('Skipped execution of job {ticket} because status is {status}', [
-                'ticket' => $job->getType(),
-                'status' => $job->getStatus()]);
+            $this->logger->notice(sprintf('Skipped execution of job %s (status: %s)', $job->getTicket(), $job->getStatus()));
 
             return;
         }
         try {
             $this->locker->lock($this->getLockName($job));
         } catch (LockException $e) {
-            $this->logger->warning('Job {job} is already running: {exception}', ['job' => $job, 'exception' => $e]);
+            $this->logger->warning('Failed to get lock for job ' . $job->getTicket());
 
             return;
         }
@@ -273,13 +267,9 @@ class Manager implements ManagerInterface
         $executionStart = microtime(true);
 
         try {
-            $this->logger->debug(
-                'Execute job of type {type} with ticket {ticket} and parameters {parameters}', [
-                    'type'       => $job->getType(),
-                    'ticket'     => $job->getTicket(),
-                    'parameters' => $job->getParameters()
-                ]
-            );
+            $this->logger->debug(sprintf('Execute job %s of type "%s"', $job->getTicket(), $job->getType()), [
+                'parameters' => $job->getParameters()
+            ]);
 
             // invoke the job
             $response = $this->invoker->invoke($job, $event->getContext());
@@ -301,7 +291,10 @@ class Manager implements ManagerInterface
 
             throw $e;
         } catch (\Exception $e) {
-            $this->logger->warning('Job execution {job} failed with the exception {exception}', ['job' => $job, 'exception' => $e]);
+            $this->logger->warning(sprintf('Failed to execute job %s (Error: $s)', $job->getTicket(), $e->getMessage()), [
+                'parameters' => $job->getParameters(),
+                'exception'  => $e
+            ]);
 
             if ($event->getContext()->has('logger')) {
                 $event->getContext()->get('logger')->error($e->getMessage(), ['exception' => $e]);
@@ -328,9 +321,9 @@ class Manager implements ManagerInterface
      */
     public function restart($ticket)
     {
-        $job = $this->findJob($ticket);
+        $this->logger->debug('Restart job ' . $ticket);
 
-        $job->setProcessingTime(0);
+        $job = $this->findJob($ticket);
 
         return $this->add($job);
     }
@@ -340,6 +333,8 @@ class Manager implements ManagerInterface
      */
     public function update(JobInterface $job)
     {
+        $this->logger->debug('Update job ' . $job->getTicket(), ['job' => $job]);
+
         if (!$this->jobManager->isManagerOf($job)) {
             $managedJob = $this->findJob($job->getTicket());
             $job        = $this->helper->copyJob($job, $managedJob);
@@ -365,7 +360,9 @@ class Manager implements ManagerInterface
         try {
             $this->producer->produce($message);
         } catch (\Exception $e) {
-            $this->logger->critical('Failed to publish message to queue backend: {exception}', ['exception' => $e]);
+            $this->logger->critical(sprintf('Failed to publish message for job %s (Error: %s)', $ticket, $e->getMessage()), [
+                'exception' => $e
+            ]);
 
             throw $e;
         }
@@ -395,11 +392,11 @@ class Manager implements ManagerInterface
     private function dispatchExecutionEvent($eventName, ExecutionEvent $event)
     {
         try {
-            $this->logger->debug('Dispatch event {event} for job with ticket {ticket}', ['event' => $eventName, 'ticket' => $event->getJob()->getTicket()]);
+            $this->logger->debug(sprintf('Dispatch event %s for job %s', $eventName, $event->getJob()->getTicket()));
 
             $this->dispatcher->dispatch($eventName, $event);
         } catch (\Exception $e) {
-            $this->logger->critical('Event listener for {event} failed with exception {exception}', ['event' => JobEvents::JOB_PRE_EXECUTE, 'exception' => $e]);
+            $this->logger->critical(sprintf('An event listener for event %s threw an exception (Error: %s)', $eventName, $e->getMessage()), ['exception' => $e]);
         }
     }
 
@@ -416,13 +413,12 @@ class Manager implements ManagerInterface
 
     /**
      * @param JobInterface $job
-     * @return bool
+     * @return void
      */
     private function releaseLock($job)
     {
-        $result = $this->locker->release($this->getLockName($job));
-        $this->logger->info('Job {job} lock released', ['job' => $job]);
+        $this->locker->release($this->getLockName($job));
 
-        return $result;
+        $this->logger->debug('Released lock for job ' . $job->getTicket());
     }
 }

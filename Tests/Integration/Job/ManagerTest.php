@@ -194,21 +194,22 @@ class ManagerTest extends DatabaseKernelTestCase
     }
 
     /**
-     * @expectedException \Sonata\NotificationBundle\Exception\HandlingException
-     */
+     *
+
     public function testRecoversFromDbalException()
     {
+        $job = $this->getJobManager()->addJob('throw_dbal_exception');
 
-        $this->markTestIncomplete('Handle DBALExceptions');
+        echo
+        $this->processJobs();
 
-        /**
-         * TODO Find a solution for the case where a DBALException leads to that job manager cannot terminate
-         * a job in a controlled way due to the fact that entity manager was closed
-         *
-         * $job = $this->getJobManager()->addJob('throw_dbal_exception');
-         * $this->assertEquals(Status::ERROR(), $job->getStatus());
-         */
-    }
+        $this->getEntityManager()->clear();
+
+        var_dump($this->getJobManager()->get($job)->getStatus());
+        exit;
+
+        $this->assertEquals(Status::ERROR(), $job->getStatus());
+    } */
 
     /**
      * @return ManagerInterface

@@ -16,7 +16,6 @@ use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
-use Sonata\NotificationBundle\Backend\QueueDispatcherInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
 use Sonata\NotificationBundle\Consumer\ConsumerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -89,14 +88,17 @@ class ProducerAdapter implements ProducerInterface, ConsumerInterface
         $body = array('ticket' => $message->getTicket());
 
         try {
-            $this->logger->debug('Publish message of type {type} and body {body} to sonata backend', array('type' => $type, 'body' => $body));
+            $this->logger->debug(sprintf('Publish message for job %s to sonata backend', $message->getTicket()), [
+                'type' => $type,
+                'body' => $body
+            ]);
 
             $queue = $this->registry->get($message->getType())->getQueue();
 
             $this->backendProvider->getBackend($queue)->createAndPublish($type, $body);
 
         } catch (\Exception $e) {
-            $this->logger->error('Failed to publish message {exception}', array('exception' => $e));
+            $this->logger->error(sprintf('Failed to publish message (Error: %s)', $e->getMessage()), ['exception' => $e]);
 
             if (!$e instanceof \RuntimeException) {
                 $e = new \RuntimeException($e->getMessage(), $e->getCode(), $e);
@@ -112,7 +114,7 @@ class ProducerAdapter implements ProducerInterface, ConsumerInterface
      */
     public function process(ConsumerEvent $event)
     {
-        $this->logger->debug('Process event {event} from sonata backend', array('event' => $event));
+        $this->logger->debug('Process event {event} from sonata backend', ['event' => $event]);
 
         $ticket = $event->getMessage()->getValue('ticket', null);
 

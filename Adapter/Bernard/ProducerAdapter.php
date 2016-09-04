@@ -74,7 +74,7 @@ class ProducerAdapter implements ProducerInterface
             'ticket' => $message->getTicket()
         ]);
 
-        $this->logger->debug('Publish message to queue backend', ['message' => $message]);
+        $this->logger->debug('Publish message to bernard queue backend', ['message' => $message]);
 
         $this->producer->produce($producerMessage, $this->registry->get($message->getType())->getQueue());
     }
@@ -91,7 +91,7 @@ class ProducerAdapter implements ProducerInterface
         $ticket = $message->ticket;
         $type = $message->type;
 
-        $this->logger->debug('Consume message {message}', [
+        $this->logger->debug('Consume message from bernard backend', [
             'message' => $message
         ]);
 

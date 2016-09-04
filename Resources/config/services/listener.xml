@@ -9,6 +9,8 @@
         <service id="abc.job.listener.job" class="Abc\Bundle\JobBundle\Listener\JobListener" public="true">
             <argument type="service" id="abc.job.manager"/>
             <argument type="service" id="abc.job.logger.factory"/>
+            <argument type="service" id="logger" on-invalid="null"/>
+            <tag name="monolog.logger" channel="abc.job"/>
             <tag name="abc.job.event_listener" event="abc.job.pre_execute" method="onPreExecute"/>
         </service>
 

@@ -768,8 +768,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($job);
 
         $subject->restart($job->getTicket());
-
-        $this->assertEquals(0, $job->getProcessingTime());
     }
 
     /**
