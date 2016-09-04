@@ -18,7 +18,7 @@ use Monolog\Handler\HandlerInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-abstract class BaseHandlerFactory
+abstract class BaseHandlerFactory implements HandlerFactoryInterface
 {
     /**
      * @var int
@@ -51,14 +51,12 @@ abstract class BaseHandlerFactory
     }
 
     /**
-     * @param JobInterface $job
-     * @param int|null     $level The minimum logging level at which this handler will be triggered
-     * @return HandlerInterface
+     * {@inheritdoc}
      */
     public abstract function createHandler(JobInterface $job, $level = null);
 
     /**
-     * @param FormatterInterface $formatter
+     * {@inheritdoc}
      */
     public function setFormatter(FormatterInterface $formatter = null)
     {
@@ -66,7 +64,7 @@ abstract class BaseHandlerFactory
     }
 
     /**
-     * @param array|ProcessorInterface[] $processors
+     * {@inheritdoc}
      */
     public function setProcessors(array $processors)
     {
@@ -74,12 +72,14 @@ abstract class BaseHandlerFactory
     }
 
     /**
+     * Sets formatter and processors.
+     *
      * @param HandlerInterface $handler
      * @return HandlerInterface
      */
     protected function initHandler(HandlerInterface $handler)
     {
-        if($this->formatter != null) {
+        if ($this->formatter != null) {
             $handler->setFormatter($this->formatter);
         }
 

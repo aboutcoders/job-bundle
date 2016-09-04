@@ -8,11 +8,11 @@
 
         <service id="abc.job.logger.factory" class="Abc\Bundle\JobBundle\Logger\LoggerFactory" public="true">
             <argument type="service" id="abc.job.registry"/>
-            <argument type="service" id="abc.job.logger.handler_factory"/>
+            <argument type="service" id="abc.job.logger.handler_factory_registry"/>
         </service>
 
-        <service id="abc.job.logger.handler_factory" class="Abc\Bundle\JobBundle\Logger\Handler\HandlerFactory" public="false">
-            <call method="addFactory">
+        <service id="abc.job.logger.handler_factory_registry" class="Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryRegistry" public="false">
+            <call method="register">
                 <argument type="service" id="abc.job.logger.storage_handler_factory"/>
             </call>
         </service>

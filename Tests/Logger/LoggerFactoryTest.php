@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Tests\Logger;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Logger\Handler\BaseHandlerFactory;
-use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactory;
+use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryRegistry;
 use Abc\Bundle\JobBundle\Logger\LoggerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Monolog\Handler\HandlerInterface;
@@ -31,7 +31,7 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
     private $registry;
 
     /**
-     * @var HandlerFactory
+     * @var HandlerFactoryRegistry
      */
     private $handlerFactory;
 
@@ -43,7 +43,7 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->registry       = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->handlerFactory = new HandlerFactory();
+        $this->handlerFactory = new HandlerFactoryRegistry();
         $this->subject        = new LoggerFactory($this->registry, $this->handlerFactory);
     }
 
@@ -60,7 +60,7 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
         $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
 
-        $this->handlerFactory->addFactory($factory);
+        $this->handlerFactory->register($factory);
 
         $jobType->expects($this->any())
             ->method('getLogLevel')
@@ -81,7 +81,42 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
 
             $logger = $this->subject->create($job);
             $this->assertInstanceOf(Logger::class, $logger);
+
+            $this->assertContains($handler, $logger->getHandlers());
         }
+    }
+
+    public function testCreatesLoggerWithAddedHandlers() {
+
+        $job = new Job();
+        $job->setType('JobType');
+
+        $handler = $this->getMock(HandlerInterface::class);
+        $extraHandler = $this->getMock(HandlerInterface::class);
+        $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+
+        $this->handlerFactory->register($factory);
+
+        $jobType->expects($this->any())
+            ->method('getLogLevel')
+            ->willReturn(Logger::CRITICAL);
+
+        $this->registry->expects($this->once())
+            ->method('get')
+            ->with($job->getType())
+            ->willReturn($jobType);
+
+        $factory->expects($this->once())
+            ->method('createHandler')
+            ->willReturn($handler);
+
+        $this->subject->addHandler($extraHandler);
+
+        $logger = $this->subject->create($job);
+
+        $this->assertContains($handler, $logger->getHandlers());
+        $this->assertContains($extraHandler, $logger->getHandlers());
     }
 
     public static function provideLevels() {

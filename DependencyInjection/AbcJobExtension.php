@@ -150,8 +150,8 @@ class AbcJobExtension extends Extension
                 $definition->addMethodCall('setProcessor', [new Reference($processor)]);
             }
 
-            $definition = $container->getDefinition('abc.job.logger.handler_factory');
-            $definition->addMethodCall('addFactory', [new Reference('abc.job.logger.stream_handler_factory')]);
+            $definition = $container->getDefinition('abc.job.logger.handler_factory_registry');
+            $definition->addMethodCall('register', [new Reference('abc.job.logger.stream_handler_factory')]);
         }
 
         foreach ($config['logging']['handler'] as $handler) {

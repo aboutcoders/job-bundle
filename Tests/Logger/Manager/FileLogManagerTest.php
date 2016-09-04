@@ -13,13 +13,22 @@ namespace Abc\Bundle\JobBundle\Tests\Logger\Manager;
 use Abc\Bundle\JobBundle\Logger\Manager\FileLogManager;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
+use Abc\Bundle\JobBundle\Test\MockHelper;
 use Symfony\Component\Filesystem\Filesystem;
+use phpmock\phpunit\PHPMock;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class FileLogManagerTest extends \PHPUnit_Framework_TestCase
 {
+    use PHPMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $json_decode;
+
     /**
      * @var
      */
@@ -32,7 +41,8 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $directory = dirname(__FILE__) . '/../../build/tests';
+        $directory         = dirname(__FILE__) . '/../../build/tests';
+        $this->json_decode = $this->getFunctionMock(MockHelper::getNamespace(FileLogManager::class), 'json_decode');
 
         $this->setUpDirectory($directory);
 
@@ -67,7 +77,7 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->subject->findByJob($job));
     }
 
-    public function testFindByJobDecodesJSON()
+    public function testFindByJobDecodesJson()
     {
         $job = new Job();
         $job->setTicket('job-ticket');
@@ -79,6 +89,11 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
         $content = json_encode($line1) . "/n" . json_encode($line2);
 
         file_put_contents($this->buildFilename($job), $content);
+
+        $this->json_decode->expects($this->any())
+            ->willReturnCallback(function ($data, $assoc) {
+                return \json_decode($data, $assoc);
+            });
 
         $this->assertEquals([$line1, $line2], $this->subject->findByJob($job));
     }
@@ -92,6 +107,28 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->buildFilename($job), '{asdasdasd');
 
         $this->assertEmpty($this->subject->findByJob($job));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testFindByJobThrowsExceptionIfJsonDecodeFails()
+    {
+        $job = new Job();
+        $job->setTicket('job-ticket');
+        $job->setType('job-type');
+
+        $line1 = ['message' => 'foo'];
+        $line2 = ['message' => 'bar'];
+
+        $content = json_encode($line1) . "/n" . json_encode($line2);
+
+        file_put_contents($this->buildFilename($job), $content);
+
+        $this->json_decode->expects($this->any())
+            ->willReturn(false);
+
+        $this->subject->findByJob($job);
     }
 
     public function testDeleteLogWithExistingFile()

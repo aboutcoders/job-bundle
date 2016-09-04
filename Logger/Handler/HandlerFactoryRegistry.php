@@ -16,7 +16,7 @@ use Monolog\Handler\HandlerInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class HandlerFactory
+class HandlerFactoryRegistry
 {
     /**
      * @var array|BaseHandlerFactory[]
@@ -24,17 +24,19 @@ class HandlerFactory
     private $factories = [];
 
     /**
-     * @param BaseHandlerFactory $factory
+     * @param HandlerFactoryInterface $factory
      */
-    public function addFactory(BaseHandlerFactory $factory)
+    public function register(HandlerFactoryInterface $factory)
     {
         $this->factories[] = $factory;
     }
 
     /**
+     * Returns the handlers created by all registered factories.
+     *
      * @param JobInterface $job
      * @param int|null     $level The minimum logging level at which this handler will be triggered
-     * @return array|HandlerInterface[]
+     * @return array|HandlerInterface[] The created handlers
      */
     public function createHandlers(JobInterface $job, $level = null)
     {

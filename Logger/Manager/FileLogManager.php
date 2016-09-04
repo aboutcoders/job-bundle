@@ -58,7 +58,7 @@ class FileLogManager implements LogManagerInterface
         foreach ($lines as $line) {
             $record = json_decode($line, true);
             if(false === $record) {
-                throw new \Exception('Failed to deserialze logs from file ' . $path);
+                throw new \RuntimeException('Failed to deserialize logs from file ' . $path);
             }
             if(null !== $record) {
                 $records[] = $record;

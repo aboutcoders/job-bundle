@@ -50,6 +50,7 @@ Please note that this bundle is still in development and thus we might need to c
 - Add validator (define add-validation-group, update-validation-group)
 - Add option to force cancellation of a job
 - Add consumer management
+- Add option to configure a dedicated connection
 
 ### Planned Features
 

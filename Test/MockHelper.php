@@ -8,18 +8,20 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Annotation;
+namespace Abc\Bundle\JobBundle\Test;
 
 /**
- * @Annotation
- * @Target({"METHOD"})
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ReturnType
+class MockHelper
 {
     /**
-     * @Required
-     * @var string
+     * @param $class
+     * @return array
      */
-    public $type;
+    public static function getNamespace($class) {
+        $pieces = explode("\\", $class);
+        array_pop($pieces);
+        return implode("\\", $pieces);
+    }
 }

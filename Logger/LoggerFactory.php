@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Logger;
 
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactory;
+use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryRegistry;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Psr\Log\NullLogger;
@@ -28,7 +28,7 @@ class LoggerFactory implements LoggerFactoryInterface
     protected $registry;
 
     /**
-     * @var HandlerFactory
+     * @var HandlerFactoryRegistry
      */
     protected $handlerFactory;
 
@@ -38,10 +38,10 @@ class LoggerFactory implements LoggerFactoryInterface
     protected $handlers = array();
 
     /**
-     * @param JobTypeRegistry $registry
-     * @param HandlerFactory  $handlerFactory
+     * @param JobTypeRegistry        $registry
+     * @param HandlerFactoryRegistry $handlerFactory
      */
-    public function __construct(JobTypeRegistry $registry, HandlerFactory $handlerFactory)
+    public function __construct(JobTypeRegistry $registry, HandlerFactoryRegistry $handlerFactory)
     {
         $this->registry       = $registry;
         $this->handlerFactory = $handlerFactory;
