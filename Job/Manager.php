@@ -283,13 +283,6 @@ class Manager implements ManagerInterface
             }
 
             $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
-        } catch (DBALException $e) {
-            $this->logger->critical('Job with ticket {ticket} could not be terminated due to exception {exception}', [
-                'ticket'    => $job->getTicket(),
-                'exception' => $e
-            ]);
-
-            throw $e;
         } catch (\Exception $e) {
             $this->logger->warning(sprintf('Failed to execute job %s (Error: $s)', $job->getTicket(), $e->getMessage()), [
                 'parameters' => $job->getParameters(),

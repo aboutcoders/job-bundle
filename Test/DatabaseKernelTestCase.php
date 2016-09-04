@@ -26,6 +26,11 @@ abstract class DatabaseKernelTestCase extends KernelTestCase
     private $em;
 
     /**
+     * @var array
+     */
+    private $entityManagerNames = [];
+
+    /**
      * @var Application
      */
     private $application;
@@ -50,8 +55,25 @@ abstract class DatabaseKernelTestCase extends KernelTestCase
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
 
-        $this->runConsole("doctrine:schema:drop", array("--force" => true));
-        $this->runConsole("doctrine:schema:update", array("--force" => true));
+        if (count($this->entityManagerNames) > 0) {
+            foreach ($this->entityManagerNames as $name) {
+                $this->runConsole("doctrine:schema:drop", ['--force' => true, '--em' => $name]);
+                $this->runConsole("doctrine:schema:update", ['--force' => true, '--em' => $name]);
+            }
+        } else {
+            $this->runConsole("doctrine:schema:drop", array("--force" => true));
+            $this->runConsole("doctrine:schema:update", array("--force" => true));
+        }
+    }
+
+    /**
+     * Set the names of the entity managers that are used
+     *
+     * @param array $names
+     */
+    public function setEntityManagerNames(array $names)
+    {
+        $this->entityManagerNames = $names;
     }
 
     /**
@@ -60,13 +82,13 @@ abstract class DatabaseKernelTestCase extends KernelTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        if(!is_null($this->em))
-        {
+        if (!is_null($this->em)) {
             $this->em->close();
         }
     }
 
-    public function setKernelOptions(array $options) {
+    public function setKernelOptions(array $options)
+    {
         $this->kernelOptions = $options;
     }
 

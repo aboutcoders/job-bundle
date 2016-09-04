@@ -1,0 +1,96 @@
+imports:
+    - { resource: services_dedicated_connection.yml }
+
+framework:
+    secret: Hell yeah!
+    router: { resource: "%kernel.root_dir%/config/routing.yml" }
+    form: true
+    csrf_protection: true
+    templating:
+        engines: ['twig']
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+    default_locale: en
+    translator: { fallback: en }
+    profiler:
+        collect: false
+    validation: { enable_annotations: true }
+
+monolog:
+    handlers:
+        main:
+            type:     stream
+            path:     "%kernel.logs_dir%/%kernel.environment%.log"
+            level:    error
+            channels: ['!abc.job']
+        abc_job:
+            type:     stream
+            path:     "%kernel.logs_dir%/abc_job_%kernel.environment%.log"
+            level:    debug
+            channels: ["abc.job"]
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+
+doctrine:
+    dbal:
+        connections:
+            default:
+                driver:   "pdo_sqlite"
+                path:     "%kernel.cache_dir%/sqliteq.db"
+            abc_job_processing:
+                driver:   "pdo_sqlite"
+                path:     "%kernel.cache_dir%/sqliteq.db"
+
+        types:
+            json: Sonata\Doctrine\Types\JsonType
+            abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
+    orm:
+        default_entity_manager: default
+        auto_generate_proxy_classes: true
+        entity_managers:
+            default:
+                connection: default
+                auto_mapping: true
+            abc_job_processing:
+                connection: abc_job_processing
+                mappings:
+                    AbcJobBundle: ~
+                    AbcSchedulerBundle: ~
+                    AbcResourceLockBundle: ~
+                    SonataNotificationBundle: ~
+                    BernardBundle: ~
+
+swiftmailer:
+    disable_delivery: true
+
+bernard:
+    driver: doctrine
+    options:
+        connection: abc_job_processing
+
+yz_supervisor:
+    default_environment: dev
+    servers:
+        dev:
+            localhost:
+                host:     ""
+                username: ""
+                password: ""
+                port:
+
+abc_resource_lock:
+    db_driver: orm
+    model_manager_name: abc_job_processing
+
+abc_scheduler:
+    db_driver: orm
+    model_manager_name: abc_job_processing
+
+abc_job:
+    adapter: sonata
+    connection: abc_job_processing
+    model_manager_name: abc_job_processing

@@ -241,5 +241,6 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
         $entity->setName('foobar');
 
         $manager->persist($entity);
+        $manager->flush();
     }
 }

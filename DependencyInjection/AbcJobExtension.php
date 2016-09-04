@@ -45,7 +45,9 @@ class AbcJobExtension extends Extension
             $container,
             array(
                 '' => array(
+                    'db_driver'             => 'abc.job.db_driver',
                     'adapter'               => 'abc.job.adapter',
+                    'connection'            => 'abc.job.connection',
                     'model_manager_name'    => 'abc.job.model_manager_name',
                     'register_default_jobs' => 'abc.job.register_default_jobs',
                     'queues'                => 'abc.job.queue_config',
@@ -123,7 +125,7 @@ class AbcJobExtension extends Extension
 
         if ('orm' == $storageConfig['type']) {
             $container->setParameter('abc.job.register_mapping.' . $config['db_driver'], true);
-        } elseif('file' == $storageConfig['type']) {
+        } elseif ('file' == $storageConfig['type']) {
             $container->setParameter('abc.job.logger.storage.path', $storageConfig['path']);
         }
 
@@ -141,7 +143,7 @@ class AbcJobExtension extends Extension
             $container->setParameter('abc.job.logger.stream.path', $streamConfig['path']);
             $container->setParameter('abc.job.logger.stream.level', $this->levelToMonologConst($streamConfig['level']));
             $container->setParameter('abc.job.logger.stream.bubble', $streamConfig['bubble']);
-            if(isset($streamConfig['formatter'])) {
+            if (isset($streamConfig['formatter'])) {
                 $container->setAlias('abc.job.logger.stream.formatter', $streamConfig['formatter']);
             }
 

@@ -658,32 +658,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\DBALException
-     */
-    public function testOnMessageHandlesDbalExceptionsThrownByJob()
-    {
-        $job       = new Job();
-        $microTime = microtime(true);
-        $message   = new Message('type', 'ticket');
-        $exception = $this->getMockBuilder(DBALException::class)->disableOriginalConstructor()->getMock();
-        $exception->expects($this->any())
-            ->method('getMessage')
-            ->willReturn('foobar');
-
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
-            ->with($message->getTicket())
-            ->willReturn($job);
-
-        $this->invoker->expects($this->once())
-            ->method('invoke')
-            ->with($job, $this->isInstanceOf(Context::class))
-            ->willThrowException($exception);
-
-        $this->subject->onMessage($message);
-    }
-
     public function testOnMessageNotUpdatesStatusIfJobWasCancelled()
     {
         $job     = new Job();

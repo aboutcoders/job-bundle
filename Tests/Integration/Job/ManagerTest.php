@@ -194,24 +194,6 @@ class ManagerTest extends DatabaseKernelTestCase
     }
 
     /**
-     *
-
-    public function testRecoversFromDbalException()
-    {
-        $job = $this->getJobManager()->addJob('throw_dbal_exception');
-
-        echo
-        $this->processJobs();
-
-        $this->getEntityManager()->clear();
-
-        var_dump($this->getJobManager()->get($job)->getStatus());
-        exit;
-
-        $this->assertEquals(Status::ERROR(), $job->getStatus());
-    } */
-
-    /**
      * @return ManagerInterface
      */
     protected function getJobManager()
