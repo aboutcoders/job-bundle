@@ -148,7 +148,7 @@ abstract class JobTestCase extends KernelTestCase
      */
     private static function getSerializer()
     {
-        return static::$kernel->getContainer()->get('jms_serializer');
+        return static::$kernel->getContainer()->get('abc.job.serializer');
     }
 
     /**

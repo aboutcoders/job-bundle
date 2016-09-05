@@ -47,12 +47,13 @@ Please note that this bundle is still in development and thus we might need to c
 
 ### Missing Features For The Stable Release
 
-- Add validator (define add-validation-group, update-validation-group)
 - Add option to force cancellation of a job
+- Add validator (define add-validation-group, update-validation-group)
 - Add consumer management
 
 ### Planned Features
 
+- Add support for CouchDB, MongoDB
 - Integrate https://github.com/beberlei/metrics
 - Consider consumer management (start, stop, pause)
 - Utilize stopwatch

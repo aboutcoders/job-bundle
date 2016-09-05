@@ -53,4 +53,5 @@ abc_job:
         controller_factory:         abc.job.controller_factory.default
         queue_config:               abc.job.queue_config.default
         validator:                  validator
+        serializer:                 jms_serializer
 ```

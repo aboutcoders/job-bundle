@@ -174,6 +174,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('locker')->defaultValue('abc.job.locker.default')->end()
                             ->scalarNode('queue_config')->defaultValue('abc.job.queue_config.default')->end()
                             ->scalarNode('validator')->defaultValue('validator')->end()
+                            ->scalarNode('serializer')->defaultValue('jms_serializer')->end()
                         ->end()
                     ->end()
                 ->end()

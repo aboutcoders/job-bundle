@@ -60,6 +60,6 @@ abstract class BaseController extends Controller
      */
     protected function getSerializer()
     {
-        return $this->get('jms_serializer');
+        return $this->get('abc.job.serializer');
     }
 }

@@ -104,7 +104,7 @@ class JobControllerTest extends DatabaseWebTestCase
         /**
          * @var JobList $deserializedList
          */
-        $deserializedList = $this->getContainer()->get('jms_serializer')->deserialize($data, JobList::class, 'json');
+        $deserializedList = $this->getContainer()->get('abc.job.serializer')->deserialize($data, JobList::class, 'json');
         $items            = $deserializedList->getItems();
 
         /**
@@ -180,7 +180,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $client = static::createClient();
 
         // get the (initialized) serializer before it is destroyed by this mockManager() call, otherwise we do not have custom handlers initialized
-        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+        $serializer = static::$kernel->getContainer()->get('abc.job.serializer');
 
         $this->mockServices(['abc.job.manager' => $this->manager]);
 
@@ -306,7 +306,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $client = static::createClient();
 
         // get the (initialized) serializer before it is destroyed by this mockServices() call, otherwise we do not have custom handlers initialized
-        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+        $serializer = static::$kernel->getContainer()->get('abc.job.serializer');
 
         $this->mockServices(['abc.job.manager' => $this->manager]);
 
@@ -353,7 +353,7 @@ class JobControllerTest extends DatabaseWebTestCase
         $client = static::createClient();
 
         // get the (initialized) serializer before it is destroyed by this mockServices() call, otherwise we do not have custom handlers initialized
-        $serializer = static::$kernel->getContainer()->get('jms_serializer');
+        $serializer = static::$kernel->getContainer()->get('abc.job.serializer');
 
         $this->mockServices(['abc.job.manager' => $this->manager]);
 
