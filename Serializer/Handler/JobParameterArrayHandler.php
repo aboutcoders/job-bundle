@@ -10,7 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\Serializer\Handler;
 
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\JobParameterArray;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\RuntimeException;
@@ -23,19 +22,6 @@ use JMS\Serializer\VisitorInterface;
  */
 class JobParameterArrayHandler implements SubscribingHandlerInterface
 {
-    /**
-     * @var JobTypeRegistry
-     */
-    private $registry;
-
-    /**
-     * @param JobTypeRegistry $registry
-     */
-    public function __construct(JobTypeRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -84,14 +70,13 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
      */
     public function deserializeJobParameterArray(VisitorInterface $visitor, $data, array $type, Context $context)
     {
+        $deserializeJob = false;
         if (is_array($data) && count($data) > 0) {
+            // if $type['params'] is not set this means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
+            if (count($type['params']) == 0 && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
 
-            // if $type['params'] is not set this probably means, that a job is being deserialized. so we check if the JobDeserializationSubscriber set the job type at the end of the $data array
-            if (count($type['params']) == 0 && is_array(end($data)) && in_array('abc.job.type', array_keys(end($data)))) {
-                $jobType = $this->extractJobType($data);
-
-                // now we retrieve information about the types from the job registry
-                $type['params'] = $this->registry->get($jobType)->getParameterTypes();
+                $type['params'] = $this->extractParamTypes($data);
+                $deserializeJob = true;
             }
         }
 
@@ -111,13 +96,23 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
             $result[$i] = $context->accept($data[$i], $type['params'][$i]);
         }
 
+        if (!$deserializeJob) {
+            /**
+             * Since serializer always returns the result of $context->accept unless visitor result is empty,
+             * we have to make sure that the visitor result is null in case only root is type JobParameterArray::class
+             *
+             * @see Serializer::handleDeserializeResult()
+             */
+            $visitor->setNavigator($context->getNavigator());
+        }
+
         return $result;
     }
 
-    private function extractJobType(&$data)
+    private function extractParamTypes(&$data)
     {
-        $jobTypeArray = array_pop($data);
+        $paramTypeArray = array_pop($data);
 
-        return array_pop($jobTypeArray);
+        return array_pop($paramTypeArray);
     }
 }

@@ -41,12 +41,12 @@ Please note that this bundle is still in development and thus we might need to c
 - [Process Control](./Resources/docs/process-control.md)
 - [Lifecycle Events](./Resources/docs/lifecycle-events.md)
 - [Clustered Environment](./Resources/docs/clustered-environment.md)
+- [Unit Testing](./Resources/docs/unit-testing.md)
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ### Missing Features For The Stable Release
 
-- Provide a TestCase for jobs
 - Add validator (define add-validation-group, update-validation-group)
 - Add option to force cancellation of a job
 - Add consumer management

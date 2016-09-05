@@ -173,12 +173,12 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer = SerializerBuilder::create()
             ->addDefaultHandlers()
-            ->configureHandlers(function (HandlerRegistry $handlerRegistry) use ($registry, $enumHandler) {
-                $handlerRegistry->registerSubscribingHandler(new JobParameterArrayHandler($registry));
+            ->configureHandlers(function (HandlerRegistry $handlerRegistry) use ($enumHandler) {
+                $handlerRegistry->registerSubscribingHandler(new JobParameterArrayHandler());
                 $handlerRegistry->registerSubscribingHandler($enumHandler);
             })
-            ->configureListeners(function (EventDispatcher $dispatcher) {
-                $dispatcher->addSubscriber(new JobDeserializationSubscriber());
+            ->configureListeners(function (EventDispatcher $dispatcher) use ($registry) {
+                $dispatcher->addSubscriber(new JobDeserializationSubscriber($registry));
             })
             ->build();
     }

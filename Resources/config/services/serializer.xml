@@ -6,11 +6,11 @@
     <services>
 
         <service id="abc.job.serializer.job_parameter_handler" class="Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler">
-            <argument type="service" id="abc.job.registry" />
             <tag name="jms_serializer.subscribing_handler"/>
         </service>
 
         <service id="abc.job.serializer.job_deserialization_subscriber" class="Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber">
+            <argument type="service" id="abc.job.registry" />
             <tag name="jms_serializer.event_subscriber"/>
         </service>
 

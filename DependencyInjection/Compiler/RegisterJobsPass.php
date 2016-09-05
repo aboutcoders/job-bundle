@@ -75,7 +75,6 @@ class RegisterJobsPass implements CompilerPassInterface
                 $jobTypeId = 'abc.job.type.' . $tag['type'];
 
                 $definition = $this->createType(
-                    $container,
                     $id,
                     $tag['type'],
                     array(new Reference($id), $tag['method']),
@@ -96,9 +95,6 @@ class RegisterJobsPass implements CompilerPassInterface
     }
 
     /**
-     * Sets a Abc\Bundle\JobBundle\Job\JobType in the container.
-     *
-     * @param ContainerBuilder $container
      * @param string           $serviceId
      * @param string           $type
      * @param callable         $callable
@@ -106,7 +102,7 @@ class RegisterJobsPass implements CompilerPassInterface
      * @param string|null      $formType
      * @return DefinitionDecorator
      */
-    protected function createType(ContainerBuilder $container, $serviceId, $type, $callable, $logLevel = null, $formType = null)
+    protected function createType($serviceId, $type, $callable, $logLevel = null, $formType = null)
     {
         $jobType = new DefinitionDecorator('abc.job.type.prototype');
         $jobType->replaceArgument(0, $serviceId);
