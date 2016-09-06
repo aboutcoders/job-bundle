@@ -11,11 +11,13 @@
 namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\JobHelper;
+use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
+use Abc\Bundle\SchedulerBundle\Schedule\SchedulerInterface;
 use Psr\Log\NullLogger;
 
 /**
@@ -131,19 +133,12 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['response'], $job->getResponse());
     }
 
-    public function testCopyJob()
+    /**
+     * @param JobInterface $original
+     * @dataProvider provideCopyJobs
+     */
+    public function testCopyJob(JobInterface $original)
     {
-        /**
-         * @var ScheduleInterface|\PHPUnit_Framework_MockObject_MockObject
-         */
-        $schedule = $this->getMock(ScheduleInterface::class);
-
-        $original = new Job();
-        $original->setTicket('JobTicket');
-        $original->setResponse('JobResponse');
-        $original->setStatus(Status::REQUESTED());
-        $original->addSchedule($schedule);
-
         $copy = new Job();
 
         $returnValue = $this->subject->copyJob($original, $copy);
@@ -154,6 +149,45 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($original->getResponse(), $copy->getResponse());
         $this->assertEquals($original->getStatus(), $copy->getStatus());
         $this->assertEquals($original->getSchedules(), $copy->getSchedules());
+    }
+
+    /**
+     * @return array
+     */
+    public function provideCopyJobs()
+    {
+        return [
+            [$this->createJob('JobType')],
+            [$this->createJob('JobType', Status::CANCELLED())],
+            [$this->createJob('JobType', Status::CANCELLED()), array('foobar')],
+            [$this->createJob('JobType', Status::CANCELLED()), array('foobar'), $this->getMock(ScheduleInterface::class)],
+            [$this->createJob('JobType', Status::CANCELLED()), array('foobar'), $this->getMock(ScheduleInterface::class), 'response'],
+        ];
+    }
+
+    /**
+     * @param string             $type
+     * @param Status             $status
+     * @param array              $parameters
+     * @param SchedulerInterface $schedule
+     * @param mixed              $response
+     * @return Job
+     */
+    public function createJob($type, $status = null, $parameters = null, $schedule = null, $response = null)
+    {
+
+        $job = new Job();
+        $job->setType($type);
+        $job->setParameters($parameters);
+        $job->setResponse('JobResponse');
+        if ($status != null) {
+            $job->setStatus($status);
+        }
+        if ($schedule != null) {
+            $job->addSchedule($schedule);
+        }
+
+        return $job;
     }
 
     /**

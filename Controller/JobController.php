@@ -31,14 +31,20 @@ class JobController extends BaseController
 {
     /**
      * @ApiDoc(
-     *  description="Returns a collection of jobs",
-     *  section="AbcJobBundle",
-     *  requirements={},
-     *  output="Abc\Bundle\JobBundle\Model\JobList",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     400 = "Returned when request is invalid",
-     *   }
+     *     description="Returns a collection of jobs",
+     *     section="AbcJobBundle",
+     *     filters={
+     *          {"name"="page", "dataType"="integer", "required"=false, "requirement"="\d+", "default"="1", "description"="The page number of the result set"},
+     *          {"name"="limit", "dataType"="integer", "required"=false, "requirement"="\d+", "default"="10", "description"="The page size"},
+     *          {"name"="sortCol", "dataType"="string", "required"=false, "pattern"="(ticket|type|status|createdAt|terminatedAt)", "default"="createdAt", "description"="The sort column"},
+     *          {"name"="sortDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "default"="DESC", "description"="The sort direction"},
+     *          {"name"="criteria", "dataType"="map", "required"=false, "default"="[]", "description"="The search criteria defined as associative array"},
+     *     },
+     *     output="Abc\Bundle\JobBundle\Model\JobList",
+     *     statusCodes = {
+     *          200 = "Returned when successful",
+     *          400 = "Returned when request is invalid"
+     *     }
      * )
      *
      * @param Request $request
@@ -73,6 +79,9 @@ class JobController extends BaseController
      * @ApiDoc(
      * description="Returns a job",
      * section="AbcJobBundle",
+     * requirements={
+     *      {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
+     * },
      * output="Abc\Bundle\JobBundle\Model\Job",
      *   statusCodes = {
      *     200 = "Returned when successful",
@@ -96,10 +105,11 @@ class JobController extends BaseController
      * Adds a new job
      *
      * @ApiDoc(
-     *   description="Adds a job",
-     *   section="AbcJobBundle",
-     *   output="Abc\Bundle\JobBundle\Model\Job",
-     *   statusCodes = {
+     *  description="Adds a job",
+     *  section="AbcJobBundle",
+     *  input="Abc\Bundle\JobBundle\Model\Job",
+     *  input="Abc\Bundle\JobBundle\Model\Job",
+     *  statusCodes = {
      *     200 = "Returned when successful",
      *     400 = "Form validation error"
      *   }
@@ -119,15 +129,15 @@ class JobController extends BaseController
      * Updates a job.
      *
      * @ApiDoc(
-     *   description="Updates a job",
-     *   section="AbcJobBundle",
-     *   output="Abc\Bundle\JobBundle\Model\Job",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     400 = "Returned when validation fails",
-     *     404 = "Returned when job not found"
-     *   }
-     * )
+     * description="Updates a job",
+     * section="AbcJobBundle",
+     * input="Abc\Bundle\JobBundle\Model\Job",
+     * output="Abc\Bundle\JobBundle\Model\Job",
+     * statusCodes = {
+     *  200 = "Returned when successful",
+     *  400 = "Returned when validation fails",
+     *  404 = "Returned when job not found"
+     * })
      *
      * @param Request $request
      * @return Response
@@ -144,7 +154,9 @@ class JobController extends BaseController
      * description="Cancels a job",
      * section="AbcJobBundle",
      * output="Abc\Bundle\JobBundle\Model\Job",
-     * parameters={},
+     * requirements={
+     *      {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
+     * },
      * statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned when job not found",
@@ -168,7 +180,9 @@ class JobController extends BaseController
      * description="Restarts a job",
      * section="AbcJobBundle",
      * output="Abc\Bundle\JobBundle\Model\Job",
-     * parameters={},
+     * requirements={
+     *      {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
+     * },
      * statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned when job not found",
@@ -194,7 +208,9 @@ class JobController extends BaseController
      * description="Returns the logs of a job",
      * section="AbcJobBundle",
      * output="array<Abc\Bundle\JobBundle\Model\Log>",
-     * parameters={},
+     * requirements={
+     *      {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
+     * },
      * statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned when job not found",
