@@ -70,14 +70,16 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
      */
     public function deserializeJobParameterArray(VisitorInterface $visitor, $data, array $type, Context $context)
     {
-        $deserializeJob = false;
-        if (is_array($data) && count($data) > 0) {
-            // if $type['params'] is not set this means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
-            if (count($type['params']) == 0 && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
+        if(!is_array($data) || count($data) == 0) {
+            return [];
+        }
 
-                $type['params'] = $this->extractParamTypes($data);
-                $deserializeJob = true;
-            }
+        // if $type['params'] is not set this means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
+        $deserializeJob = false;
+        if (count($type['params']) == 0 && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
+
+            $type['params'] = $this->extractParamTypes($data);
+            $deserializeJob = true;
         }
 
         if (count($data) > count($type['params'])) {

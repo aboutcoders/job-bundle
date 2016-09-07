@@ -437,6 +437,12 @@ class JobControllerTest extends DatabaseWebTestCase
                     'type'       => 'parameterless',
                     'parameters' => null
                 ]
+            ],
+            [
+                [
+                    'type'       => 'parameterless',
+                    'parameters' => []
+                ]
             ]
         ];
     }
@@ -470,7 +476,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $job->setType(isset($parameters['type']) ? $parameters['type'] : null);
 
-        if (isset($parameters['parameters'])) {
+        if (isset($parameters['parameters']) && count($parameters['parameters']) > 0) {
             $message = new Message(
                 $parameters['parameters'][0]['to'],
                 $parameters['parameters'][0]['from'],
