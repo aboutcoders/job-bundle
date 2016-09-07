@@ -190,7 +190,7 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function cancel($ticket)
+    public function cancel($ticket, $force = false)
     {
         $job = $this->findJob($ticket);
 
@@ -199,14 +199,15 @@ class Manager implements ManagerInterface
         }
 
         $isProcessing = $job->getStatus() == Status::PROCESSING();
-        $status       = $isProcessing ? Status::CANCELLING() : Status::CANCELLED();
+        $status       = $force ? Status::CANCELLED() : ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
 
         $this->helper->updateJob($job, $status);
         $this->jobManager->save($job);
 
-        if (!$isProcessing) {
+        if (!$isProcessing || $force) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
-            $this->logger->info('Cancelled job ' . $job->getTicket());
+            $message = $force ? 'Forced cancellation of job ' : 'Cancelled job ';
+            $this->logger->info($message . $job->getTicket());
         } else {
             $this->logger->info('Request cancellation of job ' . $job->getTicket());
         }

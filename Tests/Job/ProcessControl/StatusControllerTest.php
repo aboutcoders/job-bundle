@@ -94,7 +94,7 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
             ->method('refresh')
             ->with($this->job);
 
-        $this->job->expects($this->once())
+        $this->job->expects($this->any())
             ->method('getStatus')
             ->willReturn(Status::CANCELLED());
 
@@ -104,15 +104,19 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $this->subject->doExit();
     }
 
-    public function testDoExitReturnsTrueIfJobStatusIsCancelling()
+    /**
+     * @param Status $status
+     * @dataProvider provideCancelStatus
+     */
+    public function testDoExitReturnsTrueIfJobStatus(Status $status)
     {
         $this->manager->expects($this->once())
             ->method('refresh')
             ->with($this->job);
 
-        $this->job->expects($this->once())
+        $this->job->expects($this->any())
             ->method('getStatus')
-            ->willReturn(Status::CANCELLING());
+            ->willReturn($status);
 
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
@@ -122,15 +126,15 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Status $status
-     * @dataProvider provideNonCancellingStatus
+     * @dataProvider provideNonCancelStatus
      */
-    public function testDoExitReturnsFalseIfJobStatusIsNotCancelling(Status $status)
+    public function testDoExitReturnsFalseIfJobStatusIs(Status $status)
     {
         $this->manager->expects($this->once())
             ->method('refresh')
             ->with($this->job);
 
-        $this->job->expects($this->once())
+        $this->job->expects($this->any())
             ->method('getStatus')
             ->willReturn($status);
 
@@ -150,7 +154,7 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
             ->method('refresh')
             ->with($this->job);
 
-        $this->job->expects($this->exactly(2))
+        $this->job->expects($this->any())
             ->method('getStatus')
             ->willReturn(Status::CANCELLING());
 
@@ -174,7 +178,7 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
             ->method('refresh')
             ->with($this->job);
 
-        $this->job->expects($this->exactly(2))
+        $this->job->expects($this->any())
             ->method('getStatus')
             ->willReturn(Status::CANCELLING());
 
@@ -188,10 +192,16 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $this->subject->doExit();
     }
 
-    public static function provideNonCancellingStatus() {
+    public static function provideCancelStatus() {
+        return [
+            [Status::CANCELLED()],
+            [Status::CANCELLING()],
+        ];
+    }
+
+    public static function provideNonCancelStatus() {
         return [
             [Status::REQUESTED()],
-            [Status::CANCELLED()],
             [Status::PROCESSING()],
             [Status::PROCESSED()],
             [Status::SLEEPING()],

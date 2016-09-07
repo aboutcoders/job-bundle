@@ -273,7 +273,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param Status $status
      * @dataProvider provideUnterminatedStatus
      */
-    public function testCancel(Status $status)
+    public function testCancelWithUntermiantedJob(Status $status)
     {
         $isProcessing = $status->getValue() == Status::PROCESSING;
 
@@ -312,6 +312,49 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
 
         $this->subject->cancel($job->getTicket());
+    }
+
+    /**
+     * @param Status $status
+     * @dataProvider provideUnterminatedStatus
+     */
+    public function testForceCancelWithUntermiantedJob(Status $status)
+    {
+        $job = new Job();
+        $job->setTicket('ticket');
+        $job->setStatus($status);
+
+        $terminationEvent = new TerminationEvent($job);
+
+        $this->jobManager->expects($this->once())
+            ->method('findByTicket')
+            ->with($job->getTicket())
+            ->willReturn($job);
+
+        $this->helper->expects($this->once())
+            ->method('updateJob')
+            ->with($job, Status::CANCELLED())
+            ->willReturnCallback(
+                function (JobInterface $job, Status $status) {
+                    $job->setStatus($status);
+                }
+            );
+
+        $this->jobManager->expects($this->once())
+            ->method('save')
+            ->with(
+                $this->callback(
+                    function ($arg) use ($job) {
+                        return $arg === $job && $arg->getStatus() == Status::CANCELLED();
+                    }
+                )
+            );
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(JobEvents::JOB_TERMINATED, $terminationEvent);
+
+        $this->subject->cancel($job->getTicket(), true);
     }
 
     /**

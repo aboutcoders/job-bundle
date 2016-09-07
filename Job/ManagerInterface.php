@@ -56,12 +56,13 @@ interface ManagerInterface
     /**
      * Cancels execution of a job.
      *
-     * @param string $ticket The ticket of the job
+     * @param string  $ticket The ticket of the job
+     * @param boolean $force  Whether to enforce cancellation
      * @return JobInterface|null The cancelled job, or null if given job is already terminated
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */
-    public function cancel($ticket);
+    public function cancel($ticket, $force = false);
 
     /**
      * Returns a job.

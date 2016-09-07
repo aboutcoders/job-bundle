@@ -78,6 +78,6 @@ class StatusController implements ControllerInterface
             $this->manager->refresh($this->job);
         }
 
-        return $this->job->getStatus() == Status::CANCELLING();
+        return $this->job->getStatus() == Status::CANCELLING() || $this->job->getStatus() == Status::CANCELLED();
     }
 }

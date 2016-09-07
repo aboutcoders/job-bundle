@@ -47,7 +47,6 @@ Please note that this bundle is still in development and thus we might need to c
 
 ### Missing Features For The Stable Release
 
-- Add option to force cancellation of a job
 - Add validator (define add-validation-group, update-validation-group)
 - Add consumer management
 
