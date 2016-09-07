@@ -25,6 +25,7 @@ use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\Bundle\JobBundle\Serializer\Serializer;
 use Abc\Bundle\JobBundle\Validator\Constraint\JobTypeValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
@@ -84,9 +85,11 @@ class ServiceTest extends KernelTestCase
     {
         return [
             ['abc.job.agent_manager', AgentManagerInterface::class],
+            ['abc.job.controller_factory', Factory::class],
             ['abc.job.job_manager', JobManagerInterface::class],
             ['abc.job.listener.job', JobListener::class],
             ['abc.job.listener.schedule', ScheduleListener::class],
+            ['abc.job.locker', LockInterface::class],
             ['abc.job.logger.factory', LoggerFactoryInterface::class],
             ['abc.job.log_manager', LogManagerInterface::class],
             ['abc.job.mailer', Mailer::class],
@@ -94,8 +97,7 @@ class ServiceTest extends KernelTestCase
             ['abc.job.metadata_factory', MetadataFactory::class],
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
-            ['abc.job.locker', LockInterface::class],
-            ['abc.job.controller_factory', Factory::class],
+            ['abc.job.serializer', Serializer::class],
             ['abc.job.validator.job_type', JobTypeValidator::class]
         ];
     }

@@ -38,6 +38,9 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->manager = $this->getMock(ManagerInterface::class);

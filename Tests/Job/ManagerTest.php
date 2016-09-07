@@ -103,6 +103,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->registry      = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();

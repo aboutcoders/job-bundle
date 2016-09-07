@@ -28,11 +28,11 @@ class ManagerTest extends DatabaseKernelTestCase
 {
     public function testJobsCanLog()
     {
-        $ticket = $this->getJobManager()->addJob('log', array('message'));
+        $job = $this->getJobManager()->addJob('log', array('message'));
 
         $this->processJobs();
         
-        $logs = $this->getJobManager()->getLogs($ticket);
+        $logs = $this->getJobManager()->getLogs($job->getTicket());
 
         $this->assertTrue($this->containsMessage('message', $logs));
     }

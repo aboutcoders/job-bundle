@@ -19,7 +19,9 @@ use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
  */
 class LogManagerTest extends DatabaseKernelTestCase
 {
-    /** @var LogManager */
+    /**
+     * @var LogManager
+     */
     private $subject;
 
     /**

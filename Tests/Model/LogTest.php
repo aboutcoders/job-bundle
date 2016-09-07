@@ -17,7 +17,6 @@ use Abc\Bundle\JobBundle\Model\Log;
  */
 class LogTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetContext()
     {
         $subject = new Log();

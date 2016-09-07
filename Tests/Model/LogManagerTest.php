@@ -20,12 +20,14 @@ use Monolog\Formatter\FormatterInterface;
  */
 class LogManagerTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var LogManager|\PHPUnit_Framework_MockObject_MockObject
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->subject = $this->getMockForAbstractClass(LogManager::class);

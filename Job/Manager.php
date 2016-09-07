@@ -22,7 +22,6 @@ use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
-use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -182,7 +181,7 @@ class Manager implements ManagerInterface
         ]);
 
         if (!$job->hasSchedules()) {
-            $this->publishJob($job->getType(), $job->getTicket());
+            $this->publishJob($job);
         }
 
         return $job;
@@ -285,8 +284,8 @@ class Manager implements ManagerInterface
             $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
         } catch (\Exception $e) {
             $this->logger->warning(sprintf('Failed to execute job %s (Error: $s)', $job->getTicket(), $e->getMessage()), [
-                'parameters' => $job->getParameters(),
-                'exception'  => $e
+                'job'       => $job,
+                'exception' => $e
             ]);
 
             if ($event->getContext()->has('logger')) {
@@ -339,21 +338,18 @@ class Manager implements ManagerInterface
     }
 
     /**
-     *
-     * @param string      $type         The job type
-     * @param string      $ticket       The job ticket
-     * @param string|null $callerTicket The ticket of a child job that is calling back
+     * @param JobInterface $job
      * @throws \Exception
-     * @return void
      */
-    protected function publishJob($type, $ticket, $callerTicket = null)
+    protected function publishJob(JobInterface $job)
     {
-        $message = new Message($type, $ticket, $callerTicket);
+        $message = new Message($job->getType(), $job->getTicket());
 
         try {
             $this->producer->produce($message);
         } catch (\Exception $e) {
-            $this->logger->critical(sprintf('Failed to publish message for job %s (Error: %s)', $ticket, $e->getMessage()), [
+            $this->logger->critical(sprintf('Failed to publish message for job %s (Error: %s)', $job->getTicket(), $e->getMessage()), [
+                'job'       => $job,
                 'exception' => $e
             ]);
 

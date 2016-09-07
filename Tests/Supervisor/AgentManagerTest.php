@@ -33,6 +33,9 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
      */
     private $process;
 
+    /**
+     * @var array
+     */
     private static $processInfo = [
         'description' => 'pid 7837, uptime 0:00:41',
         'pid' => 7837,
@@ -50,10 +53,14 @@ class AgentManagerTest extends \PHPUnit_Framework_TestCase
         'stdout_logfile' => '/vagrant/app/logs/supervisor_queue-agent_default.log'
     ];
 
-    /** @var AgentManager */
+    /**
+     * @var AgentManager
+     */
     private $subject;
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->process = $this->getMockBuilder(Process::class)

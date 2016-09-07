@@ -27,6 +27,9 @@ class MessageTest extends KernelTestCase
      */
     private $serializer;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->serializer = SerializerBuilder::create()->build();

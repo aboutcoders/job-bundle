@@ -35,6 +35,9 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->consumer = $this->getMockBuilder(Consumer::class)->disableOriginalConstructor()->getMock();

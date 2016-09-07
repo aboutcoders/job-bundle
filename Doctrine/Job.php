@@ -10,10 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Doctrine;
 
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\Job as BaseJob;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\Annotation\ExclusionPolicy;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -23,14 +21,9 @@ use JMS\Serializer\Annotation\ExclusionPolicy;
 class Job extends BaseJob
 {
     /**
-     * @var SerializerInterface
+     * @var SerializationHelper
      */
-    protected static $serializer;
-
-    /**
-     * @var JobTypeRegistry
-     */
-    protected static $registry;
+    protected static $serializationHelper;
 
     /**
      * @var string|null
@@ -43,36 +36,22 @@ class Job extends BaseJob
     protected $serializedResponse;
 
     /**
-     * @return string|null The serialized parameters
+     * @var bool
      */
-    protected function getSerializedParameters()
-    {
-        return $this->serializedParameters;
-    }
+    private $paramDeserializationError = false;
 
     /**
-     * @param string|null $serializedParameters The serialized parameters
+     * @var bool
+     */
+    private $responseDeserializationError = false;
+
+    /**
+     * @param SerializationHelper $serializationHelper
      * @return void
      */
-    protected function setSerializedParameters($serializedParameters = null)
+    public static function setSerializationHelper(SerializationHelper $serializationHelper)
     {
-        $this->serializedParameters = $serializedParameters;
-    }
-
-    /**
-     * @return null|string
-     */
-    protected function getSerializedResponse()
-    {
-        return $this->serializedResponse;
-    }
-
-    /**
-     * @param null|string $serializedResponse
-     */
-    protected function setSerializedResponse($serializedResponse)
-    {
-        $this->serializedResponse = $serializedResponse;
+        static::$serializationHelper = $serializationHelper;
     }
 
     /**
@@ -83,34 +62,34 @@ class Job extends BaseJob
      */
     public function setParameters($parameters = null)
     {
-        $serializer = static::getSerializer();
-
         parent::setParameters($parameters);
 
-        try
-        {
-            $this->setSerializedParameters($parameters == null ? null : $serializer->serialize($parameters, 'json'));
-        }
-        catch(\Exception $e)
-        {
+        try {
+            $this->serializedParameters = ($parameters == null ? null : static::getSerializationHelper()->serialize($parameters));
+
+        } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to serialize parameters', null, $e);
         }
     }
 
     /**
      * @return array|null
-     * @throws \Abc\Bundle\JobBundle\Job\JobTypeNotFoundException
-     * @throws \RuntimeException
+     * @throws \Exception If deserialization fails
      */
     public function getParameters()
     {
-        if(is_null(parent::getParameters()) && !is_null($this->getSerializedParameters()))
-        {
-            // deserialize
-            $type       = static::getRegistry()->get($this->getType())->getParametersType();
-            $parameters = static::getSerializer()->deserialize($this->getSerializedParameters(), $type, 'json');
+        if ($this->paramDeserializationError) {
+            return null;
+        }
 
-            parent::setParameters($parameters);
+        if (is_null(parent::getParameters()) && !is_null($this->serializedParameters)) {
+            try {
+                parent::setParameters(static::getSerializationHelper()->deserializeParameters($this->serializedParameters, $this->getType()));
+            } catch (\Exception $e) {
+
+                $this->paramDeserializationError = true;
+                throw $e;
+            }
         }
 
         return parent::getParameters();
@@ -124,83 +103,49 @@ class Job extends BaseJob
      */
     public function setResponse($response = null)
     {
-        $serializer = static::getSerializer();
-
         parent::setResponse($response);
 
-        try
-        {
-            $this->setSerializedResponse($response == null ? null : $serializer->serialize($response, 'json'));
-        }
-        catch(\Exception $e)
-        {
+        try {
+            $this->serializedResponse = ($response == null ? null : static::getSerializationHelper()->serialize($response));
+        } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to serialize response', null, $e);
         }
     }
 
     /**
-     * @return mixed|null
-     * @throws \Abc\Bundle\JobBundle\Job\JobTypeNotFoundException
-     * @throws \RuntimeException
+     * @return mixed
+     * @throws \Exception If deserialization fails
      */
     public function getResponse()
     {
-        if(is_null(parent::getResponse()) && !is_null($this->getSerializedResponse()))
-        {
-            // deserialize
-            $type     = static::getRegistry()->get($this->getType())->getResponseType();
-            $response = static::getSerializer()->deserialize($this->getSerializedResponse(), $type, 'json');
+        if ($this->responseDeserializationError) {
+            return null;
+        }
 
-            parent::setResponse($response);
+        if (is_null(parent::getResponse()) && !is_null($this->serializedResponse)) {
+            try {
+                parent::setResponse(static::getSerializationHelper()->deserializeResponse($this->serializedResponse, $this->getType()));
+            } catch (\Exception $e) {
+                $this->responseDeserializationError = true;
+
+                throw $e;
+            }
         }
 
         return parent::getResponse();
     }
 
     /**
-     *
-     * @return SerializerInterface
+     * @return SerializationHelper
      * @throws \RuntimeException If the serializer is not set
      */
-    protected static function getSerializer()
+    protected
+    static function getSerializationHelper()
     {
-        if(is_null(static::$serializer))
-        {
+        if (is_null(static::$serializationHelper)) {
             throw new \RuntimeException('The serializer is null');
         }
 
-        return static::$serializer;
-    }
-
-    /**
-     * @param SerializerInterface $serializer
-     * @return void
-     */
-    public static function setSerializer(SerializerInterface $serializer)
-    {
-        static::$serializer = $serializer;
-    }
-
-    /**
-     * @return JobTypeRegistry
-     * @throws \RuntimeException If the registry is not set
-     */
-    protected static function getRegistry()
-    {
-        if(is_null(static::$registry))
-        {
-            throw new \RuntimeException('The registry is null');
-        }
-
-        return static::$registry;
-    }
-
-    /**
-     * @param JobTypeRegistry $registry
-     * @return void
-     */
-    public static function setRegistry(JobTypeRegistry $registry)
-    {
-        static::$registry = $registry;
+        return static::$serializationHelper;
     }
 }

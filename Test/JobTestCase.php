@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Test;
 use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
-use JMS\Serializer\SerializerInterface;
+use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

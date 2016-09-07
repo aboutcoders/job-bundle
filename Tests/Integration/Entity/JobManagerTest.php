@@ -11,29 +11,15 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration\Entity;
 
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
-use Abc\Bundle\JobBundle\Entity\Job;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Entity\JobManager;
 use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
-use JMS\Serializer\SerializerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class JobManagerTest extends DatabaseKernelTestCase
 {
-
-    /**
-     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $registry;
-
-    /**
-     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $serializer;
-
     /**
      * @var JobManager
      */
@@ -46,16 +32,21 @@ class JobManagerTest extends DatabaseKernelTestCase
     {
         parent::setUp();
 
-        $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->serializer = $this->getMock(SerializerInterface::class);
+        $this->subject = $this->getContainer()->get('abc.job.job_manager');
+    }
 
-        $this->subject = new JobManager(
-            $this->getEntityManager(),
-            Job::class,
-            $this->getScheduleManager(),
-            $this->serializer,
-            $this->registry
-        );
+    public function testSerializesParameters() {
+
+        $job = $this->subject->create('abc.sleeper', [5]);
+        $job->setStatus(Status::REQUESTED());
+
+        $this->subject->save($job);
+
+        $this->getEntityManager()->clear();
+
+        $job = $this->subject->findByTicket($job->getTicket());
+
+        $this->assertEquals([5], $job->getParameters());
     }
 
     /**

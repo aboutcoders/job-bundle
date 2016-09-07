@@ -29,6 +29,9 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->serviceId = 'service-id';

@@ -13,11 +13,10 @@ namespace Abc\Bundle\JobBundle\Tests\Doctrine;
 use Abc\Bundle\JobBundle\Doctrine\JobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\JobBundle\Entity\Job;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use JMS\Serializer\SerializerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -45,35 +44,31 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     private $repository;
 
     /**
-     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $registry;
-
-    /**
      * @var  ScheduleManager|\PHPUnit_Framework_MockObject_MockObject
      */
     private $scheduleManager;
 
     /**
-     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SerializationHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $serializer;
+    private $serializationHelper;
 
     /**
      * @var JobManager
      */
     private $subject;
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
-        $this->class           = Job::class;
-        $this->classMetaData   = $this->getMock(ClassMetadata::class);
-        $this->objectManager   = $this->getMock(ObjectManager::class);
-        $this->repository      = $this->getMock(ObjectRepository::class);
-        $this->scheduleManager = $this->getMockBuilder(ScheduleManager::class)->disableOriginalConstructor()->getMock();
-        $this->registry        = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->serializer      = $this->getMock(SerializerInterface::class);
+        $this->class               = Job::class;
+        $this->classMetaData       = $this->getMock(ClassMetadata::class);
+        $this->objectManager       = $this->getMock(ObjectManager::class);
+        $this->repository          = $this->getMock(ObjectRepository::class);
+        $this->scheduleManager     = $this->getMockBuilder(ScheduleManager::class)->disableOriginalConstructor()->getMock();
+        $this->serializationHelper = $this->getMockBuilder(SerializationHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->objectManager->expects($this->any())
             ->method('getClassMetadata')
@@ -93,12 +88,15 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
                 $this->objectManager,
                 $this->class,
                 $this->scheduleManager,
-                $this->serializer,
-                $this->registry
+                $this->serializationHelper
             ]
         );
     }
 
+    public function testSetsDeserializationHelper()
+    {
+        $this->assertAttributeInstanceOf(SerializationHelper::class, 'serializationHelper', \Abc\Bundle\JobBundle\Doctrine\Job::class);
+    }
 
     public function testGetClass()
     {
@@ -150,7 +148,6 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->delete($entity);
     }
 
-
     public function testFindAll()
     {
         $this->repository->expects($this->once())
@@ -158,7 +155,6 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->subject->findAll();
     }
-
 
     public function testFindBy()
     {

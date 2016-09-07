@@ -37,16 +37,13 @@ class ControlledConsumerTest extends \PHPUnit_Framework_TestCase
     private $controller;
 
     /**
-     * @var ControlledConsumer
+     * {@inheritdoc}
      */
-    private $subject;
-
     public function setUp()
     {
         $this->router     = $this->getMockBuilder(Router::class)->disableOriginalConstructor()->getMock();
         $this->dispatcher = $this->getMock(EventDispatcherInterface::class);
         $this->controller = $this->getMock(ControllerInterface::class);
-
     }
 
     public function testConsumeChecksController()

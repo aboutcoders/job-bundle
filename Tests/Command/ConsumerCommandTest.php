@@ -26,6 +26,9 @@ class ConsumerCommandTest extends KernelTestCase
      */
     private $consumer;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         parent::setUp();

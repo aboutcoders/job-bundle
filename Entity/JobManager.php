@@ -12,28 +12,28 @@ namespace Abc\Bundle\JobBundle\Entity;
 
 use Abc\Bundle\JobBundle\Doctrine\JobManager as BaseJobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Doctrine\ORM\EntityManager;
-use JMS\Serializer\SerializerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class JobManager extends BaseJobManager
 {
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     */
     protected $em;
 
     /**
      * @param EntityManager       $em
      * @param string              $class
      * @param ScheduleManager     $scheduleManager
-     * @param SerializerInterface $serializer
-     * @param JobTypeRegistry     $registry
+     * @param SerializationHelper $serializationHelper
      */
-    public function __construct(EntityManager $em, $class, ScheduleManager $scheduleManager, SerializerInterface $serializer, JobTypeRegistry $registry)
+    public function __construct(EntityManager $em, $class, ScheduleManager $scheduleManager, SerializationHelper $serializationHelper)
     {
-        parent::__construct($em, $class, $scheduleManager, $serializer, $registry);
+        parent::__construct($em, $class, $scheduleManager, $serializationHelper);
 
         $this->em = $em;
     }

@@ -40,6 +40,9 @@ class StreamHandlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->level   = 100;

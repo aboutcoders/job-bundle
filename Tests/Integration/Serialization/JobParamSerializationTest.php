@@ -22,7 +22,6 @@ use JMS\Serializer\SerializerInterface;
  */
 class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var SerializerInterface
      */

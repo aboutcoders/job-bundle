@@ -10,12 +10,11 @@
 
 namespace Abc\Bundle\JobBundle\Doctrine;
 
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManager as BaseJobManager;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use JMS\Serializer\SerializerInterface;
 
 /**
  * Entity manager for entities of type JobInterface
@@ -50,10 +49,9 @@ abstract class JobManager extends BaseJobManager
      * @param ObjectManager       $om
      * @param string              $class
      * @param ScheduleManager     $scheduleManager
-     * @param SerializerInterface $serializer
-     * @param JobTypeRegistry     $registry
+     * @param SerializationHelper $serializationHelper
      */
-    public function __construct(ObjectManager $om, $class, ScheduleManager $scheduleManager, SerializerInterface $serializer, JobTypeRegistry $registry)
+    public function __construct(ObjectManager $om, $class, ScheduleManager $scheduleManager, SerializationHelper $serializationHelper)
     {
         $this->objectManager   = $om;
         $this->repository      = $om->getRepository($class);
@@ -62,8 +60,7 @@ abstract class JobManager extends BaseJobManager
         $metadata    = $om->getClassMetadata($class);
         $this->class = $metadata->getName();
 
-        Job::setRegistry($registry);
-        Job::setSerializer($serializer);
+        Job::setSerializationHelper($serializationHelper);
     }
 
     /**

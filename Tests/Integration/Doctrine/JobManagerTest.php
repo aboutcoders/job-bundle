@@ -13,13 +13,11 @@ namespace Abc\Bundle\JobBundle\Tests\Integration\Doctrine;
 use Abc\Bundle\JobBundle\Doctrine\JobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\JobBundle\Entity\Job;
-use Abc\Bundle\JobBundle\Job\JobParameterArray;
 use Abc\Bundle\JobBundle\Job\JobType;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
-use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Constraints\UuidValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -30,14 +28,9 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 class JobManagerTest extends DatabaseKernelTestCase
 {
     /**
-     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var SerializationHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $registry;
-
-    /**
-     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $serializer;
+    private $serializationHelper;
 
     /**
      * @var JobManager
@@ -51,15 +44,13 @@ class JobManagerTest extends DatabaseKernelTestCase
     {
         parent::setUp();
 
-        $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->serializer = $this->getMock(SerializerInterface::class);
+        $this->serializationHelper = $this->getMockBuilder(SerializationHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->subject = new \Abc\Bundle\JobBundle\Entity\JobManager(
             $this->getEntityManager(),
             Job::class,
             $this->getScheduleManager(),
-            $this->serializer,
-            $this->registry
+            $this->serializationHelper
         );
     }
 
@@ -104,15 +95,14 @@ class JobManagerTest extends DatabaseKernelTestCase
 
     public function testHandlesParameterSerialization()
     {
-        $type        = 'foobar';
+        $type           = 'foobar';
         $parameters     = [['foo' => 'bar'], 'foobar'];
         $parameterTypes = ['array<String,String>', 'String'];
-        $jobType     = $this->setUpJobType($type, $parameterTypes);
 
         // persist object with parameters being an array
-        $this->serializer->expects($this->once())
+        $this->serializationHelper->expects($this->once())
             ->method('serialize')
-            ->with($parameters, 'json')
+            ->with($parameters)
             ->willReturn('SerializedParameter');
 
         $job = $this->subject->create($type);
@@ -123,15 +113,9 @@ class JobManagerTest extends DatabaseKernelTestCase
         // clear
         $this->getEntityManager()->clear();
 
-        // load object and verify parameters are as expected
-        $this->registry->expects($this->once())
-            ->method('get')
-            ->with($type)
-            ->willReturn($jobType);
-
-        $this->serializer->expects($this->once())
-            ->method('deserialize')
-            ->with('SerializedParameter', JobParameterArray::class . '<array<String,String>,String>', 'json')
+        $this->serializationHelper->expects($this->once())
+            ->method('deserializeParameters')
+            ->with('SerializedParameter', $type)
             ->willReturn($parameters);
 
         $persistedJob = $this->subject->findByTicket($job->getTicket());
@@ -141,15 +125,13 @@ class JobManagerTest extends DatabaseKernelTestCase
 
     public function testHandlesResponseSerialization()
     {
-        $type      = 'foobar';
-        $response     = ['foo' => 'bar'];
-        $responseType = ['Array<String,String>'];
-        $jobType   = $this->setUpJobType($type, [], $responseType);
+        $type     = 'foobar';
+        $response = ['foo' => 'bar'];
 
         // persist object with parameters being an array
-        $this->serializer->expects($this->once())
+        $this->serializationHelper->expects($this->once())
             ->method('serialize')
-            ->with($response, 'json')
+            ->with($response)
             ->willReturn('SerializedResponse');
 
         $job = $this->subject->create($type);
@@ -157,18 +139,11 @@ class JobManagerTest extends DatabaseKernelTestCase
         $job->setResponse($response);
         $this->subject->save($job);
 
-        // clear
         $this->getEntityManager()->clear();
 
-        // load object and verify parameters are as expected
-        $this->registry->expects($this->once())
-            ->method('get')
-            ->with($type)
-            ->willReturn($jobType);
-
-        $this->serializer->expects($this->once())
-            ->method('deserialize')
-            ->with('SerializedResponse', $responseType, 'json')
+        $this->serializationHelper->expects($this->once())
+            ->method('deserializeResponse')
+            ->with('SerializedResponse', $type)
             ->willReturn($response);
 
         $persistedJob = $this->subject->findByTicket($job->getTicket());
@@ -256,10 +231,9 @@ class JobManagerTest extends DatabaseKernelTestCase
      */
     private function setUpJobType($jobType, array $parameterTypes = [], $responseType = null)
     {
-        $callable   = function ()
-        {
+        $callable = function () {
         };
-        $jobType = new JobType('ServiceId', $jobType, $callable);
+        $jobType  = new JobType('ServiceId', $jobType, $callable);
         $jobType->setParameterTypes($parameterTypes);
         $jobType->setResponseType($responseType);
 

@@ -31,10 +31,9 @@ class AgentController extends BaseController
      *   }
      * )
      *
-     * @param Request $request
      * @return Response
      */
-    public function listAction(Request $request)
+    public function listAction()
     {
         return $this->serialize($this->getAgentManager()->findAll());
     }

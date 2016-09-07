@@ -39,6 +39,9 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);

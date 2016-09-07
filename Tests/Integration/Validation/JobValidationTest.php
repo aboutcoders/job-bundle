@@ -24,6 +24,9 @@ class JobValidationTest extends KernelTestCase
      */
     private $validator;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         parent::setUp();

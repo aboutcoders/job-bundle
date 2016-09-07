@@ -39,6 +39,9 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $directory         = dirname(__FILE__) . '/../../build/tests';

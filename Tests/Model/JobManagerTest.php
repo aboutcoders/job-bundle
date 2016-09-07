@@ -22,9 +22,14 @@ use Abc\Bundle\JobBundle\Model\Schedule;
  */
 class JobManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Abc\Bundle\JobBundle\Model\JobManager|\PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \Abc\Bundle\JobBundle\Model\JobManager|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->subject = $this->getMockForAbstractClass(JobManager::class);

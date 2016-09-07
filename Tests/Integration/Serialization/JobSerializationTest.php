@@ -29,7 +29,6 @@ use JMS\Serializer\SerializerInterface;
  */
 class JobSerializationTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -40,6 +39,9 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
      */
     private $serializer;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->registry = $this->getMockBuilder(JobTypeRegistry::class)

@@ -17,7 +17,6 @@ use Abc\Bundle\JobBundle\Model\Schedule;
  */
 class ScheduleTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testClone()
     {
         $schedule = new Schedule();

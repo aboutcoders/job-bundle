@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Controller;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
-use JMS\Serializer\SerializerInterface;
+use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 

@@ -20,6 +20,9 @@ use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
  */
 class ConnectionTest extends DatabaseKernelTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->setEntityManagerNames(['default', 'abc_job_processing']);

@@ -35,6 +35,9 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->loggerFactory = $this->getMock(LoggerFactoryInterface::class);

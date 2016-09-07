@@ -38,6 +38,9 @@ class JobControllerTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->controller = $this->getMock(ControllerInterface::class);

@@ -16,7 +16,7 @@
             <argument type="service" id="abc.job.entity_manager" />
             <argument>%abc.job.model.job.class%</argument>
             <argument type="service" id="abc.job.schedule_manager" />
-            <argument type="service" id="abc.job.serializer" />
+            <argument type="service" id="abc.job.serialization_helper" />
             <argument type="service" id="abc.job.registry" />
         </service>
 

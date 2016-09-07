@@ -43,6 +43,9 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
      */
     private $subject;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->producer = $this->getMockBuilder(Producer::class)->disableOriginalConstructor()->getMock();

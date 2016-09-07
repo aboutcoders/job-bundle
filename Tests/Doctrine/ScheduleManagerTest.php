@@ -41,10 +41,14 @@ class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
      */
     private $repository;
 
-    /** @var ScheduleManager */
+    /**
+     * @var ScheduleManager
+     */
     private $subject;
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->class         = Schedule::class;

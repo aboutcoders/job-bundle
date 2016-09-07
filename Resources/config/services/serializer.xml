@@ -5,12 +5,21 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
-        <service id="abc.job.serializer.job_parameter_handler" class="Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler">
+        <service id="abc.job.serializer.default" class="Abc\Bundle\JobBundle\Serializer\Serializer" public="false">
+            <argument type="service" id="jms_serializer"/>
+        </service>
+
+        <service id="abc.job.serialization_helper" class="Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper" public="false">
+            <argument type="service" id="abc.job.registry"/>
+            <argument type="service" id="abc.job.serializer"/>
+        </service>
+
+        <service id="abc.job.serializer.job_parameter_handler" class="Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler" public="true">
             <tag name="jms_serializer.subscribing_handler"/>
         </service>
 
-        <service id="abc.job.serializer.job_deserialization_subscriber" class="Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber">
-            <argument type="service" id="abc.job.registry" />
+        <service id="abc.job.serializer.job_deserialization_subscriber" class="Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber" public="true">
+            <argument type="service" id="abc.job.registry"/>
             <tag name="jms_serializer.event_subscriber"/>
         </service>
 

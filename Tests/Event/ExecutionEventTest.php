@@ -19,7 +19,6 @@ use Abc\Bundle\JobBundle\Model\Job;
  */
 class ExecutionEventTest extends TerminationEventTest
 {
-
     public function testGetContext()
     {
         $job = new Job();
