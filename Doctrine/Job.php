@@ -12,6 +12,7 @@ namespace Abc\Bundle\JobBundle\Doctrine;
 
 use Abc\Bundle\JobBundle\Model\Job as BaseJob;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
+use JMS\Serializer\Annotation\ExclusionPolicy;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -139,8 +140,7 @@ class Job extends BaseJob
      * @return SerializationHelper
      * @throws \RuntimeException If the serializer is not set
      */
-    protected
-    static function getSerializationHelper()
+    protected static function getSerializationHelper()
     {
         if (is_null(static::$serializationHelper)) {
             throw new \RuntimeException('The serializer is null');
