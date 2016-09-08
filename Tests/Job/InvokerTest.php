@@ -163,10 +163,9 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         $this->registry->register($jobType);
 
         $this->assertEquals('foobar', $this->subject->invoke($job, $context));
-        if($withLogger) {
+        if ($withLogger) {
             $this->assertSame($logger, $callable->getLogger());
-        }
-        else {
+        } else {
             $this->assertNull($callable->getLogger());
         }
     }
@@ -179,15 +178,11 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             //[$callable, $expectedResponse, $parameters, $parameterTypes, $contextParameters],
-            [function () {
-                return 'foobar';
-            }, 'foobar'],
-            [function ($argument) {
-                return $argument;
-            }, 'foobar', ['foobar'], ['string']],
-            [function ($contextParameter) {
-                return $contextParameter;
-            }, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
+            [function () {return 'foobar';}, 'foobar'],
+            [function ($argument) {return $argument;}, 'foobar', ['foobar'], ['string']],
+            [function () {}, null, null, ['string']],
+            [function ($arg1 = null, $arg2) {}, null, null, ['string', '@contextParameter'], ['contextParameter' => 'foobar']],
+            [function ($contextParameter) {return $contextParameter;}, 'foobar', [], ['@contextParameter'], ['contextParameter' => 'foobar']],
             [function ($parameter, $contextParameter) {
                 return $parameter . $contextParameter;
             }, 'foobar', ['foo'], ['string', '@contextParameter'], ['contextParameter' => 'bar']],
@@ -200,7 +195,8 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public static function provideTrueFalse(){
+    public static function provideTrueFalse()
+    {
         return [
             [true],
             [false]

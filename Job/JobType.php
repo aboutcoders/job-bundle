@@ -47,7 +47,12 @@ class JobType implements JobTypeInterface
     /**
      * @var array
      */
-    private $parameterTypes;
+    private $parameterTypes = array();
+
+    /**
+     * @var array
+     */
+    private $serializableParameterTypes;
 
     /**
      * @var string
@@ -154,34 +159,32 @@ class JobType implements JobTypeInterface
      */
     public function getParameterTypes()
     {
-        return is_null($this->parameterTypes) ? [] : $this->parameterTypes;
+        return $this->parameterTypes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParametersType()
+    public function setParameterTypes(array $types = array())
     {
-        if (is_null($this->parameterTypes) || empty($this->parameterTypes)) {
-            return null;
-        }
+        $this->parameterTypes = $types;
+    }
 
-        $serializedParams = [];
-        foreach ($this->getParameterTypes() as $parameterType) {
-            if (0 !== strpos($parameterType, '@')) {
-                $serializedParams[] = $parameterType;
+    /**
+     * {@inheritdoc}
+     */
+    public function getSerializableParameterTypes()
+    {
+        if (null == $this->serializableParameterTypes) {
+            $this->serializableParameterTypes = [];
+            foreach ($this->getParameterTypes() as $type) {
+                if (0 !== strpos($type, '@')) {
+                    $this->serializableParameterTypes[] = $type;
+                }
             }
         }
 
-        return sprintf(JobParameterArray::class . '<%s>', implode($serializedParams, ','));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParameterTypes(array $parameterTypes = null)
-    {
-        $this->parameterTypes = $parameterTypes;
+        return $this->serializableParameterTypes;
     }
 
     /**

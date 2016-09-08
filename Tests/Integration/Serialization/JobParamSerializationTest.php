@@ -54,7 +54,8 @@ class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
         return [
             [['foobar'], JobParameterArray::class.'<string>'],
             [[$this->createMessage(), false], JobParameterArray::class.'<'.Message::class.',boolean>'],
-            [[$this->createMessage(), 'string'], JobParameterArray::class.'<'.Message::class.',string>']
+            [[$this->createMessage(), 'string'], JobParameterArray::class.'<'.Message::class.',string>'],
+            [[null, 'string', null], JobParameterArray::class.'<string,string,string>'],
         ];
     }
 

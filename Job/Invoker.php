@@ -16,7 +16,7 @@ use Abc\ProcessControl\ControllerAwareInterface;
 use Psr\Log\LoggerAwareInterface;
 
 /**
- * Invokes the callable registered for a certain job type
+ * Invokes a job.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
@@ -61,7 +61,6 @@ class Invoker
      * Register the process controller that is passed to jobs implementing the ControllerAwareInterface
      *
      * @param Factory $controllerFactory
-     * @see Abc\ProcessControl\ControllerAwareInterface\ControllerAwareInterface
      */
     public function setControllerFactory(Factory $controllerFactory)
     {
@@ -78,58 +77,50 @@ class Invoker
      */
     public function invoke(JobInterface $job, ContextInterface $context)
     {
-        $jobType  = $this->registry->get($job->getType());
+        $jobType       = $this->registry->get($job->getType());
         $callableArray = $jobType->getCallable();
+        $parameters    = $this->resolveParameters($jobType, $context, $job->getParameters());
 
-        $arguments = $this->resolveArguments($jobType, $context, $job->getParameters());
-
-        if(is_array($callableArray) && $callable = $callableArray[0])
-        {
-            if($callable instanceof JobAwareInterface)
-            {
+        if (is_array($callableArray) && $callable = $callableArray[0]) {
+            if ($callable instanceof JobAwareInterface) {
                 $callable->setJob($job);
             }
 
-            if($callable instanceof ManagerAwareInterface)
-            {
+            if ($callable instanceof ManagerAwareInterface) {
                 $callable->setManager($this->manager);
             }
 
-            if($callable instanceof ControllerAwareInterface)
-            {
+            if ($callable instanceof ControllerAwareInterface) {
                 $callable->setController($this->controllerFactory->create($job));
             }
 
-            if($callable instanceof LoggerAwareInterface && $context->has('logger')) {
+            if ($callable instanceof LoggerAwareInterface && $context->has('logger')) {
                 $callable->setLogger($context->get('logger'));
             }
         }
 
-        return call_user_func_array($callableArray, $arguments);
+        return call_user_func_array($callableArray, $parameters);
     }
 
     /**
      * @param JobTypeInterface $jobType
      * @param ContextInterface $context
-     * @param array            $parameters
+     * @param array            $serializableParameters
      * @return array
      */
-    protected function resolveArguments(JobTypeInterface $jobType, ContextInterface $context, $parameters)
+    protected function resolveParameters(JobTypeInterface $jobType, ContextInterface $context, $serializableParameters = null)
     {
-        $arguments = array();
-        foreach($jobType->getParameterTypes() as $parameterType)
-        {
-            if(0 === strpos($parameterType, '@'))
-            {
-                $key         = substr($parameterType, 1);
-                $arguments[] = $context->has($key) ? $context->get($key) : null;
-            }
-            else
-            {
-                $arguments[] = array_shift($parameters);
+        $result = array();
+        $serializableParameters = $serializableParameters == null ? [] : $serializableParameters;
+        foreach ($jobType->getParameterTypes() as $parameterType) {
+            if (0 === strpos($parameterType, '@')) {
+                $key      = substr($parameterType, 1);
+                $result[] = $context->has($key) ? $context->get($key) : null;
+            } else {
+                $result[] = array_shift($serializableParameters);
             }
         }
 
-        return $arguments;
+        return $result;
     }
 }

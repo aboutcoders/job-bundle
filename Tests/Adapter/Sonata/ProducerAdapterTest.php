@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Tests\Adapter\Sonata;
 
 use Abc\Bundle\JobBundle\Adapter\Sonata\BackendProvider;
 use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
-use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
@@ -89,7 +89,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $message = new Message('type', 'ticket', 'callback');
         $backend = $this->getMock(BackendInterface::class);
 
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
         $jobType->expects($this->any())
             ->method('getQueue')
             ->willReturn($queue);
@@ -120,7 +120,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $message = new Message('type', 'ticket', 'callback');
         $backend = $this->getMock(BackendInterface::class);
 
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
         $jobType->expects($this->any())
             ->method('getQueue')
             ->willReturn($queue);

@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Adapter\Bernard;
 
 use Abc\Bundle\JobBundle\Adapter\Bernard\ProducerAdapter;
-use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
@@ -63,7 +63,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $queue   = 'QueueName';
         $message = new Message($type, $ticket);
 
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
         $jobType->expects($this->once())
             ->method('getQueue')
             ->willReturn($queue);

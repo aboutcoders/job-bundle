@@ -139,6 +139,17 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->findBy($criteria, $orderBy, $limit, $offset);
     }
 
+    public function testFindByChannel()
+    {
+        $channel = 'Channel';
+
+        $this->repository->expects($this->once())
+            ->method('findBy')
+            ->with(['channel' => $channel]);
+
+        $this->subject->findByChannel($channel);
+    }
+
     /**
      * @return array
      */

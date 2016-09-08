@@ -10,7 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Logger;
 
-use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Logger\Handler\BaseHandlerFactory;
 use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryRegistry;
@@ -58,7 +58,7 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
 
         $handler = $this->getMock(HandlerInterface::class);
         $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
 
         $this->handlerFactory->register($factory);
 
@@ -94,7 +94,7 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         $handler = $this->getMock(HandlerInterface::class);
         $extraHandler = $this->getMock(HandlerInterface::class);
         $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);;
 
         $this->handlerFactory->register($factory);
 

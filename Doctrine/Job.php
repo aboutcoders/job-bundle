@@ -143,7 +143,7 @@ class Job extends BaseJob
     protected static function getSerializationHelper()
     {
         if (is_null(static::$serializationHelper)) {
-            throw new \RuntimeException('The serializer is null');
+            throw new \RuntimeException('The serialization helper is null');
         }
 
         return static::$serializationHelper;

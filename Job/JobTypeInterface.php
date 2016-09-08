@@ -43,20 +43,28 @@ interface JobTypeInterface
     public function getMethod();
 
     /**
-     * @return array An array of strings specifying the argument types used by the JMS serializer
+     * Returns the parameter types of a job as specified in the annotation @ParamType.
+     *
+     * The order of elements in the  array reflects the order of the parameters in the method signature of the job.
+     *
+     * @return array|string[] The types of parameters the job can be invoked with
      */
     public function getParameterTypes();
 
     /**
-     * @return string|null The parameters type used to serialize job parameters with the JMS serializer
-     */
-    public function getParametersType();
-
-    /**
-     * @param array|null $parameterTypes An array of strings specifying the argument types used by the JMS serializer
+     * @param array $types The types of parameters the job can be invoked with
      * @return void
      */
-    public function setParameterTypes(array $parameterTypes = null);
+    public function setParameterTypes(array $types = array());
+
+    /**
+     * Returns the serializable parameter types of a job as specified in the annotation @ParamType.
+     *
+     * The order of elements in the  array reflects the order of the parameters in the method signature of the job.
+     *
+     * @return array|string[] An array of types the job can be invoked with
+     */
+    public function getSerializableParameterTypes();
 
     /**
      * @return string|null The response type used by the JMS serializer

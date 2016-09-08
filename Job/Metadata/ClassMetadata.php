@@ -31,7 +31,7 @@ class ClassMetadata extends BaseClassMetadata
      * @param string $method The method name
      * @param array  $typeList A list of argument types
      */
-    public function setMethodArgumentTypes($method, array $typeList = null)
+    public function setMethodArgumentTypes($method, array $typeList = array())
     {
         $this->methodArgumentTypes[$method] = $typeList;
     }
@@ -42,7 +42,7 @@ class ClassMetadata extends BaseClassMetadata
      */
     public function getMethodArgumentTypes($method)
     {
-        return isset($this->methodArgumentTypes[$method]) ? $this->methodArgumentTypes[$method] : null;
+        return isset($this->methodArgumentTypes[$method]) ? $this->methodArgumentTypes[$method] : array();
     }
 
     /**

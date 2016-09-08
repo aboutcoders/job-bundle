@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Serializer\Handler;
 
 use Abc\Bundle\JobBundle\Job\JobParameterArray;
+use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\GraphNavigator;
@@ -67,38 +68,42 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
      * @param array            $type
      * @param Context          $context
      * @return array|null
+     * @throws RuntimeException If $data contains more elements than $type['params']
      */
     public function deserializeJobParameterArray(VisitorInterface $visitor, $data, array $type, Context $context)
     {
-        if(!is_array($data) || count($data) == 0) {
-            return [];
-        }
-
-        // if $type['params'] is not set this means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
+        /**
+         * If $type['params'] is not set this most likely means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
+         * @see JobDeserializationSubscriber::onPreDeserialize()
+         */
         $deserializeJob = false;
-        if (count($type['params']) == 0 && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
-
+        if (count($type['params']) == 0 && is_array($data) && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
             $type['params'] = $this->extractParamTypes($data);
             $deserializeJob = true;
         }
 
-        if (count($data) > count($type['params'])) {
-            throw new RuntimeException(sprintf('Invalid job parameter, array contains more elements that defined (%s)', implode(',', $type['params'])));
+        if (is_array($data) && count($data) > count($type['params'])) {
+            throw new RuntimeException(sprintf('Invalid job parameters, the parameters contain more elements that defined (%s)', implode(',', $type['params'])));
         }
 
         $result = [];
-        for ($i = 0; $i < count($data); $i++) {
-            if (!is_array($type['params'][$i])) {
-                $type['params'][$i] = [
-                    'name'   => $type['params'][$i],
-                    'params' => array()
-                ];
+        for ($i = 0; $i < count($type['params']); $i++) {
+            if (!is_array($data) || !isset($data[$i]) || null == $data[$i]) {
+                $result[$i] = null;
             }
+            else {
+                if (!is_array($type['params'][$i])) {
+                    $type['params'][$i] = [
+                        'name'   => $type['params'][$i],
+                        'params' => array()
+                    ];
+                }
 
-            $result[$i] = $context->accept($data[$i], $type['params'][$i]);
+                $result[$i] = $context->accept($data[$i], $type['params'][$i]);
+            }
         }
 
-        if (!$deserializeJob) {
+        if (count($data) > 0 && !$deserializeJob) {
             /**
              * Since serializer always returns the result of $context->accept unless visitor result is empty,
              * we have to make sure that the visitor result is null in case only root is type JobParameterArray::class

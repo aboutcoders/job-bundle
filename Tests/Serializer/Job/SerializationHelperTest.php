@@ -10,7 +10,8 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Serializer\Job;
 
-use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobParameterArray;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
@@ -53,10 +54,10 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testDeserializeParameters()
     {
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
         $jobType->expects($this->any())
-            ->method('getParametersType')
-            ->willReturn('ParamType');
+            ->method('getSerializableParameterTypes')
+            ->willReturn(['ParamType']);
 
         $this->registry->expects($this->once())
             ->method('get')
@@ -65,15 +66,33 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer->expects($this->once())
             ->method('deserialize')
-            ->with('foobar', 'ParamType', 'json')
+            ->with('foobar', JobParameterArray::class . '<'. 'ParamType' .'>', 'json')
             ->willReturn('ReturnValue');
 
         $this->assertEquals('ReturnValue', $this->subject->deserializeParameters('foobar', 'JobType'));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDeserializeParametersThrowsInvalidArgumentException()
+    {
+        $jobType = $this->getMock(JobTypeInterface::class);
+        $jobType->expects($this->any())
+            ->method('getSerializableParameterTypes')
+            ->willReturn([]);
+
+        $this->registry->expects($this->once())
+            ->method('get')
+            ->with('JobType')
+            ->willReturn($jobType);
+
+        $this->subject->deserializeParameters('foobar', 'JobType');
+    }
+
     public function testDeserializeResponse()
     {
-        $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+        $jobType = $this->getMock(JobTypeInterface::class);
         $jobType->expects($this->any())
             ->method('getResponseType')
             ->willReturn('ResponseType');
@@ -90,5 +109,4 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('ReturnValue', $this->subject->deserializeResponse('foobar', 'JobType'));
     }
-
 }

@@ -23,6 +23,9 @@ class JobTest extends \PHPUnit_Framework_TestCase
      */
     private $serializationHelper;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->serializationHelper = $this->getMockBuilder(SerializationHelper::class)->disableOriginalConstructor()->getMock();
@@ -40,6 +43,19 @@ class JobTest extends \PHPUnit_Framework_TestCase
 
         $job = new Job();
         $job->setParameters($parameters);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetParametersThrowsInvalidArgumentException()
+    {
+        $this->serializationHelper->expects($this->once())
+            ->method('serialize')
+            ->willThrowException(new \Exception('asd'));
+
+        $job = new Job();
+        $job->setParameters(array('foobar'));
     }
 
     public function testGetParameters()
@@ -98,6 +114,19 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $job->setResponse($response);
 
         $this->assertAttributeEquals('SerializedResponse', 'serializedResponse', $job);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetResponseThrowsInvalidArgumentException()
+    {
+        $this->serializationHelper->expects($this->once())
+            ->method('serialize')
+            ->willThrowException(new \Exception());
+
+        $job = new Job();
+        $job->setResponse(array('foobar'));
     }
 
     public function testGetResponse()

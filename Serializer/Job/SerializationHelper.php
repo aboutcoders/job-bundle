@@ -10,6 +10,7 @@
 
 namespace Abc\Bundle\JobBundle\Serializer\Job;
 
+use Abc\Bundle\JobBundle\Job\JobParameterArray;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
 
@@ -55,10 +56,17 @@ class SerializationHelper
      * @param string $data    The serialized parameters
      * @param string $jobType The job type
      * @return array The deserialized parameters
+     * @throws \InvalidArgumentException If no serializable parameters are defined for the job type
      */
     public function deserializeParameters($data, $jobType)
     {
-        $type = $this->registry->get($jobType)->getParametersType();
+        $types = $this->registry->get($jobType)->getSerializableParameterTypes();
+
+        if (count($types) == null) {
+            throw new \InvalidArgumentException(sprintf('No serializable parameters defined for job "%s"', $jobType));
+        }
+
+        $type = sprintf(JobParameterArray::class . '<%s>', implode($types, ','));
 
         return $this->serializer->deserialize($data, $type, 'json');
     }

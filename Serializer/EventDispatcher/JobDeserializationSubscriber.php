@@ -38,9 +38,9 @@ class JobDeserializationSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            array('event' => 'serializer.pre_deserialize', 'method' => 'onPreDeserialize'),
-        );
+        return [
+            ['event' => 'serializer.pre_deserialize', 'method' => 'onPreDeserialize']
+        ];
     }
 
     /**
@@ -48,17 +48,21 @@ class JobDeserializationSubscriber implements EventSubscriberInterface
      *
      * @param PreDeserializeEvent $event
      */
-    public function onPreDeserialize(PreDeserializeEvent $event){
-
+    public function onPreDeserialize(PreDeserializeEvent $event)
+    {
         $type = $event->getType();
 
-        // if a job is deserialized
-        if(isset($type['name']) && $type['name'] == Job::class) {
-            $data = $event->getData();
-            if(isset($data['type']) && isset($data['parameters']) && is_array($data['parameters']) && count($data['parameters']) > 0) {
-                array_push($data['parameters'], ['abc.job.params' => $this->registry->get($data['type'])->getParameterTypes()]);
+        if (isset($type['name']) && ($type['name'] == Job::class || is_subclass_of($type['name'], Job::class))) {
 
-                $event->setData($data);
+            $data = $event->getData();
+            if (isset($data['type']) && isset($data['parameters']) && is_array($data['parameters']) && count($data['parameters']) > 0) {
+                $jobType = $this->registry->get($data['type']);
+                $serializableParameters = $jobType->getSerializableParameterTypes();
+
+                if (count($serializableParameters) > 0) {
+                    array_push($data['parameters'], ['abc.job.params' => $serializableParameters]);
+                    $event->setData($data);
+                }
             }
         }
     }

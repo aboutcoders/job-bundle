@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Integration\Serialization;
 
 use Abc\Bundle\EnumSerializerBundle\Serializer\Handler\EnumHandler;
-use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Job\Status;
@@ -90,9 +90,9 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
         $jobWithParameters->setParameters([$this->createMessage()]);
 
         return [
+            [$jobWithParameters],
             [$job],
             [$jobWithSchedule],
-            [$jobWithParameters],
         ];
     }
 
@@ -197,13 +197,13 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
                 $parameterTypes[] = (is_object($parameter)) ? get_class($parameter) : gettype($parameter);
             }
 
-            $jobType = $this->getMockBuilder(JobType::class)->disableOriginalConstructor()->getMock();
+            $jobType = $this->getMock(JobTypeInterface::class);
 
-            $jobType->expects($this->once())
-                ->method('getParameterTypes')
+            $jobType->expects($this->any())
+                ->method('getSerializableParameterTypes')
                 ->willReturn($parameterTypes);
 
-            $this->registry->expects($this->once())
+            $this->registry->expects($this->any())
                 ->method('get')
                 ->with($job->getType())
                 ->willReturn($jobType);

@@ -9,7 +9,7 @@
             <argument type="service" id="jms_serializer"/>
         </service>
 
-        <service id="abc.job.serialization_helper" class="Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper" public="false">
+        <service id="abc.job.serialization_helper" class="Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper" public="true">
             <argument type="service" id="abc.job.registry"/>
             <argument type="service" id="abc.job.serializer"/>
         </service>

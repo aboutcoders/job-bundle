@@ -70,7 +70,9 @@ class JobTypeRegistry
     public function register(JobTypeInterface $jobType, $loadClassMetadata = false)
     {
         if ($loadClassMetadata) {
-            /** @var ClassMetadata $classMetadata */
+            /**
+             * @var ClassMetadata $classMetadata
+             */
             $classMetadata = $this->metadataFactory->getMetadataForClass($jobType->getClass())->getRootClassMetadata();
 
             $jobType->setParameterTypes($classMetadata->getMethodArgumentTypes($jobType->getMethod()));

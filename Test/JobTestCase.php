@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Test;
 use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
-use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -37,12 +37,12 @@ abstract class JobTestCase extends KernelTestCase
 
         $deserializedParameters = $parameters;
         if (count($parameters) > 0) {
-            $data = $this->serializeParameters($parameters);
+            $data = static::getSerializationHelper()->serialize($parameters);
 
             /**
              * @var array $deserializedParameters
              */
-            $deserializedParameters = static::deserializeParameters($data, $type);
+            $deserializedParameters = static::getSerializationHelper()->deserializeParameters($data, $type);
         }
 
         $this->assertEquals($parameters, $deserializedParameters, 'parameters are equal after serialization/deserialization');
@@ -106,27 +106,6 @@ abstract class JobTestCase extends KernelTestCase
     }
 
     /**
-     * @param array $parameters The parameters the job will be invoked with
-     * @return string The serialized parameters
-     */
-    private static function serializeParameters(array $parameters)
-    {
-        return static::getSerializer()->serialize($parameters, 'json');
-    }
-
-    /**
-     * @param string $data
-     * @param string $type
-     * @return array
-     */
-    private static function deserializeParameters($data, $type)
-    {
-        $type = static::getRegistry()->get($type)->getParametersType();
-
-        return static::getSerializer()->deserialize($data, $type, 'json');
-    }
-
-    /**
      * @param string $type
      * @return JobTypeInterface
      */
@@ -144,11 +123,11 @@ abstract class JobTestCase extends KernelTestCase
     }
 
     /**
-     * @return SerializerInterface
+     * @return SerializationHelper
      */
-    private static function getSerializer()
+    private static function getSerializationHelper()
     {
-        return static::$kernel->getContainer()->get('abc.job.serializer');
+        return static::$kernel->getContainer()->get('abc.job.serialization_helper');
     }
 
     /**
