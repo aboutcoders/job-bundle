@@ -1,11 +1,11 @@
 Runtime Parameters
 ==================
 
-Jobs can be executed with two types of parameters: serializable parameters and runtime parameters. Runtime parameters are provided using the event dispatcher.
+Jobs can be executed with two types of parameters: serializable parameters and runtime parameters. Runtime parameters are provided from a context. They can be added to this context by registering an event listener.
 
 ## Default Runtime Parameters
 
-The AbcJobBundle provides the default parameters `@abc.job.logger` and `@abc.job.manager`. If specified fora job and instance of `Psr\Log\LoggerInterface` respectively `Abc\Abc\Bundle\JobBundle\Job\ManagerInterface` is injected into the job.
+The AbcJobBundle provides the default parameters `@abc.job.logger` and `@abc.job.manager`. If specified an instance of `Psr\Log\LoggerInterface` respectively `Abc\Abc\Bundle\JobBundle\Job\ManagerInterface` is injected into the job.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -65,7 +65,7 @@ Next you need to register the listener in the service container and tag it:
 </service>
 ```
 
-The runtime parameter can now be injected into a job:
+You can now use this runtime parameter inside your jobs:
 
 ```php
 /**

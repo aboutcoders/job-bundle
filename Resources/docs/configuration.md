@@ -5,7 +5,7 @@ Configuration
 
 ### Configure backend adapter
 
-Configure the adapter according to the message queue bundle that is used:
+Configure the adapter according to the message queue bundle you are using:
 
 ```yaml
 # app/config/config.yml
@@ -18,7 +18,7 @@ If you want to register the default jobs shipped with this bundle you have to en
 
 ### Register a doctrine mapping type
 
-The bundle requires to register the following doctrine mapping type:
+The bundle requires registration of the following custom doctrine mapping type:
 
 ```yaml
 # app/config/config.yml
@@ -50,7 +50,11 @@ php bin/console doctrine:schema:update --force
 
 ### Create a dedicated environment (Optional)
 
-It is recommended to run the job processing in a different environment that the production or dev environment. Please refer to the [official documentation](http://symfony.com/doc/current/configuration/environments.html) to see how this can be done.
+It is recommended to run the job processing in a different environment than the default environments.
+
+Since this environment is by symfony commands all you need to do is a `config_ENV.yml` (e.g. `config_job-processing.yml`) file where `ENV` equals the name of the environment. 
+
+Please refer to the [official documentation](http://symfony.com/doc/current/configuration/environments.html) if you need more information.
 
 ## Advanced Configuration
 
@@ -79,12 +83,12 @@ abc_job:
     adapter: sonata
     queues:
         mail:
-            - abc_mailer
+            - abc.mailer
         maintenance:
             - cleanup_database_job
 ```
 
-This will define the queues `mail`, `maintenance` and the default queue `default`, where jobs of type `abc_mailer` are sent to the queue `mail`, jobs of type `cleanup_database_job` are sent to the queue `maintenance` and all others go into the `default` queue.
+This will define the queues `mail`, `maintenance` and the default queue `default`, where jobs of type `abc.mailer` are sent to the queue `mail`, jobs of type `cleanup_database_job` are sent to the queue `maintenance` and all others go into the `default` queue.
 
 __Note:__ If you decided to use the `sonata` adapter you still have to configure the queues within the Sonata configuration as explained in the [documentation](https://sonata-project.org/bundles/notification/master/doc/reference/multiple_queues.html).
 
@@ -102,11 +106,11 @@ sonata_notification:
 
 ### Logging
 
-The bundle provides dedicated logger for each job using the [monolog lobrary](http://symfony.com/doc/current/logging.html). Whenever a job is executed a dedicated handler referred to as `storage_handler` is created and [injected into the job](./logging.md). This handler preserves the original data structure of log records by storing the log entries either in the json format or in the database. 
+The bundle provides a dedicated logger for each job using the [monolog library](http://symfony.com/doc/current/logging.html). Whenever a job is executed a dedicated handler referred to as `storage_handler` is created and [injected into the job](./logging.md). This handler preserves the original data structure of log records. 
 
 #### Storage Handler Configuration
 
-You can choose whether to store logs on the filesystem or datbase, change the default log level, or assign custom processors:
+You can choose whether to store logs on the filesystem or database, change the default log level, or assign custom processors:
 
 ```yaml
 # app/config/config.yml
@@ -123,7 +127,7 @@ abc_job:
 
 #### Stream Handler Configuration
 
-Besides the storage handler a regular stream handler can be enabled on top. This will create a regular log file for every job next to the logs that are stored on the filesystem or database by the storage_handler.
+Besides the storage handler a regular stream handler can be enabled. This will create an additional log file for every job using standard the LineFormatter.
 
 ```yaml
 # app/config/config.yml
@@ -152,7 +156,7 @@ abc_job:
 
 #### Configuring a specific log level for a job
 
-You can configure a specific log level for each job.
+You can overwrite the default log level and specific log level for each job.
 
 ```yaml
 # app/config/config.yml
@@ -164,4 +168,6 @@ abc_job:
 
 #### Internal log channel
 
-Besides the dedicated logger for jobs the AbcJobBundle uses the default logger registered within the container. This logger is configured to use the channel `abc.job`.
+Besides the dedicated logger for jobs the AbcJobBundle uses the default logger registered within the service container. This logger is configured to use the channel `abc.job`.
+
+Next Step: [Basic Usage](./basic-usage.md)

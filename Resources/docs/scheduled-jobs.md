@@ -5,7 +5,7 @@ You can configure one or more schedules for a job in order to configure repeated
 
 ## Creating a schedule
 
-There are different ways to create a scheduled. One way is to use the `createSchedule` method of the job.
+There are different ways to create a schedule. One way is to use the `createSchedule` method of the job.
 
 ```php
 $job = $manager->create('foobar');
@@ -43,10 +43,10 @@ $job = $manager->add($job);
 
 ## Removing a schedule
 
-In some cases it can be necessary to remove a job that was previously configured:
+Existing schedules can also be removed:
 
 ```php
 $job->removeSchedule($schedule);
 ```
 
-You most likely want to do this during execution of the job which requires that your job implements the [JobAwareInterface](../../Job/JobAwareInterface.php). Please refer to the [How-To work modify a job at runtime](./howto-modify-job.md) for more details.
+If you want to remove the schedule as part of the job execution you have to [inject the job manager into the job](./runtime-parameters.md).

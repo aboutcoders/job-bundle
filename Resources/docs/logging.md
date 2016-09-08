@@ -24,6 +24,8 @@ class MyJob
 }
 ```
 
+This approach is especially useful if your job class defines more than one job.
+
 ## Injecting the logger using the LoggerAwareInterface
 
 Another option is to inject the logger by making the job class implement the interface `Psr\Log\LoggerInterfaceInterface`:
@@ -58,8 +60,8 @@ Use the following command to get to logs of a job:
 $records = $manager->getLogs($job->getTicket());
 ```
 
-This will return an array of log entries that are available for this job.
+This will return an array of log records that are available for this job.
 
-__Note:__ Internally, depending on the configuration, the logs are stored either on the filesystem in the JSON format or on the database. Thereby it is possible to preserve the original structure of a log record.
+__Note:__ Depending on the configuration the records are internally stored either on the filesystem in the JSON format or in the database.
 
-Please refer to the chapter [Configuration](./configuration.md) to get information about store logs in the database instead of the filesystem, how to change log levels, register custom processors for formatters and more.
+Please refer to the chapter [Configuration](./configuration.md) to get information about the available configuration options.

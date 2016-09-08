@@ -1,7 +1,7 @@
 Cancel Jobs
 ===========
 
-In some cases it is necessary to cancel a job either manually or if for example a new version of the application is deployed. By default a job cannot be processed at runtime unless a process termination signal kills the underlying PHP process.
+In some cases it is necessary to cancel a job either manually or if for example a new version of the application is deployed. By default a job cannot be cancelled at runtime unless a process termination signal kills the underlying PHP process.
 
 To make job cancellable the job class must implement the interface ControllerAwareInterface:
 
@@ -20,7 +20,7 @@ interface ControllerAwareInterface
 }
 ```
 
-This `ControllerAwareInterface` defines the method `doExit()` which indicates whether the job has been cancelled or whether e.g a TERM signal has been sent to the underlying PHP process:
+This `ControllerAwareInterface` defines the method `doExit()` which indicates whether the job should abort it's execution:
 
 ```php
 namespace Abc\ProcessControl;
@@ -36,7 +36,7 @@ interface ControllerInterface
 }
 ```
 
-__Note:__ It is recommended to implement this interface in every job that performs work for a longer period of time (e.g > 1 second) in order to prevent uncontrolled termination of jobs and in order support manual cancellation of jobs.
+__Note:__ It is recommended to implement this interface in every job that performs work for a longer period of time (> 1 second) in order to prevent uncontrolled termination of jobs and in order support manual cancellation of jobs.
 
 Below you see an example implementation how a job uses the controller:
 
@@ -61,7 +61,7 @@ class Sleeper implements ControllerAwareInterface
     }
 
     /**
-     * @param                 $seconds
+     * @param integer $seconds
      * @param LoggerInterface $logger
      * @ParamType({"integer", "@logger"})
      */

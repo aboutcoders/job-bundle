@@ -27,14 +27,12 @@ The AbcJobBundle supports multiple message queue backends by providing adapters 
 | Amazon SQS         |        |    x    |
 | Iron MQ            |        |    x    |
 | Pheanstalk         |        |    x    |
-
-Please install the bundle fr the preferred backend.
  
 ### Install BernardBundle
 
 Please follow the installation instructions of the  [BernardBundle](https://github.com/bernardphp/BernardBundle).
 
-__Note:__ If you want using Symfony 3, you have to install the [BernardBundle](https://github.com/bernardphp/BernardBundle) from the master branch. Otherwise you can use the latest stable version.
+__Note:__ If you want using Symfony 3 you have to install the [BernardBundle](https://github.com/bernardphp/BernardBundle) from the master branch, otherwise you can use the latest stable version of the bundle.
  
 ### Install SonataNotificationBundle
 
@@ -67,3 +65,5 @@ public function registerBundles()
 If you want to use the REST-API make sure the following additional bundles are installed and configured:
 
 * [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle)
+
+Next Step: [Configuration](./configuration.md)

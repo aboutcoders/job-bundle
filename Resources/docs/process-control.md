@@ -1,9 +1,9 @@
 Process Control
 ===============
 
-The AbcJobBundle integrates the [process control](https://github.com/aboutcoders/process-control) library and thereby makes it possible to inform jobs about external events such as process termination signals or that a job has been [cancelled by the user](./cancel-jobs.md). 
+The AbcJobBundle integrates the [process control](https://github.com/aboutcoders/process-control) library and thereby makes it possible to inform jobs about external events such as process termination signals or [manual cancellation](./cancel-jobs.md) of the job. 
 
-By default jobs are only informed if they have been [cancelled manually](./cancel-jobs.md) by the user. In order to also inform jobs about process signals sent to the long running [consumer command](./message-consuming.md) you have to install the [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle).
+By default jobs are only informed if they have been [cancelled manually](./cancel-jobs.md) by the user. In order to also inform jobs about process signals sent to the long running [consumer commands](./message-consuming.md) you have to install the [AbcProcessControlBundle](https://github.com/aboutcoders/process-control-bundle).
 
 ## Process Control and SonataNotificationBundle
 

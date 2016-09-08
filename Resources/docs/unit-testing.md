@@ -1,7 +1,7 @@
 Unit Testing
 ============
 
-The AbcJobBundle provides a class [JobTestCase](../../Test/JobTestCase.php) that can be used to test if a job can be invoked by the AbcJobBundle as expected. Thi basically covers the seralization/deserialization of parameters as well as the invocation with additional runtime parameters.
+The AbcJobBundle provides a class [JobTestCase](../../Test/JobTestCase.php) that can be used to test if a job can be invoked by the AbcJobBundle as expected. This basically covers the seralization/deserialization of parameters as well as the invocation with additional [runtime parameters](./runtime-paramerters.md).
 
 
 ```php
