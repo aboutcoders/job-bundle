@@ -38,4 +38,10 @@ class StatusTest extends \PHPUnit_Framework_TestCase
             $this->assertContains($status->getValue(), $values);
         }
     }
+
+    public function testEquals()
+    {
+        $this->assertTrue(Status::equals(Status::PROCESSED(), Status::PROCESSED()));
+        $this->assertFalse(Status::equals(Status::CANCELLED(), Status::PROCESSED()));
+    }
 }

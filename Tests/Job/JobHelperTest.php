@@ -162,9 +162,9 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         return [
             [$this->createJob('JobType')],
             [$this->createJob('JobType', Status::CANCELLED())],
-            [$this->createJob('JobType', Status::CANCELLED()), array('foobar')],
-            [$this->createJob('JobType', Status::CANCELLED()), array('foobar'), $this->getMock(ScheduleInterface::class)],
-            [$this->createJob('JobType', Status::CANCELLED()), array('foobar'), $this->getMock(ScheduleInterface::class), 'response'],
+            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'))],
+            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->getMock(ScheduleInterface::class))],
+            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->getMock(ScheduleInterface::class), 'response')],
         ];
     }
 
@@ -186,7 +186,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
         if ($status != null) {
             $job->setStatus($status);
         }
-        if ($schedule != null) {
+        if ($schedule !== null) {
             $job->addSchedule($schedule);
         }
 
