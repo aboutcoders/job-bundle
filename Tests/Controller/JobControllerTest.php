@@ -48,10 +48,10 @@ class JobControllerTest extends DatabaseWebTestCase
     }
 
     /**
-     * @dataProvider provideListData
+     * @dataProvider provideValidListData
      * @param array $parameters
      */
-    public function testListAction($parameters)
+    public function testListActionWithValidParameters($parameters)
     {
         $url = '/api/jobs';
         if (!is_null($parameters)) {
@@ -116,14 +116,13 @@ class JobControllerTest extends DatabaseWebTestCase
         $this->assertEquals($job->getTicket(), $deserializedEntity->getTicket());
     }
 
-    public function testListActionWithInvalidCriteria()
+    /**
+     * @dataProvider provideInvalidListData
+     * @param array $parameters
+     */
+    public function testListActionWithInvalidParameters($parameters)
     {
-        $parameters = ['criteria' => 'foobar'];
-
-        $url = '/api/jobs';
-        if (!is_null($parameters)) {
-            $url .= '?' . http_build_query($parameters);
-        }
+        $url = '/api/jobs?' . http_build_query($parameters);;
 
         $this->entityManager->expects($this->never())
             ->method('findBy');
@@ -148,27 +147,8 @@ class JobControllerTest extends DatabaseWebTestCase
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-    }
 
-    /**
-     * @return array An array of GET parameters
-     */
-    public function provideListData()
-    {
-        return [
-            [
-                null
-            ],
-            [
-                ['page' => 1, 'sortCol' => 'type', 'sortDir' => 'ASC', 'limit' => 2]
-            ],
-            [
-                ['criteria' => ['name' => 'foobar']]
-            ],
-            [
-                ['criteria' => ['status' => 'PROCESSING']]
-            ]
-        ];
+        $data = json_decode($client->getResponse()->getContent(), true);
     }
 
     public function testGetAction()
@@ -217,7 +197,7 @@ class JobControllerTest extends DatabaseWebTestCase
      * @param $parameters
      * @dataProvider provideValidPostParameters
      */
-    public function testAddAction($parameters)
+    public function testCreateAction($parameters)
     {
         $url = '/api/jobs';
         $job = $this->buildJobFromArray($parameters);
@@ -391,6 +371,68 @@ class JobControllerTest extends DatabaseWebTestCase
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
+
+    /**
+     * @return array An array of GET parameters
+     */
+    public static function provideValidListData()
+    {
+        return [
+            [
+                null
+            ],
+            [
+                ['page' => 1, 'sortCol' => 'type', 'sortDir' => 'ASC', 'limit' => 1]
+            ],
+            [
+                ['sortCol' => 'ticket']
+            ],
+            [
+                ['sortCol' => 'type']
+            ],
+            [
+                ['sortCol' => 'status']
+            ],
+            [
+                ['sortCol' => 'createdAt']
+            ],
+            [
+                ['sortCol' => 'terminatedAt']
+            ],
+            [
+                ['sortDir' => 'ASC']
+            ],
+            [
+                ['sortDir' => 'DESC']
+            ],
+            [
+                ['criteria' => null]
+            ],
+            [
+                ['criteria' => []]
+            ],
+            [
+                ['criteria' => ['ticket' => 'f2c89c2d-7502-11e6-9861-0800271ec67e', 'status' => 'PROCESSING', 'type' => 'abc.mailer']]
+            ]
+        ];
+    }
+
+    /**
+     * @return array An array of GET parameters
+     */
+    public static function provideInvalidListData()
+    {
+        return [
+            [['page' => 'a']],
+            [['limit' => 'a']],
+            [['sortDir' => 'a']],
+            [['sortCol' => 'a']],
+            [['criteria' => ['status' => 'foobar']]],
+            [['criteria' => ['ticket' => 'foobar']]],
+            [['criteria' => ['type' => 'foobar']]],
+        ];
+    }
+
 
     public static function provideValidPostParameters()
     {

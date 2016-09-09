@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Job implements JobInterface
 {
     /**
-     * @Assert\Blank(groups={"add"})
+     * @Assert\Blank(groups={"create"})
      * @Assert\NotBlank(groups={"update"})
      * @Type("string")
      * @var string
@@ -42,6 +42,7 @@ class Job implements JobInterface
 
     /**
      * @Type("Abc\Bundle\JobBundle\Job\Status")
+     * @AbcJobAssert\Status
      * @var Status
      */
     protected $status;

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobType extends Constraint
+class Status extends Constraint
 {
-    public $message = 'The value should be a valid job type';
+    public $message = 'The value should be a valid job status.';
 }
