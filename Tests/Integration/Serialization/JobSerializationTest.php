@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Integration\Serialization;
+namespace Abc\Bundle\JobBundle\Tests\Functional\Serializer;
 
 use Abc\Bundle\EnumSerializerBundle\Serializer\Handler\EnumHandler;
 use Abc\Bundle\JobBundle\Job\JobTypeInterface;
@@ -17,6 +17,7 @@ use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
 use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
 use Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
@@ -69,11 +70,20 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
     /**
      * @param Job    $expectedJob
      * @param string $data
+     * @param array  $groups
      * @dataProvider provideSerializedJob
      */
-    public function testDeserialization($expectedJob, $data)
+    public function testDeserialization($expectedJob, $data, array $groups = [])
     {
-        $this->assertEquals($expectedJob, $this->serializer->deserialize($data, Job::class, 'json'));
+        $context = null;
+        if (count($groups) > 0) {
+            $context = new DeserializationContext();
+            $context->setGroups($groups);
+        }
+
+        $job = $this->serializer->deserialize($data, Job::class, 'json', $context);
+
+        $this->assertEquals($expectedJob, $job);
     }
 
     /**
@@ -99,7 +109,9 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
     public function provideSerializedJob()
     {
         return [
-            [$this->createJob(), '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5}']
+            [$this->createJob(), '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5}'],
+            [$this->createJob(null, 'abc.mailer', null, null, ['cron', '* * * * *']), '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5,"schedules":[{"type":"cron","expression":"* * * * *","is_active":true}]}', ['create', Schedule::class]]
+            // TODO: add test for update group
         ];
     }
 
@@ -132,13 +144,24 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Job
      */
-    public static function createJob()
+    public function createJob($ticket = 'JobTicket', $type = "abc.mailer", $status = Status::PROCESSING, $processingTime = 0.5, $schedule = null)
     {
+        if ($status != null && !$status instanceof Status) {
+            $status = new Status($status);
+        }
+
         $job = new Job();
-        $job->setTicket('JobTicket');
-        $job->setType('abc.mailer');
-        $job->setStatus(Status::PROCESSING());
-        $job->setProcessingTime((double)0.5);
+        $job->setTicket($ticket);
+        $job->setType($type);
+        $job->setProcessingTime($processingTime);
+
+        if ($status != null) {
+            $job->setStatus($status);
+        }
+
+        if(is_array($schedule) && count($schedule) > 0) {
+            $job->addSchedule($this->createSchedule($schedule[0], $schedule[1]));
+        }
 
         return $job;
     }
