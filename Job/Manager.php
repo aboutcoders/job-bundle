@@ -14,6 +14,7 @@ use Abc\Bundle\JobBundle\Event\ExecutionEvent;
 use Abc\Bundle\JobBundle\Event\TerminationEvent;
 use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
+use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface as LoggerFactoryInterface;
@@ -93,6 +94,11 @@ class Manager implements ManagerInterface
     protected $logger;
 
     /**
+     * @var
+     */
+    private $jobLogger = array();
+
+    /**
      * @param JobTypeRegistry          $registry
      * @param JobManagerInterface      $jobManager
      * @param Invoker                  $invoker
@@ -140,14 +146,6 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type, array $parameters = null, BaseScheduleInterface $schedule = null)
-    {
-        return $this->jobManager->create($type, $parameters, $schedule);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function addJob($type, array $parameters = null, BaseScheduleInterface $schedule = null)
     {
         return $this->add($this->jobManager->create($type, $parameters, $schedule));
@@ -158,12 +156,11 @@ class Manager implements ManagerInterface
      */
     public function add(JobInterface $job)
     {
-        if (!$this->registry->has($job->getType())) {
-            throw new \InvalidArgumentException(sprintf('A job of type "%s" is not registered', $job->getType()));
-        }
-
         if (null != $this->validator) {
-            $this->validator->validate($job);
+            $errors = $this->validator->validate($job);
+            if(count($errors) > 0) {
+                throw new ValidationFailedException($errors);
+            }
         }
 
         if (!$this->jobManager->isManagerOf($job)) {
@@ -289,9 +286,7 @@ class Manager implements ManagerInterface
                 'exception' => $e
             ]);
 
-            if ($event->getContext()->has('logger')) {
-                $event->getContext()->get('logger')->error($e->getMessage(), ['exception' => $e]);
-            }
+            $this->getJobLogger($job)->error($e->getMessage(), ['exception' => $e]);
 
             $response = new ExceptionResponse($e->getMessage(), $e->getCode());
             $status   = Status::ERROR();
@@ -326,14 +321,25 @@ class Manager implements ManagerInterface
      */
     public function update(JobInterface $job)
     {
+        $existingJob = $this->jobManager->findByTicket($job->getTicket());
+        if (null == $existingJob) {
+            return $this->create($job);
+        }
+
         $this->logger->debug('Update job ' . $job->getTicket(), ['job' => $job]);
 
-        if (!$this->jobManager->isManagerOf($job)) {
-            $managedJob = $this->findJob($job->getTicket());
-            $job        = $this->helper->copyJob($job, $managedJob);
+        $job = $this->helper->copyJob($job, $existingJob);
+
+        if (null != $this->validator) {
+            $errors = $this->validator->validate($job);
+            if(count($errors) > 0) {
+                throw new ValidationFailedException($errors);
+            }
         }
 
         $this->jobManager->save($job);
+
+        $this->getJobLogger($job)->debug('Updated job', ['job' => $job]);
 
         return $job;
     }
@@ -410,5 +416,19 @@ class Manager implements ManagerInterface
         $this->locker->release($this->getLockName($job));
 
         $this->logger->debug('Released lock for job ' . $job->getTicket());
+    }
+
+    /**
+     * @param JobInterface $job
+     * @return LoggerInterface
+     */
+    private function getJobLogger(JobInterface $job)
+    {
+        if (!isset($this->jobLogger[0]) || $job !== $this->jobLogger[0]) {
+            $this->jobLogger[0] = $job;
+            $this->jobLogger[1] = $this->loggerFactory->create($job);
+        }
+
+        return $this->jobLogger[1];
     }
 }

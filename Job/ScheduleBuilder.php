@@ -10,10 +10,21 @@
 
 namespace Abc\Bundle\JobBundle\Job;
 
+use Abc\Bundle\JobBundle\Model\Schedule;
+use Abc\Bundle\JobBundle\Model\ScheduleInterface;
+
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class ScheduleBuilder
 {
-
+    /**
+     * @param $type
+     * @param $expression
+     * @return ScheduleInterface
+     */
+    public static function create($type, $expression)
+    {
+        return new Schedule($type, $expression);
+    }
 }

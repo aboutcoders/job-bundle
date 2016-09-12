@@ -18,7 +18,8 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class Parameter extends Constraint
+class Parameters extends Constraint
 {
+    public $type;
     public $message = 'The value must be an array.';
 }

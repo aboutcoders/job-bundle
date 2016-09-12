@@ -13,7 +13,13 @@ namespace Abc\Bundle\JobBundle\Validator\Job;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class AbstractConstraintProvider
+abstract class AbstractConstraintProvider implements ConstraintProviderInterface
 {
-
+    /**
+     * {@inheritdoc}
+     */
+    public function getPriority()
+    {
+        return -1;
+    }
 }

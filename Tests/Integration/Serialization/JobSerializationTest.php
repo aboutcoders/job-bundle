@@ -8,33 +8,21 @@
 * file that was distributed with this source code.
 */
 
-namespace Abc\Bundle\JobBundle\Tests\Functional\Serializer;
+namespace Abc\Bundle\JobBundle\Tests\Integration\Serialization;
 
-use Abc\Bundle\EnumSerializerBundle\Serializer\Handler\EnumHandler;
-use Abc\Bundle\JobBundle\Job\JobTypeInterface;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
-use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
-use Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler;
-use JMS\Serializer\EventDispatcher\EventDispatcher;
-use JMS\Serializer\Handler\HandlerRegistry;
-use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobSerializationTest extends \PHPUnit_Framework_TestCase
+class JobSerializationTest extends KernelTestCase
 {
-    /**
-     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $registry;
-
     /**
      * @var SerializerInterface
      */
@@ -45,11 +33,8 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)
-            ->setMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->setUpSerializer($this->registry);
+        static::bootKernel();
+        $this->serializer = static::$kernel->getContainer()->get('abc.job.serializer');
     }
 
     /**
@@ -58,8 +43,6 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerialization($job)
     {
-        $this->setUpRegistry($job);
-
         $data = $this->serializer->serialize($job, 'json');
 
         $deserializedJob = $this->serializer->deserialize($data, Job::class, 'json');
@@ -89,78 +72,50 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function provideJobs()
+    public static function provideJobs()
     {
-        $job = $this->createJob();
-
-        $jobWithSchedule = $this->createJob();
-        $jobWithSchedule->addSchedule($this->createSchedule());
-
-        $jobWithParameters = $this->createJob();
-        $jobWithParameters->setParameters([$this->createMessage()]);
-
         return [
-            [$jobWithParameters],
-            [$job],
-            [$jobWithSchedule],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5)],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5, [new Message('to@domain.tld', 'from@domain.tld', 'Message Subject', 'Message Body')])],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5, null, [self::createSchedule()])],
         ];
     }
 
-    public function provideSerializedJob()
+    public static function provideSerializedJob()
     {
         return [
-            [$this->createJob(), '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5}'],
-            [$this->createJob(null, 'abc.mailer', null, null, ['cron', '* * * * *']), '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5,"schedules":[{"type":"cron","expression":"* * * * *","is_active":true}]}', ['create', Schedule::class]]
-            // TODO: add test for update group
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getJobArray()
-    {
-        return [
-            'ticket'          => 'JobTicket',
-            'type'            => 'abc.mailer',
-            'status'          => 'PROCESSING',
-            'processing_time' => 0.5,
-            'parameters'      => [
-                ['to'      => 'to@domain.tld',
-                 'from'    => 'from@domain.tld',
-                 'message' => 'message body',
-                 'subject' => 'subject'
-                ]
+            [
+                self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5),
+                '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5}'
             ],
-            'schedules'       => [
-                [
-                    'type'       => 'cron',
-                    'expression' => '* * * * *'
-                ]
-            ]
+            [
+                self::createJob(null, 'abc.mailer', null, null, [new Message('to@domain.tld', 'from@domain.tld', 'Message Subject', 'Message Body')]),
+                '{"type":"abc.mailer","parameters":[{"to":"to@domain.tld","from":"from@domain.tld","subject":"Message Subject","message":"Message Body"}]}',
+            ],
+            [
+                self::createJob(null, 'abc.mailer', null, null, null, [self::createSchedule('cron', '* * * * *')]),
+                '{"type":"abc.mailer","schedules":[{"type":"cron","expression":"* * * * *","is_active":true}]}',
+                //['create'] // not sure yet if we want to use serialization groups
+            ],
         ];
     }
 
     /**
      * @return Job
      */
-    public function createJob($ticket = 'JobTicket', $type = "abc.mailer", $status = Status::PROCESSING, $processingTime = 0.5, $schedule = null)
+    public static function createJob($ticket = null, $type = null, $status = null, $processingTime = null, $parameters = null, array $schedules = array())
     {
-        if ($status != null && !$status instanceof Status) {
-            $status = new Status($status);
-        }
-
         $job = new Job();
         $job->setTicket($ticket);
         $job->setType($type);
+        $job->setParameters($parameters);
         $job->setProcessingTime($processingTime);
+        foreach ($schedules as $schedule) {
+            $job->addSchedule($schedule);
+        }
 
         if ($status != null) {
             $job->setStatus($status);
-        }
-
-        if(is_array($schedule) && count($schedule) > 0) {
-            $job->addSchedule($this->createSchedule($schedule[0], $schedule[1]));
         }
 
         return $job;
@@ -171,65 +126,8 @@ class JobSerializationTest extends \PHPUnit_Framework_TestCase
      * @param string $schedule
      * @return Schedule
      */
-    public function createSchedule($type = 'cron', $schedule = '* * * * *')
+    public static function createSchedule($type = null, $schedule = null)
     {
         return new Schedule($type, $schedule);
-    }
-
-    /**
-     * @param string $to
-     * @param string $from
-     * @param string $subject
-     * @param string $message
-     * @return Message
-     */
-    public function createMessage($to = 'to@domain.tld', $from = 'from@domain.tld', $subject = 'Message Subject', $message = 'Message Body')
-    {
-        return new Message($to, $from, $subject, $message);
-    }
-
-    /**
-     * @param JobTypeRegistry $registry
-     */
-    private function setUpSerializer(JobTypeRegistry $registry)
-    {
-        EnumHandler::register(Status::class);
-        $enumHandler = new EnumHandler();
-
-        $this->serializer = SerializerBuilder::create()
-            ->addDefaultHandlers()
-            ->configureHandlers(function (HandlerRegistry $handlerRegistry) use ($enumHandler) {
-                $handlerRegistry->registerSubscribingHandler(new JobParameterArrayHandler());
-                $handlerRegistry->registerSubscribingHandler($enumHandler);
-            })
-            ->configureListeners(function (EventDispatcher $dispatcher) use ($registry) {
-                $dispatcher->addSubscriber(new JobDeserializationSubscriber($registry));
-            })
-            ->build();
-    }
-
-    /**
-     * @param Job $job
-     * @return void
-     */
-    private function setUpRegistry(Job $job)
-    {
-        if ($job->getParameters() != null && is_array($job->getParameters()) && count($job->getParameters()) > 0) {
-            $parameterTypes = [];
-            foreach ($job->getParameters() as $parameter) {
-                $parameterTypes[] = (is_object($parameter)) ? get_class($parameter) : gettype($parameter);
-            }
-
-            $jobType = $this->getMock(JobTypeInterface::class);
-
-            $jobType->expects($this->any())
-                ->method('getSerializableParameterTypes')
-                ->willReturn($parameterTypes);
-
-            $this->registry->expects($this->any())
-                ->method('get')
-                ->with($job->getType())
-                ->willReturn($jobType);
-        }
     }
 }

@@ -18,6 +18,7 @@ use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\JobList;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
+use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Test\DatabaseWebTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -197,7 +198,7 @@ class JobControllerTest extends DatabaseWebTestCase
      * @param $parameters
      * @dataProvider provideValidPostParameters
      */
-    public function testCreateAction($parameters)
+    public function testCreateActionWithValidParameters($parameters)
     {
         $url = '/api/jobs';
         $job = $this->buildJobFromArray($parameters);
@@ -212,7 +213,7 @@ class JobControllerTest extends DatabaseWebTestCase
                 return $job;
             });
 
-        $client = static::createClient();
+        $client = static::createClient(['environment' => 'validate_rest']);
 
         $this->mockServices([
             'abc.job.manager' => $this->manager
@@ -221,6 +222,36 @@ class JobControllerTest extends DatabaseWebTestCase
         $client->request('POST', $url, $parameters, [], ['CONTENT_TYPE' => 'application/json'], null, 'json');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @param $parameters
+     * @dataProvider provideInvalidPostParameters
+     */
+    public function testCreateWithInvalidParameters($parameters)
+    {
+        $url = '/api/jobs';
+        $job = $this->buildJobFromArray($parameters);
+
+        $this->manager->expects($this->never())
+            ->method('add');
+
+        $client = static::createClient(['environment' => 'validate_rest']);
+
+        $this->mockServices([
+            'abc.job.manager' => $this->manager
+        ]);
+
+        $client->request('POST', $url, $parameters, [], ['CONTENT_TYPE' => 'application/json'], null, 'json');
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+
+        $data = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('message', $data);
+        $this->assertEquals('Invalid parameters', $data['message']);
+        $this->assertTrue(isset($data['errors'][0]));
+        $this->assertArraySubset(['property_path' => 'parameters[0].to', 'message' => 'This value is not a valid email address.'], $data['errors'][0]);
     }
 
     /**
@@ -490,6 +521,28 @@ class JobControllerTest extends DatabaseWebTestCase
     }
 
     /**
+     * @return array
+     */
+    public static function provideInvalidPostParameters()
+    {
+        return [
+            [
+                [
+                    'type'       => 'abc.mailer',
+                    'parameters' => [
+                        [
+                            'to'      => 'foobar',
+                            'from'    => 'from@domain.tld',
+                            'message' => 'message body',
+                            'subject' => 'subject'
+                        ]
+                    ]
+                ]
+            ],
+        ];
+    }
+
+    /**
      * Injects a mock object for the service abc.job.manager
      *
      * @see http://blog.lyrixx.info/2013/04/12/symfony2-how-to-mock-services-during-functional-tests.html
@@ -531,7 +584,7 @@ class JobControllerTest extends DatabaseWebTestCase
 
         if (isset($parameters['schedules'])) {
             foreach ($parameters['schedules'] as $scheduleParameters) {
-                $schedule = $job->createSchedule($scheduleParameters['type'], $scheduleParameters['expression']);
+                $schedule = new Schedule($scheduleParameters['type'], $scheduleParameters['expression']);
                 $job->addSchedule($schedule);
             }
         }

@@ -24,6 +24,10 @@ class StatusValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if(null === $value) {
+            return;
+        }
+
         if(!in_array($value, JobStatus::values())){
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)

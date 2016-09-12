@@ -18,8 +18,9 @@ use Abc\Bundle\JobBundle\Job\JobInterface;
  */
 class ExecutionEvent extends TerminationEvent
 {
-
-    /** @var ContextInterface */
+    /**
+     * @var ContextInterface
+     */
     protected $context;
 
     /**

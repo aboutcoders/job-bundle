@@ -47,6 +47,18 @@ Please note that this bundle is still in development and thus we might need to c
 
 ### Missing Features For The Stable Release
 
+- handle Exceptions thrown by JobController::deserializeJob
+- ensure that JobController::putActions validates parameters
+- refactor integration tests to functional tests
+- add testcase to test parameter validation (contraint providers)
+- documentation for validation
+- unit test validators
+- add validator for schedule (type, expression)
+- consider throw JobTypeNotFoundExcpetion in manager or validator?
+- unit test manager job is created if not exists
+- document chapter validation
+- cleanup API error response (query parameter & job validation errors)
+
 - Add validator (define add-validation-group, update-validation-group)
 - Add consumer management
 

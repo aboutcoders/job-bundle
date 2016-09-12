@@ -15,6 +15,10 @@
             <tag name="abc.job" type="abc.sleeper" method="sleep" validationGroups="" validation-groups="" add-validation-groups="" update-validation-groups=""/>
         </service>
 
+        <service id="abc.job.constraint_provider.default_jobs" class="Abc\Bundle\JobBundle\Job\Parameter\DefaultJobsConstraintProvider">
+            <tag name="abc.job.constraint_provider"/>
+        </service>
+
     </services>
 
 </container>

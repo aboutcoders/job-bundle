@@ -37,6 +37,10 @@ class JobTypeValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if(null === $value) {
+            return;
+        }
+
         if(!in_array($value, $this->registry->getTypeChoices())){
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)

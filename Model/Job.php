@@ -11,62 +11,60 @@
 namespace Abc\Bundle\JobBundle\Model;
 
 use Abc\Bundle\JobBundle\Job\Status;
-use Abc\Bundle\JobBundle\Validator\Constraint as AbcJobAssert;
+use Abc\Bundle\JobBundle\Validator\Constraint as AssertJob;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Exclude;
-use JMS\Serializer\Annotation\PostDeserialize;
-use JMS\Serializer\Annotation\SerializedName;
-use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation as JMS;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ * @AssertJob\Job
  */
 class Job implements JobInterface
 {
     /**
-     * @Assert\Blank(groups={"create"})
-     * @Assert\NotBlank(groups={"update"})
-     * @Type("string")
+     * @JMS\Type("string")
+     * @Assert\Uuid
      * @var string
      */
     protected $ticket;
 
     /**
-     * @Type("string")
-     * @AbcJobAssert\JobType
+     * @JMS\Type("string")
+     * @Assert\NotBlank
+     * @AssertJob\JobType
      * @var string
      */
     protected $type;
 
     /**
-     * @Type("Abc\Bundle\JobBundle\Job\Status")
-     * @AbcJobAssert\Status
+     * @JMS\Type("Abc\Bundle\JobBundle\Job\Status")
+     * @AssertJob\Status
      * @var Status
      */
     protected $status;
 
     /**
-     * @Type("Abc\Bundle\JobBundle\Job\JobParameterArray");
+     * @JMS\Type("Abc\Bundle\JobBundle\Job\JobParameterArray");
      * @var array
      */
     protected $parameters;
 
     /**
-     * @Type("double")
+     * @JMS\Type("double")
      * @var double
      */
     protected $processingTime;
 
     /**
-     * @Type("DateTime")
+     * @JMS\Type("DateTime")
      * @var \DateTime
      */
     protected $createdAt;
 
     /**
-     * @Type("DateTime")
+     * @JMS\Type("DateTime")
      * @var \DateTime|null
      */
     protected $terminatedAt;
@@ -77,7 +75,7 @@ class Job implements JobInterface
     protected $response;
 
     /**
-     * @Type("ArrayCollection<Abc\Bundle\JobBundle\Model\Schedule>")
+     * @JMS\Type("ArrayCollection<Abc\Bundle\JobBundle\Model\Schedule>")
      * @var ArrayCollection|Schedule[]
      */
     protected $schedules;
@@ -88,9 +86,9 @@ class Job implements JobInterface
      */
     public function __construct($type = null, $parameters = null)
     {
-        $this->schedules      = new ArrayCollection();
-        $this->type           = $type;
-        $this->parameters     = $parameters;
+        $this->schedules  = new ArrayCollection();
+        $this->type       = $type;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -176,14 +174,6 @@ class Job implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function createSchedule($type, $expression)
-    {
-        return new Schedule($type, $expression);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function hasSchedules()
     {
         return 0 !== $this->schedules->count();
@@ -202,7 +192,7 @@ class Job implements JobInterface
      */
     public function removeSchedule(BaseScheduleInterface $schedule)
     {
-       $this->schedules->removeElement($schedule);
+        $this->schedules->removeElement($schedule);
     }
 
     /**
@@ -210,8 +200,7 @@ class Job implements JobInterface
      */
     public function removeSchedules()
     {
-        foreach($this->getSchedules() as $schedule)
-        {
+        foreach ($this->getSchedules() as $schedule) {
             $this->removeSchedule($schedule);
         }
     }
@@ -302,10 +291,11 @@ class Job implements JobInterface
     /**
      * Ensures that member variable $schedules is an ArrayCollection after deserialization
      *
-     * @PostDeserialize
+     * @JMS\PostDeserialize
      */
-    private function postSerialize() {
-        if($this->schedules == null) {
+    private function postSerialize()
+    {
+        if ($this->schedules == null) {
             $this->schedules = new ArrayCollection();
         }
     }

@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
+use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
 use Abc\Bundle\JobBundle\Validator\Constraint as AbcAssert;
 use Abc\Bundle\JobBundle\Model\JobList;
 use JMS\Serializer\Exception\Exception;
@@ -135,6 +136,10 @@ class JobController extends BaseController
     {
         $job = $this->deserializeJob($request);
 
+        if ($response = $this->validateJob($job)) {
+            return $this->serialize($response, 400);
+        }
+
         return $this->serialize($this->getManager()->add($job));
     }
 
@@ -158,6 +163,10 @@ class JobController extends BaseController
     public function updateAction(Request $request)
     {
         $job = $this->deserializeJob($request);
+
+        if ($response = $this->validateJob($job)) {
+            return $this->serialize($response, 400);
+        }
 
         return $this->serialize($this->getManager()->update($job));
     }
@@ -243,17 +252,25 @@ class JobController extends BaseController
 
     /**
      * @param Request $request
+     * @param array   $groups
      * @return JobInterface|mixed
      * @throws UnsupportedMediaTypeHttpException
      * @throws BadRequestHttpException
      */
-    protected function deserializeJob(Request $request)
+    protected function deserializeJob(Request $request, array $groups = [])
     {
         try {
+            $context = null;
+            if (count($groups) > 0) {
+                $context = new DeserializationContext();
+                $context->setGroups($groups);
+            }
+
             return $this->getSerializer()->deserialize(
                 json_encode($request->request->all(), true),
                 Job::class,
-                $request->getContentType()
+                $request->getContentType(),
+                $context
             );
         } catch (UnsupportedFormatException $e) {
             throw new UnsupportedMediaTypeHttpException($e->getMessage(), $e);
@@ -326,5 +343,24 @@ class JobController extends BaseController
                 $validationErrors[] = new ParameterConstraintViolation($name, $error->getMessage());
             }
         }
+    }
+
+    /**
+     * @param $job
+     * @return ErrorResponse|null
+     */
+    private function validateJob($job)
+    {
+        if ($this->getParameter('abc.job.rest.validate')) {
+            $errors = $this->getValidator()->validate($job);
+            if (count($errors) > 0) {
+                $response = new ErrorResponse('Invalid parameters', 'The request contains invalid job parameters');
+                $response->setErrors($errors);
+
+                return $response;
+            }
+        }
+
+        return null;
     }
 }

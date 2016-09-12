@@ -19,6 +19,8 @@ abc_job:
             - job_type_B2
     controller:
         refresh_interval: 1         # The interval in seconds the database is checked if job has been cancelled
+    manager:
+        validate: true              # Set to false to disable validation
     rest:
         enable: true                # Set to false to disable loading of REST API related services
         validate: false             # Set to true to enable validation of jobs (ignored if validation for manager is enabled)

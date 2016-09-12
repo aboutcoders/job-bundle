@@ -23,17 +23,21 @@ The short ways is to create and add the job in one step:
 $job = $manager->addJob('say_hello', array('World'));
 ```
 
-The other way is to first create the job and then add it. This can be useful if you e.g. want to add one or more schedules for a job.
+The other way is to first create the job and then add it, this is necessary if you want to configure more than one schedule to the job. The recommended way to create a job is using the `JobBuilder`.
 
 ```php
-$job = $manager->create('say_hello', array('World'));
+use Abc\Bundle\JobBundle\Job\JobBuilder;
 
-// do something with the job
+$job = JobBuilder::create('my_job')
+    ->addSchedule('cron', '1 * * * *')
+    ->addSchedule('cron', '30 * * * *')
+    ->build();
+    
 
-$job = $manager->add($job);
-
-$ticket = $job->getTicket();
+$ticket = $manager->add($job)->getTicket();
 ```
+
+Please note that the method `add` returns the instance of the job. This is most likely not the same instance as the one that was passed as parameter to the method. The returned job provides information such as the ticket or status information about the job.
 
 ### Getting a job
 
@@ -63,7 +67,7 @@ $manager->restart($job->getTicket());
 
 ### Updating a job
 
-Use the following command to get to restart a job:
+Use the following command to get to update a job:
 
 ```php
 // modify the job

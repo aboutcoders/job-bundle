@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
+use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
 
@@ -26,30 +27,26 @@ use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
 interface ManagerInterface
 {
     /**
-     * Creates a job
+     * Adds a job.
      *
-     * @param string                 $type
-     * @param array|null             $parameters
-     * @param ScheduleInterface|null $schedule
-     * @return JobInterface
-     */
-    public function create($type, array $parameters = null, ScheduleInterface $schedule = null);
-
-    /**
-     * Adds a job for asynchronous processing.
+     * If job is not configured with any schedules the job will be published to the queue at once.
      *
      * @param JobInterface $job
      * @return JobInterface The added job
+     * @throws ValidationFailedException
      */
     public function add(JobInterface $job);
 
     /**
-     * Adds a job for asynchronous processing.
+     * Adds a job.
+     *
+     * If job is not configured with any schedules the job will be published to the queue at once.
      *
      * @param string                 $type       The job type
      * @param array|null             $parameters The job parameters
      * @param ScheduleInterface|null $schedule   The schedule of the job
      * @return JobInterface
+     * @throws ValidationFailedException
      */
     public function addJob($type, array $parameters = null, ScheduleInterface $schedule = null);
 
@@ -63,6 +60,26 @@ interface ManagerInterface
      * @throws \RuntimeException
      */
     public function cancel($ticket, $force = false);
+
+    /**
+     * Updates existing job or creates job if it does not exist.
+     *
+     * @param JobInterface $job
+     * @return JobInterface The updated job
+     * @throws \RuntimeException
+     * @throws ValidationFailedException
+     */
+    public function update(JobInterface $job);
+
+    /**
+     * Restarts a job.
+     *
+     * @param string $ticket
+     * @return JobInterface The restarted job
+     * @throws TicketNotFoundException
+     * @throws \RuntimeException
+     */
+    public function restart($ticket);
 
     /**
      * Returns a job.
@@ -93,23 +110,4 @@ interface ManagerInterface
      */
     public function onMessage(Message $message);
 
-    /**
-     * Restarts a job.
-     *
-     * @param string $ticket
-     * @return JobInterface The restarted job
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function restart($ticket);
-
-    /**
-     * Updates a job.
-     *
-     * @param JobInterface $job
-     * @return JobInterface The updated job
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function update(JobInterface $job);
 }

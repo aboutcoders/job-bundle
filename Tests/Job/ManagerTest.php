@@ -210,21 +210,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testAddThrowsExceptionIfTypeIsNotRegistered()
-    {
-        $job = new Job();
-        $job->setType('foobar');
-
-        $this->registry->expects($this->any())
-            ->method('has')
-            ->willReturn(false);
-
-        $this->subject->add($job);
-    }
-
-    /**
      * @expectedException \Exception
      */
     public function testAddRethrowsBackendExceptions()
@@ -648,26 +633,17 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->onMessage($message);
     }
 
-    /**
-     * @dataProvider provideExceptions
-     * @param \Exception $exception
-     * @param null       $logger
-     */
-    public function testOnMessageHandlesExceptionsThrownByJob(\Exception $exception, $logger = null)
+    public function testOnMessageHandlesExceptionsThrownByJob()
     {
         $job       = new Job();
         $microTime = microtime(true);
         $message   = new Message('type', 'ticket');
+        $exception = new \Exception('foo', 100);
 
-        if ($logger != null) {
-            $this->dispatcher->expects($this->at(0))
-                ->method('dispatch')
-                ->willReturnCallback(
-                    function ($eventName, ExecutionEvent $event) use ($logger) {
-                        $event->getContext()->set('logger', $logger);
-                    }
-                );
-        }
+        $this->loggerFactory->expects($this->once())
+            ->method('create')
+            ->with($job)
+            ->willReturn(new NullLogger());
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -790,85 +766,33 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $subject->restart($job->getTicket());
     }
 
-    /**
-     * @expectedException \Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException
-     */
-    public function testUpdateThrowsExecptionIfJobIsNotManaged()
+    public function testUpdate()
     {
         $job = new Job();
         $job->setTicket('JobTicket');
 
-        $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(false);
+        $existingJob = new Job();
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
             ->with($job->getTicket())
-            ->willReturn(null);
-
-        $this->subject->update($job);
-    }
-
-    public function testUpdateCopiesJobIfJobIsNotManaged()
-    {
-        $job = new Job();
-        $job->setTicket('JobTicket');
-
-        $managedJob = new Job();
-
-        $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(false);
-
-        $this->jobManager->expects($this->once())
-            ->method('findByTicket')
-            ->with($job->getTicket())
-            ->willReturn($managedJob);
+            ->willReturn($existingJob);
 
         $this->helper->expects($this->once())
             ->method('copyJob')
-            ->with($job, $managedJob)
-            ->willReturn($managedJob);
+            ->with($job, $existingJob)
+            ->willReturn($existingJob);
 
         $this->jobManager->expects($this->once())
             ->method('save')
-            ->with($managedJob);
+            ->with($existingJob);
+
+        $this->loggerFactory->expects($this->once())
+            ->method('create')
+            ->with($existingJob)
+            ->willReturn(new NullLogger());
 
         $this->subject->update($job);
-    }
-
-    public function testUpdateWithManagedJob()
-    {
-        $job = new Job();
-        $job->setTicket('JobTicket');
-
-        $this->jobManager->expects($this->once())
-            ->method('isManagerOf')
-            ->with($job)
-            ->willReturn(true);
-
-        $this->helper->expects($this->never())
-            ->method('copyJob');
-
-        $this->jobManager->expects($this->once())
-            ->method('save')
-            ->with($job);
-
-        $this->subject->update($job);
-    }
-
-    /**
-     * @return array
-     */
-    public static function provideExceptions()
-    {
-        return [
-            [new \Exception('foo', 100)],
-            [new \Exception('foo', 100), new NullLogger()]
-        ];
     }
 
     public static function provideStatusToSkip()

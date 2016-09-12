@@ -10,10 +10,34 @@
 
 namespace Abc\Bundle\JobBundle\Validator\Constraint;
 
+use Abc\Bundle\JobBundle\Job\JobInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Abc\Bundle\JobBundle\Validator\Constraint as AssertJob;
+
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobValidator
+class JobValidator extends ConstraintValidator
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value, Constraint $constraint)
+    {
+        if(!$value instanceof JobInterface) {
+            throw new \InvalidArgumentException('The value must be an instance of '.JobInterface::class);
+        }
 
+        if(null == $value->getType()) {
+            return;
+        }
+
+        $this->context->getValidator()
+            ->inContext($this->context)
+            ->atPath('parameters')
+            ->validate($value->getParameters(), new AssertJob\Parameters(['type' => $value->getType()]));
+
+        return;
+    }
 }

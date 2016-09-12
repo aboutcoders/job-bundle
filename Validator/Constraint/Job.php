@@ -10,10 +10,18 @@
 
 namespace Abc\Bundle\JobBundle\Validator\Constraint;
 
+use Symfony\Component\Validator\Constraint;
+
 /**
+ * @Annotation
+ * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class Job
+class Job extends Constraint
 {
-
+    public function getTargets()
+    {
+        return [self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT];
+    }
 }

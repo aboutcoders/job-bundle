@@ -3,50 +3,35 @@ Scheduled Jobs
 
 You can configure one or more schedules for a job in order to configure repeated execution of a job. The bundle relies on the [AbcSchedulerBundle](https://github.org/aboutcoders/scheduler-bundle) to provide this functionality.
 
+## Creating a job with schedules
+
+If you want to create a job with one or more schedules the recommended way is to use the `JobBuilder`:
+
+```php
+use Abc\Bundle\JobBundle\Job\JobBuilder;
+
+$job = JobBuilder::create('my_job')
+    ->addSchedule('cron', '1 * * * *')
+    ->addSchedule('cron', '30 * * * *')
+    ->build();
+```
+
 ## Creating a schedule
 
-There are different ways to create a schedule. One way is to use the `createSchedule` method of the job.
+If you want to create a schedule the recommended way is to use the `ScheduleBuilder`:
 
 ```php
-$job = $manager->create('foobar');
+use Abc\Bundle\JobBundle\Job\ScheduleBuilder;
 
-$schedule = $job->createSchedule('cron', '* * * * *');
-```
-
-You can also create a new instance
-
-```php
-$schedule = Abc\Bundle\SchedulerBundle\Model\Schedule('cron', '*/5 * * * *');
-```
-
-You can also define your own Schedule class if you think this is necessary. You only need to make sure that schedule implements the interface [ScheduleInterface](https://github.com/aboutcoders/scheduler-bundle/blob/master/Model/ScheduleInterface.php) defined by the [AbcSchedulerBundle](https://github.org/aboutcoders/scheduler-bundle).
-
-## Adding a scheduled job
-
-There are different ways to add a scheduled job. In case you job only needs one schedule this is the shortest way:
-
-```php
-$job = $manager->addJob('my_job', array('Hello ' 'World!'), $schedule);
-```
-
-You can also create schedules first and then add them to the job and finally add the job to the manager:
-
-```php
-$job = $manager->create('foobar');
-
-$job->addSchedule($schedule1);
-
-$job->addSchedule($schedule2);
-
-$job = $manager->add($job);
+$schedule = ScheduleBuilder::create('cron', '1 * * * *');
 ```
 
 ## Removing a schedule
 
-Existing schedules can also be removed:
+You can remove previously added schedules from a job:
 
 ```php
 $job->removeSchedule($schedule);
 ```
 
-If you want to remove the schedule as part of the job execution you have to [inject the job manager into the job](./runtime-parameters.md).
+If you want to add or remove schedules during the execution of the job please refer to the section [Managing a job at runtime](./job-management.md).

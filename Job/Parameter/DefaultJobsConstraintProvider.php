@@ -10,15 +10,44 @@
 
 namespace Abc\Bundle\JobBundle\Job\Parameter;
 
-use Abc\Bundle\JobBundle\Job\Parameter\ConstraintProviderInterface;
+use Abc\Bundle\JobBundle\Validator\Job\AbstractConstraintProvider;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class SleeperConstraintProvider implements ConstraintProviderInterface
+class DefaultJobsConstraintProvider extends AbstractConstraintProvider
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getConstraints($type)
     {
-        return
+        switch ($type) {
+            case 'abc.mailer':
+                return $this->provideMailerConstraints();
+                break;
+            case 'abc.sleeper':
+                return $this->provideSleeperConstraints();
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array
+     */
+    protected function provideMailerConstraints()
+    {
+        return [new Assert\NotBlank()];
+    }
+
+    /**
+     * @return array
+     */
+    protected function provideSleeperConstraints()
+    {
+        return [new Assert\Range(['min' => 1])];
     }
 }

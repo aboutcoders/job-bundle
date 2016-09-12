@@ -47,7 +47,7 @@ abstract class JobTestCase extends KernelTestCase
 
         $this->assertEquals($parameters, $deserializedParameters, 'parameters are equal after serialization/deserialization');
 
-        $resolvedParameters = $this->resolveArguments(static::getJobType($type), $parameters, $runtimeParameters);
+        $resolvedParameters = $this->resolveParameters(static::getJobType($type), $parameters, $runtimeParameters);
 
         $mock = $this->getMockBuilder($class)
             ->disableOriginalConstructor()
@@ -90,7 +90,7 @@ abstract class JobTestCase extends KernelTestCase
      *  @param array            $contextArray $context
      * @return array
      */
-    private function resolveArguments(JobTypeInterface $jobType, array $parameters, array $contextArray)
+    private function resolveParameters(JobTypeInterface $jobType, array $parameters, array $contextArray)
     {
         $result = array();
         foreach ($jobType->getParameterTypes() as $parameterType) {

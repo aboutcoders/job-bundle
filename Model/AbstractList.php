@@ -2,25 +2,25 @@
 
 namespace Abc\Bundle\JobBundle\Model;
 
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation as JMS;
 
 /**
+ * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @author Wojciech Ciolko <wojciech.ciolko@aboutcoders.com>
  */
 abstract class AbstractList implements AbstractListInterface
 {
     /**
+     * @JMS\Type("array")
+     * @JMS\SerializedName("items")
      * @var array[Entity]
-     * @Type("array")
-     * @SerializedName("items")
      */
     protected $items;
 
     /**
+     * @JMS\Type("integer")
+     * @JMS\SerializedName("totalCount")
      * @var int
-     * @Type("integer")
-     * @SerializedName("totalCount")
      */
     protected $totalCount;
 

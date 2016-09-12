@@ -10,10 +10,30 @@
 
 namespace Abc\Bundle\JobBundle\Job\Exception;
 
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ValidationFailedException
+class ValidationFailedException extends \RuntimeException
 {
+    /**
+     * @var ConstraintViolationListInterface
+     */
+    private $list;
 
+    public function __construct(ConstraintViolationListInterface $list)
+    {
+        parent::__construct(sprintf('Validation failed with %d error(s).', count($list)));
+
+        $this->list = $list;
+    }
+
+    /**
+     * @return ConstraintViolationListInterface
+     */
+    public function getConstraintViolationList()
+    {
+        return $this->list;
+    }
 }
