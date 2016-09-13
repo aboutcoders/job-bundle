@@ -51,17 +51,6 @@ interface ManagerInterface
     public function addJob($type, array $parameters = null, ScheduleInterface $schedule = null);
 
     /**
-     * Cancels execution of a job.
-     *
-     * @param string  $ticket The ticket of the job
-     * @param boolean $force  Whether to enforce cancellation
-     * @return JobInterface|null The cancelled job, or null if given job is already terminated
-     * @throws TicketNotFoundException
-     * @throws \RuntimeException
-     */
-    public function cancel($ticket, $force = false);
-
-    /**
      * Updates existing job or creates job if it does not exist.
      *
      * @param JobInterface $job
@@ -70,6 +59,17 @@ interface ManagerInterface
      * @throws ValidationFailedException
      */
     public function update(JobInterface $job);
+
+    /**
+     * Cancels a job.
+     *
+     * @param string  $ticket The ticket of the job
+     * @param boolean $force  Whether to enforce cancellation
+     * @return JobInterface|null The cancelled job, or null if given job is already terminated
+     * @throws TicketNotFoundException
+     * @throws \RuntimeException
+     */
+    public function cancel($ticket, $force = false);
 
     /**
      * Restarts a job.

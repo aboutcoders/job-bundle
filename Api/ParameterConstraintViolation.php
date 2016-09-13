@@ -12,7 +12,6 @@ namespace Abc\Bundle\JobBundle\Api;
 
 use JMS\Serializer\Annotation\Type;
 
-
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */

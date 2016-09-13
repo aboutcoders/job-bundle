@@ -10,23 +10,20 @@
 
 namespace Abc\Bundle\JobBundle\Controller;
 
-use Abc\Bundle\JobBundle\Api\ErrorResponse;
+use Abc\Bundle\JobBundle\Api\BadRequestResponse;
 use Abc\Bundle\JobBundle\Api\ParameterConstraintViolation;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
-use Abc\Bundle\JobBundle\Validator\Constraint as AbcAssert;
+use Abc\Bundle\JobBundle\Validator\Constraints as AbcAssert;
 use Abc\Bundle\JobBundle\Model\JobList;
-use JMS\Serializer\Exception\Exception;
-use JMS\Serializer\Exception\UnsupportedFormatException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -67,7 +64,7 @@ class JobController extends BaseController
 
         if ($errors = $this->validateQueryParameters($page, $sortColumn, $sortDir, $limit, $criteria)) {
 
-            $response = new ErrorResponse('Invalid query parameters', 'One or more query parameters are invalid');
+            $response = new BadRequestResponse('Invalid query parameters', 'One or more query parameters are invalid');
             $response->setErrors($errors);
 
             return $this->serialize($response, 400);
@@ -112,7 +109,7 @@ class JobController extends BaseController
         try {
             return $this->serialize($this->getManager()->get($ticket));
         } catch (TicketNotFoundException $e) {
-            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+            return $this->createNotFoundResponse($e->getMessage());
         }
     }
 
@@ -132,7 +129,7 @@ class JobController extends BaseController
      * @param Request $request
      * @return Response
      */
-    public function createAction(Request $request)
+    public function addAction(Request $request)
     {
         $job = $this->deserializeJob($request);
 
@@ -194,7 +191,7 @@ class JobController extends BaseController
         try {
             return $this->serialize($this->getManager()->cancel($ticket, $force));
         } catch (TicketNotFoundException $e) {
-            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+            return $this->createNotFoundResponse($e->getMessage());
         }
     }
 
@@ -219,7 +216,7 @@ class JobController extends BaseController
         try {
             return $this->serialize($this->getManager()->restart($ticket));
         } catch (TicketNotFoundException $e) {
-            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+            return $this->createNotFoundResponse($e->getMessage());
         }
     }
 
@@ -246,7 +243,7 @@ class JobController extends BaseController
         try {
             return $this->serialize($this->getManager()->getLogs($ticket));
         } catch (TicketNotFoundException $e) {
-            throw $this->createNotFoundException(sprintf('Job with ticket %s not found', $ticket), $e);
+            return $this->createNotFoundResponse($e->getMessage());
         }
     }
 
@@ -254,29 +251,21 @@ class JobController extends BaseController
      * @param Request $request
      * @param array   $groups
      * @return JobInterface|mixed
-     * @throws UnsupportedMediaTypeHttpException
-     * @throws BadRequestHttpException
      */
     protected function deserializeJob(Request $request, array $groups = [])
     {
-        try {
-            $context = null;
-            if (count($groups) > 0) {
-                $context = new DeserializationContext();
-                $context->setGroups($groups);
-            }
-
-            return $this->getSerializer()->deserialize(
-                json_encode($request->request->all(), true),
-                Job::class,
-                $request->getContentType(),
-                $context
-            );
-        } catch (UnsupportedFormatException $e) {
-            throw new UnsupportedMediaTypeHttpException($e->getMessage(), $e);
-        } catch (Exception $e) {
-            throw new BadRequestHttpException($e->getMessage(), $e);
+        $context = null;
+        if (count($groups) > 0) {
+            $context = new DeserializationContext();
+            $context->setGroups($groups);
         }
+
+        return $this->getSerializer()->deserialize(
+            json_encode($request->request->all(), true),
+            Job::class,
+            'json',
+            $context
+        );
     }
 
     /**
@@ -347,14 +336,14 @@ class JobController extends BaseController
 
     /**
      * @param $job
-     * @return ErrorResponse|null
+     * @return BadRequestResponse|null
      */
     private function validateJob($job)
     {
         if ($this->getParameter('abc.job.rest.validate')) {
             $errors = $this->getValidator()->validate($job);
             if (count($errors) > 0) {
-                $response = new ErrorResponse('Invalid parameters', 'The request contains invalid job parameters');
+                $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
                 $response->setErrors($errors);
 
                 return $response;
@@ -362,5 +351,14 @@ class JobController extends BaseController
         }
 
         return null;
+    }
+
+    /**
+     * @param string $message
+     * @return Response
+     */
+    private function createNotFoundResponse($message)
+    {
+        return $this->serialize(new BadRequestResponse('Not found', $message), 404);
     }
 }

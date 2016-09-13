@@ -96,8 +96,8 @@ class JobHelper
         $to->setResponse($from->getResponse());
         $to->setParameters($from->getParameters());
 
-        if ($status = $from->getStatus()) {
-            $to->setStatus($status);
+        if (null != $from->getStatus()) {
+            $to->setStatus($from->getStatus());
         }
 
         foreach ($from->getSchedules() as $schedule) {

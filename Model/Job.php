@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Model;
 
 use Abc\Bundle\JobBundle\Job\Status;
-use Abc\Bundle\JobBundle\Validator\Constraint as AssertJob;
+use Abc\Bundle\JobBundle\Validator\Constraints as AssertJob;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
@@ -40,7 +40,6 @@ class Job implements JobInterface
 
     /**
      * @JMS\Type("Abc\Bundle\JobBundle\Job\Status")
-     * @AssertJob\Status
      * @var Status
      */
     protected $status;

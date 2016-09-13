@@ -158,7 +158,7 @@ class Manager implements ManagerInterface
     {
         if (null != $this->validator) {
             $errors = $this->validator->validate($job);
-            if(count($errors) > 0) {
+            if (count($errors) > 0) {
                 throw new ValidationFailedException($errors);
             }
         }
@@ -200,6 +200,10 @@ class Manager implements ManagerInterface
 
         $this->helper->updateJob($job, $status);
         $this->jobManager->save($job);
+
+        if ($force) {
+            $this->locker->release($job->getTicket());
+        }
 
         if (!$isProcessing || $force) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
@@ -288,7 +292,7 @@ class Manager implements ManagerInterface
 
             $this->getJobLogger($job)->error($e->getMessage(), ['exception' => $e]);
 
-            $response = new ExceptionResponse($e->getMessage(), $e->getCode());
+            $response = new ExceptionResponse($e);
             $status   = Status::ERROR();
         }
 
@@ -323,7 +327,7 @@ class Manager implements ManagerInterface
     {
         $existingJob = $this->jobManager->findByTicket($job->getTicket());
         if (null == $existingJob) {
-            return $this->create($job);
+            return $this->add($job);
         }
 
         $this->logger->debug('Update job ' . $job->getTicket(), ['job' => $job]);
@@ -332,7 +336,7 @@ class Manager implements ManagerInterface
 
         if (null != $this->validator) {
             $errors = $this->validator->validate($job);
-            if(count($errors) > 0) {
+            if (count($errors) > 0) {
                 throw new ValidationFailedException($errors);
             }
         }

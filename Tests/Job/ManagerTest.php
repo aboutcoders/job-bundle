@@ -258,7 +258,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param Status $status
      * @dataProvider provideUnterminatedStatus
      */
-    public function testCancelWithUntermiantedJob(Status $status)
+    public function testCancel(Status $status)
     {
         $isProcessing = $status->getValue() == Status::PROCESSING;
 
@@ -303,7 +303,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param Status $status
      * @dataProvider provideUnterminatedStatus
      */
-    public function testForceCancelWithUntermiantedJob(Status $status)
+    public function testCancelWithForce(Status $status)
     {
         $job = new Job();
         $job->setTicket('ticket');
@@ -334,6 +334,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+
+        $this->locker->expects($this->once())
+            ->method('release')
+            ->with($job->getTicket());
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')

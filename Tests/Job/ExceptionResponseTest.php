@@ -34,21 +34,24 @@ class ExceptionResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCode()
     {
-        $subject = new ExceptionResponse('foobar', 100);
+        $exception = new \Exception('foobar', 100);
+        $subject = new ExceptionResponse($exception);
 
         $this->assertSame(100, $subject->getCode());
     }
 
     public function testGetMessage()
     {
-        $subject = new ExceptionResponse('foobar', 100);
+        $exception = new \Exception('foobar', 100);
+        $subject = new ExceptionResponse($exception);
 
         $this->assertSame('foobar', $subject->getMessage());
     }
 
     public function testSerializationToJson()
     {
-        $subject = new ExceptionResponse('foobar', 100);
+        $exception = new \Exception('foobar', 100);
+        $subject = new ExceptionResponse($exception);
 
         $data = $this->serializer->serialize($subject, 'json');
 

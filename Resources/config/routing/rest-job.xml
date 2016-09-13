@@ -16,8 +16,8 @@
         <requirement key="_format">json</requirement>
     </route>
 
-    <route id="abc_job_create" path="/jobs" methods="POST">
-        <default key="_controller">AbcJobBundle:Job:create</default>
+    <route id="abc_job_add" path="/jobs" methods="POST">
+        <default key="_controller">AbcJobBundle:Job:add</default>
         <default key="_format">json</default>
         <requirement key="_format">json</requirement>
     </route>
