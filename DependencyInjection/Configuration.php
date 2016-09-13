@@ -35,11 +35,11 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('db_driver')
+                    ->defaultValue('orm')
                     ->validate()
                         ->ifNotInArray($supportedDrivers)
                         ->thenInvalid('The driver %s is not supported. Please choose one of ' . json_encode($supportedDrivers))
                     ->end()
-                    ->defaultValue('orm')
                 ->end()
                 ->scalarNode('adapter')
                     ->validate()

@@ -11,34 +11,33 @@
 namespace Abc\Bundle\JobBundle\Model;
 
 use Abc\Bundle\SchedulerBundle\Model\Schedule as BaseSchedule;
-use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Expose;
-use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation as JMS;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  *
- * @ExclusionPolicy("all")
+ * @JMS\ExclusionPolicy("all")
  */
 class Schedule extends BaseSchedule implements ScheduleInterface
 {
     /**
-     * @Expose
-     * @Type("string")
+     * @JMS\Expose
+     * @JMS\Type("string")
      * @var string|null
      */
     protected $type;
 
     /**
-     * @Expose
-     * @Type("string")
+     * @JMS\Expose
+     * @JMS\Type("string")
      * @var string|null
      */
     protected $expression;
 
     /**
-     * @Type("boolean")
-     * @Expose
+     * @JMS\Expose
+     * @JMS\Type("boolean")
      * @var boolean
      */
     protected $isActive;

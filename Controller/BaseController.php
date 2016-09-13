@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -24,11 +25,12 @@ abstract class BaseController extends Controller
 {
     /**
      * @param mixed $data
+     * @param int   $status
      * @return Response
      */
-    protected function serialize($data)
+    protected function serialize($data, $status = 200)
     {
-        return new Response($this->getSerializer()->serialize($data, 'json'));
+        return new Response($this->getSerializer()->serialize($data, 'json'), $status);
     }
 
     /**
@@ -61,5 +63,13 @@ abstract class BaseController extends Controller
     protected function getSerializer()
     {
         return $this->get('abc.job.serializer');
+    }
+
+    /**
+     * @return ValidatorInterface
+     */
+    protected function getValidator()
+    {
+        return $this->get('abc.job.validator');
     }
 }

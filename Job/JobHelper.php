@@ -86,24 +86,24 @@ class JobHelper
     /**
      * Copies properties of a job to another job
      *
-     * @param JobInterface                             $original The original job
-     * @param \Abc\Bundle\JobBundle\Model\JobInterface $copy     The job where where properties from original job are copied to
+     * @param JobInterface                             $from The job where properties are copied from
+     * @param \Abc\Bundle\JobBundle\Model\JobInterface $to   The job where where properties are copied to
      * @return \Abc\Bundle\JobBundle\Model\JobInterface The copied job
      */
-    public function copyJob(JobInterface $original, \Abc\Bundle\JobBundle\Model\JobInterface $copy)
+    public function copyJob(JobInterface $from, \Abc\Bundle\JobBundle\Model\JobInterface $to)
     {
-        $copy->setType($original->getType());
-        $copy->setResponse($original->getResponse());
-        $copy->setParameters($original->getParameters());
+        $to->setType($from->getType());
+        $to->setResponse($from->getResponse());
+        $to->setParameters($from->getParameters());
 
-        if ($status = $original->getStatus()) {
-            $copy->setStatus($status);
+        if (null != $from->getStatus()) {
+            $to->setStatus($from->getStatus());
         }
 
-        foreach ($original->getSchedules() as $schedule) {
-            $copy->addSchedule($schedule);
+        foreach ($from->getSchedules() as $schedule) {
+            $to->addSchedule($schedule);
         }
 
-        return $copy;
+        return $to;
     }
 }

@@ -51,14 +51,11 @@ class JobDeserializationSubscriber implements EventSubscriberInterface
     public function onPreDeserialize(PreDeserializeEvent $event)
     {
         $type = $event->getType();
-
         if (isset($type['name']) && ($type['name'] == Job::class || is_subclass_of($type['name'], Job::class))) {
-
             $data = $event->getData();
             if (isset($data['type']) && isset($data['parameters']) && is_array($data['parameters']) && count($data['parameters']) > 0) {
                 $jobType = $this->registry->get($data['type']);
                 $serializableParameters = $jobType->getSerializableParameterTypes();
-
                 if (count($serializableParameters) > 0) {
                     array_push($data['parameters'], ['abc.job.params' => $serializableParameters]);
                     $event->setData($data);

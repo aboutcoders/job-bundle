@@ -46,21 +46,9 @@ interface JobInterface
     public function setParameters($parameters = null);
 
     /**
-     * @param string $type
-     * @param $expression
-     * @return ScheduleInterface
-     */
-    public function createSchedule($type, $expression);
-
-    /**
      * @return bool
      */
     public function hasSchedules();
-
-    /**
-     * @return ScheduleInterface[]
-     */
-    public function getSchedules();
 
     /**
      * @param ScheduleInterface $schedule
@@ -78,6 +66,11 @@ interface JobInterface
      * @return void
      */
     public function removeSchedules();
+
+    /**
+     * @return ScheduleInterface[]
+     */
+    public function getSchedules();
 
     /**
      * @return mixed|null

@@ -20,25 +20,24 @@ use JMS\Serializer\Annotation\Type;
 class ExceptionResponse
 {
     /**
-     * @var int
      * @Type("integer")
+     * @var int
      */
     protected $code;
 
     /**
-     * @var string
      * @Type("string")
+     * @var string
      */
     protected $message;
 
     /**
-     * @param string $message
-     * @param int $code
+     * @param \Exception $e
      */
-    function __construct($message, $code)
+    function __construct(\Exception $e)
     {
-        $this->code    = $code;
-        $this->message = $message;
+        $this->code    = $e->getCode();
+        $this->message = $e->getMessage();
     }
 
     /**

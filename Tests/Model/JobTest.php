@@ -15,16 +15,6 @@ use Abc\Bundle\JobBundle\Model\Schedule;
 
 class JobTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCreateSchedule()
-    {
-        $subject  = new Job();
-        $schedule = $subject->createSchedule('foo', 'bar');
-
-        $this->assertInstanceOf(Schedule::class, $schedule);
-        $this->assertEquals('foo', $schedule->getType());
-        $this->assertEquals('bar', $schedule->getExpression());
-    }
-
     public function testHasSchedule()
     {
         $job = new Job();

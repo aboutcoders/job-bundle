@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\ConfigurationCheckPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\ControllerConfigurationPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\LockerConfigurationPass;
+use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterConstraintProvidersPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterDoctrineListenerPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterJobsPass;
 use Abc\Bundle\JobBundle\DependencyInjection\Compiler\RegisterEventListenersPass;
@@ -34,6 +35,7 @@ class AbcJobBundle extends Bundle
         $container->addCompilerPass(new ControllerConfigurationPass());
         $container->addCompilerPass(new LockerConfigurationPass());
         $container->addCompilerPass(new RegisterJobsPass());
+        $container->addCompilerPass(new RegisterConstraintProvidersPass());
         $container->addCompilerPass(new RegisterEventListenersPass());
         $container->addCompilerPass(new RegisterDoctrineListenerPass());
 

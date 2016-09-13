@@ -46,8 +46,9 @@ Please note that this bundle is still in development and thus we might need to c
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ### Missing Features For The Stable Release
-
-- Add validator (define add-validation-group, update-validation-group)
+- Add test case to parameters of custom jobs
+- Add documentation for validation
+- Document & unit test job creation when $manager->update is invoked & job does not exist
 - Add consumer management
 
 ### Planned Features

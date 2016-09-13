@@ -172,6 +172,7 @@ class AbcJobExtension extends Extension
     private function loadRest(array $config, XmlFileLoader $loader, ContainerBuilder $container)
     {
         $container->setParameter('abc.job.rest', $config['rest']['enable']);
+        $container->setParameter('abc.job.rest.validate', $config['rest']['validate']);
     }
 
     /**
