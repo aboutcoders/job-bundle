@@ -13,6 +13,7 @@ namespace Abc\Bundle\JobBundle\Controller;
 use Abc\Bundle\JobBundle\Api\BadRequestResponse;
 use Abc\Bundle\JobBundle\Api\ParameterConstraintViolation;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
+use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
@@ -137,7 +138,14 @@ class JobController extends BaseController
             return $this->serialize($response, 400);
         }
 
-        return $this->serialize($this->getManager()->add($job));
+        try {
+            return $this->serialize($this->getManager()->add($job));
+        } catch (ValidationFailedException $e) {
+            $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
+            $response->setErrors($e->getConstraintViolationList());
+
+            return $this->serialize($response, 400);
+        }
     }
 
     /**
@@ -165,7 +173,14 @@ class JobController extends BaseController
             return $this->serialize($response, 400);
         }
 
-        return $this->serialize($this->getManager()->update($job));
+        try {
+            return $this->serialize($this->getManager()->update($job));
+        } catch (ValidationFailedException $e) {
+            $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
+            $response->setErrors($e->getConstraintViolationList());
+
+            return $this->serialize($response, 400);
+        }
     }
 
     /**

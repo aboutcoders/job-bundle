@@ -51,7 +51,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('manager')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('validate')->defaultFalse()->end()
+                        ->scalarNode('validate')->defaultTrue()->end()
                     ->end()
                 ->end()
                 ->scalarNode('default_queue')->defaultValue('default')->end()

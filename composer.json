@@ -20,7 +20,7 @@
         "nelmio/api-doc-bundle": "~2",
         "doctrine/annotations": "1.*",
         "aboutcoders/process-control": "~1.2",
-        "aboutcoders/scheduler-bundle": "~1.1",
+        "aboutcoders/scheduler-bundle": "~1.2",
         "aboutcoders/resource-lock-bundle": "dev-master",
         "aboutcoders/enum-serializer-bundle": "~0.2"
     },

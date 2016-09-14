@@ -157,8 +157,10 @@ class Manager implements ManagerInterface
     public function add(JobInterface $job)
     {
         if (null != $this->validator) {
+            $this->logger->debug('Validate job');
             $errors = $this->validator->validate($job);
             if (count($errors) > 0) {
+                $this->logger->debug('Validation failed with errors', ['errors' => $errors]);
                 throw new ValidationFailedException($errors);
             }
         }
