@@ -38,16 +38,16 @@ Please note that this bundle is still in development and thus we might need to c
 - [Cancel Jobs](./Resources/docs/cancel-jobs.md)
 - [Runtime Parameters](./Resources/docs/runtime-parameters.md)
 - [Logging](./Resources/docs/logging.md)
+- [Validation](./Resources/docs/validation.md)
+- [Unit Testing](./Resources/docs/unit-testing.md)
 - [Process Control](./Resources/docs/process-control.md)
 - [Lifecycle Events](./Resources/docs/lifecycle-events.md)
 - [Clustered Environment](./Resources/docs/clustered-environment.md)
-- [Unit Testing](./Resources/docs/unit-testing.md)
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ### Missing Features For The Stable Release
-- Add test case to parameters of custom jobs
-- Add documentation for validation
+- Add test case to validate parameters of custom jobs
 - Document & unit test job creation when $manager->update is invoked & job does not exist
 - Add consumer management
 
