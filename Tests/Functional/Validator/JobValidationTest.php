@@ -53,7 +53,7 @@ class JobValidationTest extends KernelTestCase
     {
         $job = new Job();
         $job->setType('abc.sleeper');
-        $job->setParameters(['aasd']);
+        $job->setParameters(['foobar']);
 
         $errors = $this->validator->validate($job);
         $this->assertTrue($errors->has(0));

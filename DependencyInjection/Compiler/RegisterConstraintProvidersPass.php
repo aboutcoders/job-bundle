@@ -30,9 +30,9 @@ class RegisterConstraintProvidersPass implements CompilerPassInterface
 
     /**
      * @param string $validator Service name of the definition registry in processed container
-     * @param string $tag      The tag name used for jobs
+     * @param string $tag       The tag name used for jobs
      */
-    public function __construct($validator = 'abc.job.parameter_validator', $tag = 'abc.job.constraint_provider')
+    public function __construct($validator = 'abc.job.validator.parameters', $tag = 'abc.job.constraint_provider')
     {
         $this->validator = $validator;
         $this->tag       = $tag;
