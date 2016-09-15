@@ -34,7 +34,7 @@ install:
     - composer update $COMPOSER_FLAGS
 
 script:
-  - phpunit --coverage-text
+  - phpunit -v
 
 notifications:
   hipchat:

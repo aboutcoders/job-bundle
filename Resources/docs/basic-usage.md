@@ -40,16 +40,10 @@ This will consume all messages from the default queue and process associated job
 
 __Note:__ If you are using the job `abc.mailer` be aware that depending on the spool configuration emails are not sent until the kernel terminates.
 
-## Defining a custom job
 
-To register a custom job, you have to do two things:
+## Creating a custom job
 
-- Create the job class
-- Register the job class in the service container
-
-### Step 1: Create the job class
-
-First you have to create the class that will perform the actual work. This can be any kind of class.
+To create a custom job you have to create a class that will perform the actual work. This can be any kind of class.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -74,13 +68,13 @@ class MyJob
 }
 ```
 
-Please note the annotations __@ParamType__ and __@ReturnType__. They are used to specify the type of parameters the method is invoked with as well as the type of the return value. Since jobs are executed in the background the parameters must be persisted and therefor serialized when a job is added to the queue. Serialization and deserialization is done using the [JMS Serializer](http://jmsyst.com/libs/serializer).
+If the method of the class that you want to invoke as job requires parameters or returns a value you need to annotate the method. Please note the annotations __@ParamType__ and __@ReturnType__. They are used to specify the type of parameters the method is invoked with as well as the type of the return value. Since jobs are executed in the background the parameters must be persisted and therefor serialized when a job is added to the queue. Serialization and deserialization is done using the [JMS Serializer](http://jmsyst.com/libs/serializer).
 
-In the above example there is a special parameter `@abc.job.logger`. This parameter references a so called [runtime parameter](./docs/howto-inject-runtime-parameters.md). In contrast to regular parameters which are serialized when a job is added to the queue runtime parameters are provided at runtime of a job using the event dispatcher.
+In the above example there is a special parameter `@abc.job.logger`. This parameter references a so called [runtime parameter](./runtime-parameters.md). In contrast to regular parameters which are serialized when a job is added to the queue runtime parameters are provided at runtime of a job using the event dispatcher.
 
-__Note:__ Do not mix runtime parameters with service ids inside the dependency injection container.
+__Note:__ Do not mix runtime parameters with service ids inside the dependency injection container. However you can of course inject any service from the service container as a runtime parameter.
 
-The previous example uses the default runtime parameter `@abc.job.logger` that is provided by the AbcJobBundle. If this parameter is defined a dedicated PSR compliant logger will be injected into the method which will log methods only for this job. Please refer to the chapter [Logging]() if you want to know more about the logging features.
+The previous example uses the default runtime parameter `@abc.job.logger` that is provided by the AbcJobBundle. If this parameter is defined, a dedicated PSR compliant logger will be injected into the method which will log methods only for this job. Please refer to the chapter [Logging]() if you want to know more about the logging features.
 
 ### Step 2: Register the class in the service container
 

@@ -12,10 +12,6 @@ use Abc\ProcessControl\ControllerInterface;
 
 interface ControllerAwareInterface
 {
-    /**
-     * @param ControllerInterface $controller
-     * @return void
-     */
     public function setController(ControllerInterface $controller);
 }
 ```
@@ -27,11 +23,6 @@ namespace Abc\ProcessControl;
 
 interface ControllerInterface
 {
-    /**
-     * Indicates whether to exit a process
-     *
-     * @return boolean
-     */
     public function doExit();
 }
 ```
@@ -41,40 +32,26 @@ __Note:__ It is recommended to implement this interface in every job that perfor
 Below you see an example implementation how a job uses the controller:
 
 ```php
-
 use Abc\ProcessControl\ControllerAwareInterface;
 use Abc\ProcessControl\ControllerInterface;
 
 class Sleeper implements ControllerAwareInterface
 {
-    /**
-     * @var ControllerInterface
-     */
     private $controller;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setController(ControllerInterface $controller)
     {
         $this->controller = $controller;
     }
 
     /**
+     * @ParamType({"integer", "@logger"})
      * @param integer $seconds
      * @param LoggerInterface $logger
-     * @ParamType({"integer", "@logger"})
      */
     public function sleep($seconds, LoggerInterface $logger)
     {
-        do {
-            $logger->info('sleep for 1 second');
-
-            sleep(1);
-            $seconds--;
-
-            $logger->info('determine whether to terminate');
-        } while ($seconds > 0 && !$this->controller->doExit());
+        // ...
     }
 }
 ```
