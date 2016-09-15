@@ -10,9 +10,9 @@
             <tag name="validator.constraint_validator" />
         </service>
 
-        <service id="abc.job.parameter_validator" class="Abc\Bundle\JobBundle\Validator\Constraints\ParametersValidator" public="true">
+        <service id="abc.job.validator.parameters" class="Abc\Bundle\JobBundle\Validator\Constraints\ParametersValidator" public="true">
             <argument type="service" id="abc.job.registry" />
-            <tag name="validator.constraint_validator"/>
+            <tag name="validator.constraint_validator" />
         </service>
 
     </services>

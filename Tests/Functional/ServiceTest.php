@@ -27,6 +27,7 @@ use Abc\Bundle\JobBundle\Model\AgentManagerInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Serializer\Serializer;
 use Abc\Bundle\JobBundle\Validator\Constraints\JobTypeValidator;
+use Abc\Bundle\JobBundle\Validator\Constraints\ParametersValidator;
 use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
@@ -108,7 +109,8 @@ class ServiceTest extends KernelTestCase
             ['abc.job.registry', JobTypeRegistry::class],
             ['abc.job.schedule_manager', ScheduleManager::class],
             ['abc.job.serializer', Serializer::class],
-            ['abc.job.validator.job_type', JobTypeValidator::class]
+            ['abc.job.validator.job_type', JobTypeValidator::class],
+            ['abc.job.validator.parameters', ParametersValidator::class]
         ];
     }
 
