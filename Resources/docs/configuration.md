@@ -36,7 +36,7 @@ If you want to enable the JSON REST-API you have to import the routing files.
 # app/config/routing.yml
 abc-rest-job:
     type: rest
-    resource: "@AbcJobBundle/Resources/config/routing/rest-all.yml"
+    resource: "@AbcJobBundle/Resources/config/routing/rest-all.xml"
     prefix: /api
 ```
 
@@ -64,7 +64,7 @@ The AbcJobBundle sends and consumes messages from queues.
 
 #### Default Queue
 
-By default there is one queue defined with the name `default`. You can change the name if this default queue:
+By default there is one queue defined with the name `default`, you can change the name of this queue:
 
 ```yaml
 # app/config/config.yml
@@ -127,7 +127,7 @@ abc_job:
 
 #### Stream Handler Configuration
 
-Besides the storage handler a regular stream handler can be enabled. This will create an additional log file for every job using standard the LineFormatter.
+Besides the storage handler a regular stream handler can be enabled, that creates an additional log file for every job using the standard [LineFormatter](https://github.com/Seldaek/monolog/blob/master/src/Monolog/Formatter/LineFormatter.php).
 
 ```yaml
 # app/config/config.yml
@@ -144,7 +144,7 @@ abc_job:
 
 #### Registering Custom Handlers
 
-Besides the storage and log handler you can define additional handlers that will be registered in the logger.
+Besides the storage and log handler you can define additional custom handlers that will be pushed to logger that is injected into the jobs.
 
 ```yaml
 # app/config/config.yml
@@ -154,9 +154,9 @@ abc_job:
             - my_handler_id         # An array of service ids of additional handlers to register
 ```
 
-#### Configuring a specific log level for a job
+#### Configuring a custom log level for a job
 
-You can overwrite the default log level and specific log level for each job.
+You can overwrite the default log level and specify a custom log level for each job.
 
 ```yaml
 # app/config/config.yml

@@ -11,7 +11,7 @@ abc_job:
     register_default_jobs: true
 ```
 
-Use the following code to send an email:
+The following example sends an email:
 
 ```php
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
@@ -30,13 +30,13 @@ $message->setSubject('Hello World');
 $manager->add('abc_mailer', [$message]);
 ```
 
-You can now trigger processing of the job by invoking the consumer command:
+You can trigger processing of the job with the consumer command:
 
 ```bash
 php bin/console abc:job:consume default --stop-when-empty
 ```
 
-This will consume all messages from the default queue and process associated job.
+This will consume all messages from the default queue and process the associated jobs.
 
 __Note:__ If you are using the job `abc.mailer` be aware that depending on the spool configuration emails are not sent until the kernel terminates.
 

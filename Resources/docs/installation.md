@@ -15,7 +15,7 @@ Make sure the following bundles are installed and configured:
 The AbcJobBundle supports multiple message queue backends by providing adapters for the following bundles:
 
 * [BernardBundle](https://github.com/bernardphp/BernardBundle)
-* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle).
+* [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle)
 
 
 | Backend            | Sonata | Bernard |
