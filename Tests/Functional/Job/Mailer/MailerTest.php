@@ -19,14 +19,6 @@ use Abc\Bundle\JobBundle\Test\JobTestCase;
  */
 class MailerTest extends JobTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function setUp()
-    {
-        self::bootKernel();
-    }
-
     public function testJobIsRegistered()
     {
         $this->assertJobIsRegistered('abc.mailer');

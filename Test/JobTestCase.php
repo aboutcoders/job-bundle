@@ -23,6 +23,14 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 abstract class JobTestCase extends KernelTestCase
 {
     /**
+     * {@inheritDoc}
+     */
+    public function setUp()
+    {
+        self::bootKernel();
+    }
+
+    /**
      * Asserts that job will be invoked with the given parameters.
      *
      * @param string $type              The job type
