@@ -16,25 +16,25 @@ use Abc\Bundle\JobBundle\Annotation\ReturnType;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class AnnotatedJob {
-
-
+class AnnotatedJob
+{
     /**
-     * @ParamType("string")
+     * @ParamType("param", type="string")
      */
-    public function methodWithSingleParameters($string)
+    public function methodWithSingleParameters($param)
     {
     }
 
     /**
-     * @ParamType({"string","boolean"})
+     * @ParamType("param1", type="string", options={})
+     * @ParamType("param2", type="boolean", options={"groups"={"group1"}})
      */
-    public function methodWithMultipleParameters($string, $boolean)
+    public function methodWithMultipleParameters($param1, $param2)
     {
     }
 
     /**
-     * @ReturnType("string")
+     * @ReturnType("string", options={})
      */
     public function methodWithResponse()
     {

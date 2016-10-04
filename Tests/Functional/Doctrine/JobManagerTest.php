@@ -13,7 +13,6 @@ namespace Abc\Bundle\JobBundle\Tests\Functional\Doctrine;
 use Abc\Bundle\JobBundle\Doctrine\JobManager;
 use Abc\Bundle\JobBundle\Doctrine\ScheduleManager;
 use Abc\Bundle\JobBundle\Entity\Job;
-use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
@@ -97,12 +96,10 @@ class JobManagerTest extends DatabaseKernelTestCase
     {
         $type           = 'foobar';
         $parameters     = [['foo' => 'bar'], 'foobar'];
-        $parameterTypes = ['array<String,String>', 'String'];
 
-        // persist object with parameters being an array
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
-            ->with($parameters)
+            ->method('serializeParameters')
+            ->with($type, $parameters)
             ->willReturn('SerializedParameter');
 
         $job = $this->subject->create($type);
@@ -110,12 +107,11 @@ class JobManagerTest extends DatabaseKernelTestCase
         $job->setParameters($parameters);
         $this->subject->save($job);
 
-        // clear
         $this->getEntityManager()->clear();
 
         $this->serializationHelper->expects($this->once())
             ->method('deserializeParameters')
-            ->with('SerializedParameter', $type)
+            ->with($type, 'SerializedParameter')
             ->willReturn($parameters);
 
         $persistedJob = $this->subject->findByTicket($job->getTicket());
@@ -130,8 +126,8 @@ class JobManagerTest extends DatabaseKernelTestCase
 
         // persist object with parameters being an array
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
-            ->with($response)
+            ->method('serializeReturnValue')
+            ->with($type, $response)
             ->willReturn('SerializedResponse');
 
         $job = $this->subject->create($type);
@@ -142,8 +138,8 @@ class JobManagerTest extends DatabaseKernelTestCase
         $this->getEntityManager()->clear();
 
         $this->serializationHelper->expects($this->once())
-            ->method('deserializeResponse')
-            ->with('SerializedResponse', $type)
+            ->method('deserializeReturnValue')
+            ->with($type, 'SerializedResponse')
             ->willReturn($response);
 
         $persistedJob = $this->subject->findByTicket($job->getTicket());
@@ -221,22 +217,5 @@ class JobManagerTest extends DatabaseKernelTestCase
     private function getScheduleManager()
     {
         return $this->getContainer()->get('abc.job.schedule_manager');
-    }
-
-    /**
-     * @param string $jobType
-     * @param array  $parameterTypes
-     * @param string $responseType
-     * @return JobType
-     */
-    private function setUpJobType($jobType, array $parameterTypes = [], $responseType = null)
-    {
-        $callable = function () {
-        };
-        $jobType  = new JobType('ServiceId', $jobType, $callable);
-        $jobType->setParameterTypes($parameterTypes);
-        $jobType->setResponseType($responseType);
-
-        return $jobType;
     }
 }

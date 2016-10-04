@@ -36,18 +36,20 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->serviceId = 'service-id';
         $this->type      = 'job-type';
-        $this->callable  = array(new JobAwareJob, JobAwareJob::getMethodName());
+        $this->callable  = [new JobAwareJob, JobAwareJob::getMethodName()];
         $this->logLevel  = Logger::ERROR;
         $this->subject   = new JobType($this->serviceId, $this->type, $this->callable, $this->logLevel);
     }
 
     /**
+     * @dataProvider getInvalidConstructorArgs
+     * @expectedException \InvalidArgumentException
+     *
      * @param mixed    $serviceId
      * @param mixed    $type
      * @param callable $callable
      * @param mixed    $logLevel
-     * @dataProvider getInvalidConstructorArgs
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testConstructThrowsInvalidArgumentException($serviceId, $type, $callable, $logLevel = null)
     {
@@ -74,6 +76,11 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(JobAwareJob::getMethodName(), $this->subject->getMethod());
     }
 
+    public function testGetCallable()
+    {
+        $this->assertEquals([new JobAwareJob, JobAwareJob::getMethodName()], $this->subject->getCallable());
+    }
+
     public function testGetSetLogLevel()
     {
         $this->assertEquals($this->logLevel, $this->subject->getLogLevel());
@@ -90,12 +97,59 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('string'), $this->subject->getParameterTypes());
     }
 
-    public function testGetSetResponseType()
+    public function testGetParameterType()
     {
-        $this->assertNull($this->subject->getResponseType());
+        $this->subject->setParameterTypes(['Type1', 'Type2']);
+        $this->assertEquals('Type1', $this->subject->getParameterType(0));
+        $this->assertEquals('Type2', $this->subject->getParameterType(1));
+    }
 
-        $this->subject->setResponseType('response');
-        $this->assertEquals('response', $this->subject->getResponseType());
+    public function testGetSetParameterTypeOptions()
+    {
+        $this->assertTrue(is_array($this->subject->getParameterTypeOptions()));
+        $this->assertTrue(is_array($this->subject->getParameterTypeOptions(1)));
+
+        $this->subject->setParameterTypeOptions([['Parameter1TypeOptions'], ['Parameter2TypeOptions']]);
+
+        $this->assertEquals([['Parameter1TypeOptions'], ['Parameter2TypeOptions']], $this->subject->getParameterTypeOptions());
+        $this->assertEquals(['Parameter1TypeOptions'], $this->subject->getParameterTypeOptions(0));
+        $this->assertEquals(['Parameter2TypeOptions'], $this->subject->getParameterTypeOptions(1));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetParameterTypeWithIndexNotDefined()
+    {
+        $this->subject->getParameterType(0);
+    }
+
+    /**
+     * @dataProvider provideDataForGetIndices
+     * @param array $parameterTypes
+     * @param       $expectedIndices
+     */
+    public function testGetIndicesOfSerializableParameters(array $parameterTypes, $expectedIndices)
+    {
+        $this->subject->setParameterTypes($parameterTypes);
+
+        $this->assertEquals($expectedIndices, $this->subject->getIndicesOfSerializableParameters());
+    }
+
+    public function testGetSetReturnType()
+    {
+        $this->assertNull($this->subject->getReturnType());
+
+        $this->subject->setReturnType('response');
+        $this->assertEquals('response', $this->subject->getReturnType());
+    }
+
+    public function testGetSetReturnTypeOptions()
+    {
+        $this->assertTrue(is_array($this->subject->getReturnTypeOptions()));
+
+        $this->subject->setReturnTypeOptions(['ReturnTypeOptions']);
+        $this->assertEquals(['ReturnTypeOptions'], $this->subject->getReturnTypeOptions());
     }
 
     public function testGetSetQueue()
@@ -106,6 +160,9 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('queue', $this->subject->getQueue());
     }
 
+    /**
+     * @return array
+     */
     public static function getInvalidConstructorArgs()
     {
         $callable = function () {
@@ -121,6 +178,21 @@ class JobTypeTest extends \PHPUnit_Framework_TestCase
             ['service-id', 'type', $callable, 'false'],
             ['service-id', 'type', $callable, false],
             ['service-id', 'type', $callable, 1000]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function provideDataForGetIndices()
+    {
+        return [
+            [['@runtimeParameter'], []],
+            [['@runtimeParameter', 'Type1'], [1]],
+            [['@runtimeParameter', 'Type1', 'Type2'], [1, 2]],
+            [['Type1', '@runtimeParameter'], [0]],
+            [['Type1', '@runtimeParameter', 'Type2'], [0, 2]],
+            [['Type1', '@runtimeParameter1', 'Type2', '@runtimeParameter2'], [0, 2]]
         ];
     }
 }

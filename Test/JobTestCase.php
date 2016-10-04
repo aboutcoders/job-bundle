@@ -10,12 +10,16 @@
 
 namespace Abc\Bundle\JobBundle\Test;
 
+use Abc\Bundle\JobBundle\Event\ExecutionEvent;
+use Abc\Bundle\JobBundle\Event\JobEvents;
+use Abc\Bundle\JobBundle\Job\Context\Context;
+use Abc\Bundle\JobBundle\Job\Invoker;
 use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
-use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -33,29 +37,13 @@ abstract class JobTestCase extends KernelTestCase
     /**
      * Asserts that job will be invoked with the given parameters.
      *
-     * @param string $type              The job type
-     * @param array  $parameters        The parameters the job will be invoked ith
-     * @param array  $runtimeParameters An associative array containing additional runtime parameters (optional)
+     * @param string $type       The job type
+     * @param array  $parameters The parameters the job will be invoked ith
      */
-    public function assertJobInvokedWithParams($type, array $parameters = array(), array $runtimeParameters = array())
+    public function assertInvokesJob($type, array $parameters = array())
     {
-        $class             = static::getJobType($type)->getClass();
-        $method            = static::getJobType($type)->getMethod();
-        $runtimeParameters = array_merge($this->getDefaultRuntimeParameters(), $runtimeParameters);
-
-        $deserializedParameters = $parameters;
-        if (count($parameters) > 0) {
-            $data = static::getSerializationHelper()->serialize($parameters);
-
-            /**
-             * @var array $deserializedParameters
-             */
-            $deserializedParameters = static::getSerializationHelper()->deserializeParameters($data, $type);
-        }
-
-        $this->assertEquals($parameters, $deserializedParameters, 'parameters are equal after serialization/deserialization');
-
-        $resolvedParameters = $this->resolveParameters(static::getJobType($type), $parameters, $runtimeParameters);
+        $class  = static::getJobType($type)->getClass();
+        $method = static::getJobType($type)->getMethod();
 
         $mock = $this->getMockBuilder($class)
             ->disableOriginalConstructor()
@@ -65,6 +53,8 @@ abstract class JobTestCase extends KernelTestCase
         $callable = $mock->expects($this->once())
             ->method($method);
 
+        $resolvedParameters = $this->resolveParameters($type, $parameters);
+
         // expect mock is called with the given parameters
         call_user_func_array([$callable, 'with'], $resolvedParameters);
 
@@ -73,44 +63,45 @@ abstract class JobTestCase extends KernelTestCase
     }
 
     /**
-     * Asserts that the registered job class matches the expected one
-     *
-     * @param string $type
-     * @param string $expected
+     * @param string $type The job type
+     * @param string $expectedServiceId The expected id of the service
+     * @param string $expectedMethod The expected name of the method
      */
-    public function assertJobClass($type, $expected)
-    {
-        $callable = static::getJobType($type)->getCallable();
-        $this->assertSame(get_class($callable[0]), $expected);
-    }
-
-    /**
-     * @param $type
-     */
-    public static function assertJobIsRegistered($type)
+    public static function assertJobIsRegistered($type, $expectedServiceId, $expectedMethod)
     {
         static::assertTrue(static::getRegistry()->has($type));
+        static::assertEquals($expectedServiceId, static::getRegistry()->get($type)->getServiceId());
+        static::assertEquals($expectedMethod, static::getRegistry()->get($type)->getMethod());
     }
 
     /**
-     * @param JobTypeInterface $jobType
-     * @param array            $parameters
-     *  @param array            $contextArray $context
-     * @return array
+     * @param string $type       The type of the job
+     * @param array  $parameters The parameters of the job
+     * @return array The parameters the job will be invoked with
      */
-    private function resolveParameters(JobTypeInterface $jobType, array $parameters, array $contextArray)
+    public function resolveParameters($type, array $parameters)
     {
-        $result = array();
-        foreach ($jobType->getParameterTypes() as $parameterType) {
-            if (0 === strpos($parameterType, '@')) {
-                $key      = substr($parameterType, 1);
-                $result[] = isset($contextArray[$key]) ? $contextArray[$key] : null;
-            } else {
-                $result[] = array_shift($parameters);
-            }
+        // serialize/deserialize parameters
+        $deserializedParameters = $parameters;
+        if (count($parameters) > 0) {
+            $data = static::getSerializationHelper()->serializeParameters($type, $parameters);
+
+            /**
+             * @var array $deserializedParameters
+             */
+            $deserializedParameters = static::getSerializationHelper()->deserializeParameters($type, $data);
         }
 
-        return $result;
+        // Dispatch event to let listeners register runtime parameters
+        $job = new Job();
+        $job->setType($type);
+        $job->setParameters($deserializedParameters);
+
+        $event = new ExecutionEvent($job, new Context());
+
+        static::getDispatcher()->dispatch(JobEvents::JOB_PRE_EXECUTE, $event);
+
+        return Invoker::resolveParameters(static::getJobType($type), $event->getContext(), $deserializedParameters);
     }
 
     /**
@@ -139,13 +130,10 @@ abstract class JobTestCase extends KernelTestCase
     }
 
     /**
-     * @return array
+     * @return EventDispatcherInterface
      */
-    private function getDefaultRuntimeParameters()
+    private static function getDispatcher()
     {
-        return [
-            'manager' => $this->getMock(ManagerInterface::class),
-            'logger'  => $this->getMock(LoggerInterface::class)
-        ];
+        return static::$kernel->getContainer()->get('event_dispatcher');
     }
 }

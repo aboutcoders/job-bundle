@@ -18,7 +18,19 @@ namespace Abc\Bundle\JobBundle\Annotation;
 final class ParamType
 {
     /**
-     * @var array<string> @Required
+     * @Required
+     * @var string
      */
-    public $typeList;
+    public $name;
+
+    /**
+     * @Required
+     * @var string
+     */
+    public $type;
+
+    /**
+     * @var array
+     */
+    public $options = array();
 }

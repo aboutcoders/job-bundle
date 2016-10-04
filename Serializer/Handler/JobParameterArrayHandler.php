@@ -11,7 +11,7 @@
 namespace Abc\Bundle\JobBundle\Serializer\Handler;
 
 use Abc\Bundle\JobBundle\Job\JobParameterArray;
-use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
+use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\GraphNavigator;
@@ -23,6 +23,19 @@ use JMS\Serializer\VisitorInterface;
  */
 class JobParameterArrayHandler implements SubscribingHandlerInterface
 {
+    /**
+     * @var JobTypeRegistry
+     */
+    private $registry;
+
+    /**
+     * @param JobTypeRegistry $registry
+     */
+    public function __construct(JobTypeRegistry $registry)
+    {
+        $this->registry = $registry;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -74,11 +87,14 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
     {
         /**
          * If $type['params'] is not set this most likely means, that a job is being deserialized, so we check if the JobDeserializationSubscriber set the type of params at the end of the $data array
+         *
          * @see JobDeserializationSubscriber::onPreDeserialize()
          */
         $deserializeJob = false;
-        if (count($type['params']) == 0 && is_array($data) && is_array(end($data)) && in_array('abc.job.params', array_keys(end($data)))) {
-            $type['params'] = $this->extractParamTypes($data);
+        if (count($type['params']) == 0 && is_array($data) && is_array(end($data)) && in_array('abc.job.type', array_keys(end($data)))) {
+
+            $jobType        = $this->extractJobType($data);
+            $type['params'] = $this->getParamTypes($jobType);
             $deserializeJob = true;
         }
 
@@ -90,8 +106,7 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
         for ($i = 0; $i < count($type['params']); $i++) {
             if (!is_array($data) || !isset($data[$i]) || null == $data[$i]) {
                 $result[$i] = null;
-            }
-            else {
+            } else {
                 if (!is_array($type['params'][$i])) {
                     $type['params'][$i] = [
                         'name'   => $type['params'][$i],
@@ -116,10 +131,34 @@ class JobParameterArrayHandler implements SubscribingHandlerInterface
         return $result;
     }
 
-    private function extractParamTypes(&$data)
+    /**
+     * Extracts the job type from the array
+     *
+     * @param array $data
+     * @return string
+     */
+    private function extractJobType(&$data)
     {
-        $paramTypeArray = array_pop($data);
+        $jobTypeArray = array_pop($data);
 
-        return array_pop($paramTypeArray);
+        return array_pop($jobTypeArray);
+    }
+
+    /**
+     * @param string $type The job type
+     * @return array
+     */
+    private function getParamTypes($type)
+    {
+        $jobType = $this->registry->get($type);
+        $types   = $jobType->getParameterTypes();
+        $indices = $jobType->getIndicesOfSerializableParameters();
+
+        $rs = array();
+        foreach ($indices as $index) {
+            $rs[] = $types[$index];
+        }
+
+        return $rs;
     }
 }

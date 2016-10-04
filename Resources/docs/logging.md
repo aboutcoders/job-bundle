@@ -7,7 +7,7 @@ There are two ways to inject the logger into the job class.
 
 ## Injecting the logger as a runtime parameter
 
-To inject the logger as a runtime parameter you simply have to specify the `@abc.job.logger` in the `@ParamType` annotation of the method and add the logger to the method signature:
+To inject the logger as a runtime parameter you simply have to specify the `@abc.logger` in the `@ParamType` annotation of the method and add the logger to the method signature:
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -15,7 +15,7 @@ namespace My\Bundle\ExampleBundle\Job\MyJob;
 class MyJob
 {
     /**
-     * @ParamType({"@abc.job.logger"})
+     * @ParamType("logger", type="@abc.logger")
      */
     public function doSomething(Psr\Log\LoggerInterface $logger)
     {

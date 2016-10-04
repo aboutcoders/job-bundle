@@ -11,6 +11,7 @@
 namespace Abc\Bundle\JobBundle\Tests\Functional\Serializer;
 
 use Abc\Bundle\JobBundle\Job\JobParameterArray;
+use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler;
 use JMS\Serializer\Handler\HandlerRegistry;
@@ -23,6 +24,11 @@ use JMS\Serializer\SerializerInterface;
 class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $registry;
+
+    /**
      * @var SerializerInterface
      */
     private $serializer;
@@ -32,13 +38,14 @@ class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->setUpSerializer();
     }
 
     /**
+     * @dataProvider provideParameters
      * @param array  $parameters
      * @param string $type
-     * @dataProvider provideParameters
      */
     public function testSerializeParameters(array $parameters, $type)
     {
@@ -49,6 +56,9 @@ class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($parameters, $deserializedParameters);
     }
 
+    /**
+     * @return array
+     */
     public function provideParameters()
     {
         return [
@@ -76,7 +86,7 @@ class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
         $this->serializer = SerializerBuilder::create()
             ->addDefaultHandlers()
             ->configureHandlers(function (HandlerRegistry $handlerRegistry) {
-                $handlerRegistry->registerSubscribingHandler(new JobParameterArrayHandler());
+                $handlerRegistry->registerSubscribingHandler(new JobParameterArrayHandler($this->registry));
             })
             ->build();
     }

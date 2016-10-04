@@ -1,20 +1,21 @@
 Unit Testing
 ============
 
-The AbcJobBundle provides a class [JobTestCase](../../Test/JobTestCase.php) that can be used to test if a job can be invoked by the AbcJobBundle as expected. This basically covers the seralization/deserialization of parameters as well as the invocation with additional [runtime parameters](./runtime-paramerters.md).
+The AbcJobBundle provides a class [JobTestCase](../../Test/JobTestCase.php) that can be used to test custom jobs.
 
+So far this class provides three methods that can be used to test custom jobs.
+
+## Testing if a job is registered
+
+With the method `assertJobIsRegistered` you can test if a certain job is registered with the expected service and method.
 
 ```php
 namespace Tests\AppBundle\Job\MyJob;
 
-use AppBundle\Job\MyJob;
 use Abc\Bundle\JobBundle\Test\JobTestCase;
 
 class MyJobTest extends JobTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
     public function setUp()
     {
         self::bootKernel();
@@ -22,33 +23,50 @@ class MyJobTest extends JobTestCase
 
     public function testJobIsRegistered()
     {
-        $this->assertJobIsRegistered('my_job');
-    }
-
-    public function testClass()
-    {
-        $this->assertJobClass('my_job', MyJob::class);
-    }
-
-    public function testParameters()
-    {
-        $param = new MyParameter(...);
-
-        $this->assertJobInvokedWithParams('my_job', [$param]);
+        $this->assertJobIsRegistered('say_hello', 'my_job', 'sayHello');
     }
 }
 ```
 
-If your job uses [runtime parameters](./runtime-parameters.md) others than the default one you can simply pass parameters to method `assertJobInvokedWithParams`
+## Testing if a job can be invoked
+
+With the method `assertInvokesJob` you can test if a job can be invoked with the given parameters. To do so the given parameters are serialized/deserialized and resolved together with the runtime parameters.
 
 ```php
+namespace Tests\AppBundle\Job\MyJob;
+
+use Abc\Bundle\JobBundle\Test\JobTestCase;
+
+class MyJobTest extends JobTestCase
+{
+    public function testInvokeJob()
+    {
+        self::bootKernel();
+        
+        $this->assertInvokesJob('say_hello', ['World']);
+    }
+}
+```
+
+## Testing parameters
+
+The method `resolveParameters` returns the parameters a job will be invoked with, including the runtime parameters. It performs serialization/deserialization of the parameters identical to when a job is added or updated.
+
+```php
+namespace Tests\AppBundle\Job\MyJob;
+
+use Abc\Bundle\JobBundle\Test\JobTestCase;
+
+class MyJobTest extends JobTestCase
+{
     public function testParameters()
     {
-        $param1 = ...
-        $param2 = ...
+        self::bootKernel();
         
-        $runtimeParam = ...
-
-        $this->assertJobInvokedWithParams('my_job', [$param, $param2], ['my_runtime_param' => $runtimeParam]);
+        $parameters = $this->resolveParameters('say_hello', ['World']);
+        
+        // $this->assert...
+        // ...
     }
+}
 ```

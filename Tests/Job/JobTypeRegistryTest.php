@@ -93,12 +93,28 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($classMetadata);
 
         $classMetadata->expects($this->once())
-            ->method('getMethodArgumentTypes')
-            ->willReturn(array('foo', 'bar'));
+            ->method('getParameterTypes')
+            ->willReturn(['ParameterTypes']);
+
+        $classMetadata->expects($this->once())
+            ->method('getParameterOptions')
+            ->willReturn(['ParameterTypeOptions']);
+
+        $classMetadata->expects($this->once())
+            ->method('getReturnType')
+            ->willReturn('ReturnType');
+
+        $classMetadata->expects($this->once())
+            ->method('getReturnOptions')
+            ->willReturn(['ReturnTypeOptions']);
 
         $this->subject->register($jobType, true);
 
         $this->assertSame($jobType, $this->subject->get($jobType->getName()));
+        $this->assertEquals(['ParameterTypes'], $jobType->getParameterTypes());
+        $this->assertEquals(['ParameterTypeOptions'], $jobType->getParameterTypeOptions());
+        $this->assertEquals('ReturnType', $jobType->getReturnType());
+        $this->assertEquals(['ReturnTypeOptions'], $jobType->getReturnTypeOptions());
     }
 
     /**

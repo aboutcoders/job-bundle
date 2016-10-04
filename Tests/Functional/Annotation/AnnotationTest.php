@@ -62,16 +62,16 @@ class AnnotationTest extends KernelTestCase
 
     public function testMethodWithSingleParameters()
     {
-        $this->assertEquals(array('string'), $this->classMetadata->getMethodArgumentTypes('methodWithSingleParameters'));
+        $this->assertEquals(array('string'), $this->classMetadata->getParameterTypes('methodWithSingleParameters'));
     }
 
     public function testMethodWithMultipleParameters()
     {
-        $this->assertEquals(array('string', 'boolean'), $this->classMetadata->getMethodArgumentTypes('methodWithMultipleParameters'));
+        $this->assertEquals(array('string', 'boolean'), $this->classMetadata->getParameterTypes('methodWithMultipleParameters'));
     }
 
     public function testMethodWithResponse()
     {
-        $this->assertEquals('string', $this->classMetadata->getMethodReturnType('methodWithResponse'));
+        $this->assertEquals('string', $this->classMetadata->getReturnType('methodWithResponse'));
     }
 } 

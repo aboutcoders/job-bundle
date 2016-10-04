@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use phpmock\phpunit\PHPMock;
 
 /**
+ * @runTestsInSeparateProcesses
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class FileLogManagerTest extends \PHPUnit_Framework_TestCase

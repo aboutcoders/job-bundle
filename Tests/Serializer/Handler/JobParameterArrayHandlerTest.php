@@ -11,6 +11,9 @@
 namespace Abc\Bundle\JobBundle\Tests\Serializer\Handler;
 
 use Abc\Bundle\JobBundle\Job\JobParameterArray;
+use Abc\Bundle\JobBundle\Job\JobType;
+use Abc\Bundle\JobBundle\Job\JobTypeInterface;
+use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
 use Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler;
 use JMS\Serializer\Construction\ObjectConstructorInterface;
@@ -26,6 +29,11 @@ use Metadata\MetadataFactoryInterface;
 class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $registry;
+
+    /**
      * @var JobParameterArrayHandler
      */
     private $subject;
@@ -35,7 +43,8 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->subject = new JobParameterArrayHandler();
+        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->subject  = new JobParameterArrayHandler($this->registry);
     }
 
     public function testGetSubscribingMethodsListensOnJsonSerialization()
@@ -74,11 +83,11 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideDataWithoutTypeAdded
      * @param array $data
      * @param array $type
-     * @dataProvider provideDataWithoutTypesAdded
      */
-    public function testDeserializeJobParameterArrayWithoutTypesAdded(array $data, array $type)
+    public function testDeserializeJobParameterArrayWithoutTypeAdded(array $data, array $type)
     {
         $visitor   = $this->getMock(VisitorInterface::class);
         $context   = $this->getMock(DeserializationContext::class);
@@ -109,7 +118,7 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedReturnValue, $returnValue);
     }
 
-    public static function provideDataWithoutTypesAdded()
+    public static function provideDataWithoutTypeAdded()
     {
         return [
             [['foobar'], ['name' => JobParameterArray::class, 'params' => [
@@ -119,29 +128,30 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $data
-     * @param array $types
-     * @dataProvider provideDataWithTypesAdded
+     * @dataProvider provideDataWithTypeAdded
+     * @param JobTypeInterface $jobType
+     * @param array  $data
+     * @param array  $parameters
      */
-    public function testDeserializeJobParameterArrayWithTypesAdded(array $data, array $types)
+    public function testDeserializeJobParameterArrayWithTypeAdded(JobTypeInterface $jobType, array $data, array $parameters)
     {
-        $visitor = $this->getMock(VisitorInterface::class);
-        $context = $this->getMock(DeserializationContext::class);
-        $type    = ['params' => []];
+        $visitor          = $this->getMock(VisitorInterface::class);
+        $context          = $this->getMock(DeserializationContext::class);
         $dataWithoutTypes = $data;
         $dataWithoutTypes = array_pop($dataWithoutTypes);
 
+        $this->setUpRegistry($jobType);
+
         $expectedReturnValue = [];
-        $at = 0;
-        for ($i = 0; $i < count($types); $i++) {
-            if(!is_array($dataWithoutTypes) || !isset($dataWithoutTypes[$i]) || null == $dataWithoutTypes[$i]) {
+        $at                  = 0;
+        for ($i = 0; $i < count($parameters); $i++) {
+            if (!is_array($dataWithoutTypes) || !isset($dataWithoutTypes[$i]) || null == $dataWithoutTypes[$i]) {
                 $expectedReturnValue[] = null;
-            }
-            else {
+            } else {
                 $context->expects($this->at($at))
                     ->method('accept')
                     ->with($dataWithoutTypes[$i], [
-                        'name'   => $types[$i],
+                        'name'   => $parameters[$i],
                         'params' => []
                     ])
                     ->willReturn('deserializedParam_' . $i);
@@ -151,15 +161,16 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $returnValue = $this->subject->deserializeJobParameterArray($visitor, $data, $type, $context);
+        $returnValue = $this->subject->deserializeJobParameterArray($visitor, $data, ['params' => []], $context);
 
         $this->assertEquals($expectedReturnValue, $returnValue);
     }
 
     /**
-     * @param array $data
      * @dataProvider provideDataForInvalidArgumentException
      * @expectedException \JMS\Serializer\Exception\RuntimeException
+     *
+     * @param array $data
      */
     public function testDeserializeJobParameterArrayTrowsInvalidArgumentException(array $data)
     {
@@ -170,20 +181,61 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
         $this->subject->deserializeJobParameterArray($visitor, $data, $type, $context);
     }
 
-    public static function provideDataWithTypesAdded()
+    /**
+     * @return array
+     */
+    public function provideDataWithTypeAdded()
     {
+        // $jobType, $data, $indices, $parameterTypes
         return [
-            [['foobar', ['abc.job.params' => ['foobarType']]], ['foobarType']],
-            [[['abc.job.params' => ['foobarType']]], ['foobarType']]
-
+            [$this->createJobType('abc.job.foobar', ['foobarType']), [['abc.job.type' => 'abc.job.foobar']], ['foobarType']],
+            [$this->createJobType('abc.job.foobar', ['@runtimeParameter', 'foobarType']), ['foobar', ['abc.job.type' => 'abc.job.foobar']], ['foobarType']]
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function provideDataForInvalidArgumentException()
     {
         return [
             [['foobar']],
             [['foobar', ['abc.job.params' => []]]],
         ];
+    }
+
+    /**
+     * @param JobTypeInterface $jobType
+     */
+    private function setUpRegistry(JobTypeInterface $jobType)
+    {
+        $this->registry->expects($this->any())
+            ->method('get')
+            ->with($jobType->getName())
+            ->willReturn($jobType);
+    }
+
+    /**
+     * @param       $type
+     * @param array $parameterTypes
+     * @return JobTypeInterface
+     */
+    private function createJobType($type, array $parameterTypes)
+    {
+        /**
+         * @var JobType|\PHPUnit_Framework_MockObject_MockObject $jobType
+         */
+        $jobType = $this->getMockBuilder(JobType::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getName'])
+            ->getMock();
+
+        $jobType->expects($this->any())
+            ->method('getName')
+            ->willReturn($type);
+
+        $jobType->setParameterTypes($parameterTypes);
+
+        return $jobType;
     }
 }

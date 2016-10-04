@@ -79,7 +79,7 @@ class Invoker
     {
         $jobType       = $this->registry->get($job->getType());
         $callableArray = $jobType->getCallable();
-        $parameters    = $this->resolveParameters($jobType, $context, $job->getParameters());
+        $parameters    = static::resolveParameters($jobType, $context, $job->getParameters());
 
         if (is_array($callableArray) && $callable = $callableArray[0]) {
             if ($callable instanceof JobAwareInterface) {
@@ -105,19 +105,19 @@ class Invoker
     /**
      * @param JobTypeInterface $jobType
      * @param ContextInterface $context
-     * @param array            $serializableParameters
+     * @param array|null       $parameters
      * @return array
      */
-    protected function resolveParameters(JobTypeInterface $jobType, ContextInterface $context, $serializableParameters = null)
+    public static function resolveParameters(JobTypeInterface $jobType, ContextInterface $context, $parameters = null)
     {
-        $result = array();
-        $serializableParameters = $serializableParameters == null ? [] : $serializableParameters;
+        $result     = array();
+        $parameters = $parameters == null ? array() : $parameters;
         foreach ($jobType->getParameterTypes() as $parameterType) {
             if (0 === strpos($parameterType, '@')) {
                 $key      = substr($parameterType, 1);
                 $result[] = $context->has($key) ? $context->get($key) : null;
             } else {
-                $result[] = array_shift($serializableParameters);
+                $result[] = array_shift($parameters);
             }
         }
 

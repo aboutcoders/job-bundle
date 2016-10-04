@@ -10,7 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Functional\Job\Mailer;
 
-use Abc\Bundle\JobBundle\Job\Mailer\Mailer;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Test\JobTestCase;
 
@@ -21,19 +20,13 @@ class MailerTest extends JobTestCase
 {
     public function testJobIsRegistered()
     {
-        $this->assertJobIsRegistered('abc.mailer');
-    }
-
-    public function testClass()
-    {
-        $this->assertJobClass('abc.mailer', Mailer::class);
+        $this->assertJobIsRegistered('abc.mailer', 'abc.job.mailer', 'send');
     }
 
     public function testParameters()
     {
-
         $message = new Message('mail@domain.tld', 'to@domain.td', 'Subject', 'MessageBody');
 
-        $this->assertJobInvokedWithParams('abc.mailer', [$message]);
+        $this->assertInvokesJob('abc.mailer', [$message]);
     }
 }

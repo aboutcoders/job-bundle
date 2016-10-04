@@ -35,15 +35,16 @@ The best way to understand this is see it in action. Assuming we have the follow
 class CustomJob
 {
     /**
-     * @ParamType({"string","integer"})
+     * @ParamType("value1", type="string")
+     * @ParamType("value2", type="string")
      */
-    public function execute($type, $number)
+    public function execute($value1, $value2)
     {
         // ...
     }
 ```
 
-This job defines two parameters `$type` and `$number`. A constraint provider for this job could be:
+This job defines two parameters `$value1` and `$value1`. A constraint provider for this job could be:
 
 ```php
 namespace AppBundle\Validation\Job;
@@ -64,7 +65,7 @@ class CustomConstraintProvider extends AbstractConstraintProvider
     }
 ```
 
-This would defined the constraint `Assert\Choice` for the parameter `$type` and the constraint `Assert\Range` for the parameters `$number`.
+This would defined the constraint `Assert\Choice` for the parameter `$value1` and the constraint `Assert\Range` for the parameters `$value2`.
 
 You can also define a multiple constraints for one parameters:
 
@@ -88,7 +89,7 @@ class CustomConstraintProvider extends AbstractConstraintProvider
     }
 ```
 
-As you can see, the number of elements returned in the array matches the number of parameters of the job. Each array element can be a single constraint or an array of constraints. The previous example adds the constraint that both parameters `$type` and `$number` cannot be empty.
+As you can see, the number of elements returned in the array matches the number of parameters of the job. Each array element can be a single constraint or an array of constraints. The previous example adds the constraint that both parameters `$value1` and `$value2` cannot be empty.
 
 Please also note that the constraint provider inherits from `AbstractConstraintProvider`. This provider defines a default priority of `-1`;
 
@@ -113,7 +114,9 @@ The [runtime parameters](./runtime-parameters.md) of jobs are not validated. Tha
 class CustomJob
 {
     /**
-     * @ParamType({"string", "@abc.logger", "integer"})
+     * @ParamType("type", type="string")
+     * @ParamType("logger", type="@abc.logger")
+     * @ParamType("number", type="intger")
      */
     public function execute($type, $logger  $number)
     {

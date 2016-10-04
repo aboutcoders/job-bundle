@@ -49,10 +49,12 @@ class Mailer implements JobAwareInterface
     /**
      * Sends a mail.
      *
+     * @ParamType("message", type="Abc\Bundle\JobBundle\Job\Mailer\Message")
+     * @ParamType("logger", type="@abc.logger")
+     *
      * @param Message         $message
      * @param LoggerInterface $logger
      * @throws \Exception Rethrows exceptions thrown by mailer
-     * @ParamType({"Abc\Bundle\JobBundle\Job\Mailer\Message", "@logger"})
      */
     public function send(Message $message, LoggerInterface $logger)
     {
@@ -65,14 +67,11 @@ class Mailer implements JobAwareInterface
 
         $mail->addPart($message->getMessage(), 'text/plain');
 
-        try
-        {
+        try {
             $this->mailer->send($mail);
 
             $this->mailer->getTransport()->stop();
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->mailer->getTransport()->stop();
 
             throw $e;

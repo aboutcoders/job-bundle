@@ -112,7 +112,7 @@ interface ManagerAwareInterface
 
 ### Inject the manager as a runtime parameter
 
-To inject the manager as a runtime parameter you simply have to specify the `@manager` service in the `@ParamType` annotation of your method and the manager will be injected.
+To inject the manager as a runtime parameter you simply have to specify the `@abc.manager` service in the `@ParamType` annotation of your method and the manager will be injected.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -122,7 +122,7 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 class MyJob
 {
     /**
-     * @ParamType({"@manager"})
+     * @ParamType("manager", type="@abc.manager")
      */
     public function doSomething(ManagerInterface $manager)
     {

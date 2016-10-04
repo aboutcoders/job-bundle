@@ -47,17 +47,22 @@ class JobType implements JobTypeInterface
     /**
      * @var array
      */
-    private $parameterTypes = array();
+    private $parameterTypes = [];
 
     /**
      * @var array
      */
-    private $serializableParameterTypes;
+    private $parameterTypeOptions = [];
 
     /**
      * @var string
      */
-    private $responseType;
+    private $returnType;
+
+    /**
+     * @var array
+     */
+    private $returnTypeOptions = [];
 
     /**
      * @var int
@@ -165,7 +170,7 @@ class JobType implements JobTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function setParameterTypes(array $types = array())
+    public function setParameterTypes(array $types)
     {
         $this->parameterTypes = $types;
     }
@@ -173,34 +178,65 @@ class JobType implements JobTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getSerializableParameterTypes()
+    public function getParameterType($index)
     {
-        if (null == $this->serializableParameterTypes) {
-            $this->serializableParameterTypes = [];
-            foreach ($this->getParameterTypes() as $type) {
-                if (0 !== strpos($type, '@')) {
-                    $this->serializableParameterTypes[] = $type;
-                }
-            }
+        if (!isset($this->parameterTypes[$index])) {
+            throw new \InvalidArgumentException('No type defined for parameter #' . $index);
         }
 
-        return $this->serializableParameterTypes;
+        return $this->parameterTypes[$index];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResponseType()
+    public function getParameterTypeOptions($index = null)
     {
-        return $this->responseType;
+        if (is_int($index) && $index >= 0) {
+            return isset($this->parameterTypeOptions[$index]) ? $this->parameterTypeOptions[$index] : array();
+        }
+
+        return $this->parameterTypeOptions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setResponseType($responseType = null)
+    public function setParameterTypeOptions(array $options)
     {
-        $this->responseType = $responseType;
+        $this->parameterTypeOptions = $options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReturnType()
+    {
+        return $this->returnType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setReturnType($type = null)
+    {
+        $this->returnType = $type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReturnTypeOptions()
+    {
+        return $this->returnTypeOptions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setReturnTypeOptions(array $options)
+    {
+        $this->returnTypeOptions = $options;
     }
 
     /**
@@ -217,5 +253,20 @@ class JobType implements JobTypeInterface
     public function setQueue($queue)
     {
         $this->queue = $queue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndicesOfSerializableParameters()
+    {
+        $indices = [];
+        for ($i = 0; $i < count($this->parameterTypes); $i++) {
+            if (0 !== strpos($this->parameterTypes[$i], '@')) {
+                $indices[] = $i;
+            }
+        }
+
+        return $indices;
     }
 }

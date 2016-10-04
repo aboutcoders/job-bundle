@@ -21,8 +21,14 @@ use Metadata\Driver\DriverInterface;
  */
 class AnnotationDriver implements DriverInterface
 {
+    /**
+     * @var Reader
+     */
     private $reader;
 
+    /**
+     * @param Reader $reader
+     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
@@ -37,35 +43,44 @@ class AnnotationDriver implements DriverInterface
     {
         $classMetadata                  = new ClassMetadata($name = $class->name);
         $classMetadata->fileResources[] = $class->getFilename();
-
-        $propertiesMetadata    = array();
-        $propertiesAnnotations = array();
-
-        foreach($class->getMethods() as $method)
-        {
-            /** @var \ReflectionMethod $method */
-
-            if($method->class !== $name)
-            {
+        foreach ($class->getMethods() as $method) {
+            /**
+             * @var \ReflectionMethod $method
+             */
+            if ($method->class !== $name) {
                 continue;
             }
 
             $methodAnnotations = $this->reader->getMethodAnnotations($method);
-
-            foreach($methodAnnotations as $annot)
-            {
-                if($annot instanceof ParamType)
-                {
-                    $classMetadata->setMethodArgumentTypes($method->getName(), $annot->typeList);
+            foreach ($methodAnnotations as $annotation) {
+                if ($annotation instanceof ParamType) {
+                    if(!$classMetadata->hasMethod($method->name)) {
+                        $this->addMethod($classMetadata, $method);
+                    }
+                    $classMetadata->setParameterType($method->getName(), $annotation->name, $annotation->type);
+                    $classMetadata->setParameterOptions($method->getName(), $annotation->name, $annotation->options);
                 }
 
-                if($annot instanceof ReturnType)
-                {
-                    $classMetadata->setMethodReturnType($method->getName(), $annot->type);
+                if ($annotation instanceof ReturnType) {
+                    $classMetadata->setReturnType($method->getName(), $annotation->type);
                 }
             }
         }
 
         return $classMetadata;
+    }
+
+    /**
+     * @param ClassMetadata     $classMetadata
+     * @param \ReflectionMethod $method
+     */
+    protected function addMethod(ClassMetadata $classMetadata, \ReflectionMethod $method)
+    {
+        $names = array();
+        foreach ($method->getParameters() as $parameter) {
+            $names[] = $parameter->getName();
+        }
+
+        $classMetadata->addMethod($method->getName(), $names);
     }
 }
