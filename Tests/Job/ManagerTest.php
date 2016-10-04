@@ -882,7 +882,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         if (null == $response) {
             $this->helper->expects($this->once())
                 ->method('updateJob')
-                ->with($expectedJob, $this->equalTo($status), $processingTime)
+                ->with($expectedJob, $this->equalTo($status), ($processingTime == null ? $this->greaterThanOrEqual(0) : $processingTime))
                 ->willReturnCallback(
                     function (JobInterface $job) use ($status, $processingTime) {
                         $job->setStatus($status);
@@ -894,7 +894,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->helper->expects($this->once())
                 ->method('updateJob')
-                ->with($expectedJob, $this->equalTo($status), $processingTime, $response)
+                ->with($expectedJob, $this->equalTo($status), ($processingTime == null ? $this->greaterThanOrEqual(0) : $processingTime), $response)
                 ->willReturnCallback(
                     function (JobInterface $job) use ($status, $processingTime) {
                         $job->setStatus($status);

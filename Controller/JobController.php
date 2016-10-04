@@ -41,7 +41,7 @@ class JobController extends BaseController
      *     {"name"="limit", "dataType"="integer", "required"=false, "requirement"="\d+", "default"="10", "description"="The page size"},
      *     {"name"="sortCol", "dataType"="string", "required"=false, "pattern"="(ticket|type|status|createdAt|terminatedAt)", "default"="createdAt", "description"="The sort column"},
      *     {"name"="sortDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "default"="DESC", "description"="The sort direction"},
-     *     {"name"="criteria", "dataType"="map", "required"=false, "default"="[]", "description"="The search criteria defined as associative array, valid keys are ticket|type|status"}
+     *     {"name"="criteria", "dataType"="map", "required"=false, "description"="The search criteria defined as associative array, valid keys are ticket|type|status"}
      *   },
      *   responseMap = {
      *     200 = {"class" = "Abc\Bundle\JobBundle\Model\JobList"},
@@ -115,7 +115,7 @@ class JobController extends BaseController
     }
 
     /**
-     * Adds a new job
+     * Adds a new job.
      *
      * @ApiDoc(
      *  description="Adds a job",
@@ -184,6 +184,8 @@ class JobController extends BaseController
     }
 
     /**
+     * Cancels a job.
+     *
      * @ApiDoc(
      *   description="Cancels a job",
      *   section="AbcJobBundle",
@@ -211,6 +213,8 @@ class JobController extends BaseController
     }
 
     /**
+     * Restarts a job.
+     *
      * @ApiDoc(
      *   description="Restarts a job",
      *   section="AbcJobBundle",
