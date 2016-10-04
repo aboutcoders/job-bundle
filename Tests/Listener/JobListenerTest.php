@@ -62,8 +62,8 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->subject->onPreExecute($event);
 
-        $this->assertTrue($context->has('logger'));
-        $this->assertSame($logger, $context->get('logger'));
+        $this->assertTrue($context->has('abc.logger'));
+        $this->assertSame($logger, $context->get('abc.logger'));
     }
 
     public function testOnPreExecuteRegistersManager()
@@ -74,7 +74,7 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->subject->onPreExecute($event);
 
-        $this->assertTrue($context->has('manager'));
-        $this->assertSame($this->manager, $context->get('manager'));
+        $this->assertTrue($context->has('abc.manager'));
+        $this->assertSame($this->manager, $context->get('abc.manager'));
     }
 }

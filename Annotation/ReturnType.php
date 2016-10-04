@@ -22,4 +22,9 @@ class ReturnType
      * @var string
      */
     public $type;
+
+    /**
+     * @var array
+     */
+    public $options = array();
 }

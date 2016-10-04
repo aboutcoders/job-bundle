@@ -5,7 +5,7 @@ Jobs can be executed with two types of parameters: serializable parameters and r
 
 ## Default Runtime Parameters
 
-The AbcJobBundle provides the default parameters `@abc.job.logger` and `@abc.job.manager`. If specified an instance of `Psr\Log\LoggerInterface` respectively `Abc\Abc\Bundle\JobBundle\Job\ManagerInterface` is injected into the job.
+The AbcJobBundle provides the default parameters `@abc.logger` and `@abc.manager`. If specified an instance of `Psr\Log\LoggerInterface` respectively `Abc\Abc\Bundle\JobBundle\Job\ManagerInterface` is injected into the job.
 
 ```php
 namespace My\Bundle\ExampleBundle\Job\MyJob;
@@ -16,7 +16,7 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 class ManagerAwareJob
 {
     /**
-     * @ParamType({"@abc.job.manager"})
+     * @ParamType("manager", type="@abc.manager")
      */
     public function sayHello(ManagerInterface $manager)
     {
@@ -69,7 +69,7 @@ You can now use this runtime parameter inside your jobs:
 
 ```php
 /**
- * @ParamType({"@my_custom_param"})
+ * @ParamType("myParam", type="@my_custom_param")
  */
 public function doSomething($myParam) {
 }

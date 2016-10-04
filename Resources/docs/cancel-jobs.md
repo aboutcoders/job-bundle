@@ -45,7 +45,8 @@ class Sleeper implements ControllerAwareInterface
     }
 
     /**
-     * @ParamType({"integer", "@logger"})
+     * @ParamType("seconds", type="integer")
+     * @ParamType("logger", type="@abc.logger")
      * @param integer $seconds
      * @param LoggerInterface $logger
      */

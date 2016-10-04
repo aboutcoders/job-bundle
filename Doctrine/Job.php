@@ -12,12 +12,12 @@ namespace Abc\Bundle\JobBundle\Doctrine;
 
 use Abc\Bundle\JobBundle\Model\Job as BaseJob;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
-use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  *
- * @ExclusionPolicy("all")
+ * @JMS\ExclusionPolicy("all")
  */
 class Job extends BaseJob
 {
@@ -66,7 +66,7 @@ class Job extends BaseJob
         parent::setParameters($parameters);
 
         try {
-            $this->serializedParameters = ($parameters == null ? null : static::getSerializationHelper()->serialize($parameters));
+            $this->serializedParameters = ($parameters == null ? null : static::getSerializationHelper()->serializeParameters($this->getType(), $parameters));
 
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to serialize parameters', null, $e);
@@ -85,7 +85,7 @@ class Job extends BaseJob
 
         if (is_null(parent::getParameters()) && !is_null($this->serializedParameters)) {
             try {
-                parent::setParameters(static::getSerializationHelper()->deserializeParameters($this->serializedParameters, $this->getType()));
+                parent::setParameters(static::getSerializationHelper()->deserializeParameters($this->getType(), $this->serializedParameters));
             } catch (\Exception $e) {
 
                 $this->paramDeserializationError = true;
@@ -107,7 +107,7 @@ class Job extends BaseJob
         parent::setResponse($response);
 
         try {
-            $this->serializedResponse = ($response == null ? null : static::getSerializationHelper()->serialize($response));
+            $this->serializedResponse = ($response == null ? null : static::getSerializationHelper()->serializeReturnValue($this->getType(), $response));
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Failed to serialize response', null, $e);
         }
@@ -125,7 +125,7 @@ class Job extends BaseJob
 
         if (is_null(parent::getResponse()) && !is_null($this->serializedResponse)) {
             try {
-                parent::setResponse(static::getSerializationHelper()->deserializeResponse($this->serializedResponse, $this->getType()));
+                parent::setResponse(static::getSerializationHelper()->deserializeReturnValue($this->getType(), $this->serializedResponse));
             } catch (\Exception $e) {
                 $this->responseDeserializationError = true;
 

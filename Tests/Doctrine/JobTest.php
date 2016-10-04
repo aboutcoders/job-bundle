@@ -34,14 +34,15 @@ class JobTest extends \PHPUnit_Framework_TestCase
 
     public function testSetParameters()
     {
-        $parameters = array('foobar');
+        $parameters = ['foobar'];
 
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
-            ->with($parameters)
+            ->method('serializeParameters')
+            ->with('JobType', $parameters)
             ->willReturn('serializedParameters');
 
         $job = new Job();
+        $job->setType('JobType');
         $job->setParameters($parameters);
     }
 
@@ -51,11 +52,12 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testSetParametersThrowsInvalidArgumentException()
     {
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
+            ->method('serializeParameters')
             ->willThrowException(new \Exception('asd'));
 
         $job = new Job();
-        $job->setParameters(array('foobar'));
+        $job->setType('JobType');
+        $job->setParameters(['foobar']);
     }
 
     public function testGetParameters()
@@ -66,11 +68,11 @@ class JobTest extends \PHPUnit_Framework_TestCase
 
         $this->serializationHelper->expects($this->once())
             ->method('deserializeParameters')
-            ->with('SerializedParameters', 'JobType')
-            ->willReturn(array('foobar'));
+            ->with('JobType', 'SerializedParameters')
+            ->willReturn(['foobar']);
 
 
-        $this->assertEquals(array('foobar'), $job->getParameters());
+        $this->assertEquals(['foobar'], $job->getParameters());
     }
 
     public function testGetParametersWithNull()
@@ -103,14 +105,15 @@ class JobTest extends \PHPUnit_Framework_TestCase
 
     public function testSetResponse()
     {
-        $response = array('foobar');
+        $response = ['foobar'];
 
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
-            ->with($response)
+            ->method('serializeReturnValue')
+            ->with('JobType', $response)
             ->willReturn('SerializedResponse');
 
         $job = new Job();
+        $job->setType('JobType');
         $job->setResponse($response);
 
         $this->assertAttributeEquals('SerializedResponse', 'serializedResponse', $job);
@@ -122,26 +125,26 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testSetResponseThrowsInvalidArgumentException()
     {
         $this->serializationHelper->expects($this->once())
-            ->method('serialize')
+            ->method('serializeReturnValue')
             ->willThrowException(new \Exception());
 
         $job = new Job();
-        $job->setResponse(array('foobar'));
+        $job->setType('JobType');
+        $job->setResponse(['foobar']);
     }
 
-    public function testGetResponse()
+    public function testAGetResponse()
     {
         $job = new Job();
         $job->setType('JobType');
         $this->setProperty($job, 'serializedResponse', 'SerializedResponse');
 
         $this->serializationHelper->expects($this->once())
-            ->method('deserializeResponse')
-            ->with('SerializedResponse', 'JobType')
-            ->willReturn(array('foobar'));
+            ->method('deserializeReturnValue')
+            ->with('JobType', 'SerializedResponse')
+            ->willReturn(['foobar']);
 
-
-        $this->assertEquals(array('foobar'), $job->getResponse());
+        $this->assertEquals(['foobar'], $job->getResponse());
     }
 
     public function testGetResponseWithNull()
@@ -150,7 +153,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $job->setType('JobType');
 
         $this->serializationHelper->expects($this->never())
-            ->method('deserializeResponse');
+            ->method('deserializeReturnValue');
 
         $this->assertEquals(null, $job->getResponse());
     }
@@ -162,7 +165,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $this->setProperty($job, 'serializedResponse', 'SerializedResponse');
 
         $this->serializationHelper->expects($this->any())
-            ->method('deserializeResponse')
+            ->method('deserializeReturnValue')
             ->willThrowException(new \Exception('Some deserialization error'));
 
         try {

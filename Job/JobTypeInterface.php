@@ -43,39 +43,61 @@ interface JobTypeInterface
     public function getMethod();
 
     /**
-     * Returns the parameter types of a job as specified in the annotation @ParamType.
+     * Returns the parameter types of a job.
      *
-     * The order of elements in the  array reflects the order of the parameters in the method signature of the job.
+     * The index of the elements corresponds to the position of the parameter in the method signature of the job.
      *
      * @return array|string[] The types of parameters the job can be invoked with
      */
     public function getParameterTypes();
 
     /**
+     * Returns the type of a parameter.
+     *
+     * @param integer $index The index of the parameter within the method signature (starting with zero)
+     * @return string
+     */
+    public function getParameterType($index);
+
+    /**
      * @param array $types The types of parameters the job can be invoked with
      * @return void
      */
-    public function setParameterTypes(array $types = array());
+    public function setParameterTypes(array $types);
 
     /**
-     * Returns the serializable parameter types of a job as specified in the annotation @ParamType.
-     *
-     * The order of elements in the  array reflects the order of the parameters in the method signature of the job.
-     *
-     * @return array|string[] An array of types the job can be invoked with
+     * @param integer $index The index of the parameter within the method signature (starting with zero)
+     * @return array
      */
-    public function getSerializableParameterTypes();
+    public function getParameterTypeOptions($index = null);
 
     /**
-     * @return string|null The response type used by the JMS serializer
-     */
-    public function getResponseType();
-
-    /**
-     * @param string|null $responseType The response type used by the JMS serializer
+     * @param array $options
      * @return void
      */
-    public function setResponseType($responseType = null);
+    public function setParameterTypeOptions(array $options);
+
+    /**
+     * @return string The return type
+     */
+    public function getReturnType();
+
+    /**
+     * @param string $type The return type
+     * @return void
+     */
+    public function setReturnType($type);
+
+    /**
+     * @param array $options
+     * @return void
+     */
+    public function setReturnTypeOptions(array $options);
+
+    /**
+     * @return array
+     */
+    public function getReturnTypeOptions();
 
     /**
      * @return int|null The Monolog\Logger log level
@@ -98,4 +120,11 @@ interface JobTypeInterface
      * @return string The name of the queue this job is assigned to
      */
     public function getQueue();
+
+    /**
+     * Returns the indices of the parameters within the method signature of the job that are serializable
+     *
+     * @return array
+     */
+    public function getIndicesOfSerializableParameters();
 }

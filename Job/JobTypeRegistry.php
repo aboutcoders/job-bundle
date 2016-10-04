@@ -65,7 +65,7 @@ class JobTypeRegistry
 
     /**
      * @param JobTypeInterface $jobType
-     * @param bool             $loadClassMetadata Whether to load class meta data of the job
+     * @param bool             $loadClassMetadata Whether to load class metadata of the job class
      */
     public function register(JobTypeInterface $jobType, $loadClassMetadata = false)
     {
@@ -75,8 +75,10 @@ class JobTypeRegistry
              */
             $classMetadata = $this->metadataFactory->getMetadataForClass($jobType->getClass())->getRootClassMetadata();
 
-            $jobType->setParameterTypes($classMetadata->getMethodArgumentTypes($jobType->getMethod()));
-            $jobType->setResponseType($classMetadata->getMethodReturnType($jobType->getMethod()));
+            $jobType->setParameterTypes($classMetadata->getParameterTypes($jobType->getMethod()));
+            $jobType->setParameterTypeOptions($classMetadata->getParameterOptions($jobType->getMethod()));
+            $jobType->setReturnType($classMetadata->getReturnType($jobType->getMethod()));
+            $jobType->setReturnTypeOptions($classMetadata->getReturnOptions($jobType->getMethod()));
         }
 
         $jobType->setQueue($this->queueConfig->getQueue($jobType->getName()));

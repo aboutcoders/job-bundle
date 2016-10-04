@@ -13,7 +13,7 @@ namespace Abc\Bundle\JobBundle\Job;
 /**
  * JobParameterArray
  *
- * This class currently acts as a type identifier for the JMS serializer in order to serialize/deserialize the parameters of a job.
+ * This class for now only acts as a type identifier for the serializer in order to serialize/deserialize the parameters of a job.
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @see \Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler

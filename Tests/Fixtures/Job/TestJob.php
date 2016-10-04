@@ -14,15 +14,13 @@ use Abc\Bundle\JobBundle\Job\JobAwareInterface;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
+use Abc\Bundle\JobBundle\Job\ScheduleBuilder;
 use Abc\Bundle\JobBundle\Tests\Fixtures\App\Bundle\TestBundle\Entity\Entity;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Annotation\ParamType;
 use Abc\Bundle\JobBundle\Annotation\ReturnType;
 use Abc\ProcessControl\ControllerAwareInterface;
 use Abc\ProcessControl\ControllerInterface;
-use Doctrine\DBAL\Driver\PDOException;
-use Doctrine\DBAL\Exception\DriverException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -87,10 +85,13 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
 
 
     /**
+     * @ParamType("maxIterations", type="integer")
+     * @ParamType("iterations", type="integer")
+     * @ParamType("logger", type="@abc.logger")
+     *
      * @param                 $maxIterations
      * @param int             $iterations
      * @param LoggerInterface $logger
-     * @ParamType({"integer","integer", "@logger"})
      */
     public function schedule($maxIterations, $iterations = 0, LoggerInterface $logger)
     {
@@ -110,25 +111,24 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * Creates a schedule
      *
+     * @ParamType("type", type="string")
+     * @ParamType("expression", type="string")
+     *
      * @param string $type
      * @param string $expression
-     * @ParamType({"string","string"})
      */
     public function createSchedule($type, $expression)
     {
-        $schedule = new Schedule();
-        $schedule->setType($type);
-        $schedule->setExpression($expression);
-
-        $schedule = $this->job->createSchedule($type, $expression);
-        $this->job->addSchedule($schedule);
+        $this->job->addSchedule(ScheduleBuilder::create($type, $expression));
     }
 
     /**
      * Removes a schedule
      *
+     * @ParamType("logger", type="@abc.logger")
+     *
      * @param LoggerInterface $logger
-     * @ParamType({"@logger"})
+
      */
     public function removeSchedule(LoggerInterface $logger)
     {
@@ -140,9 +140,11 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * Updates a schedule
      *
+     * @ParamType("type", type="string")
+     * @ParamType("expression", type="string")
+     *
      * @param string $type
      * @param string $expression
-     * @ParamType({"string","string"})
      */
     public function updateSchedule($type, $expression)
     {
@@ -155,10 +157,11 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     }
 
     /**
+     * @ParamType("response", type="Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
+     * @ReturnType("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
+     *
      * @param mixed $response
      * @return mixed $response
-     * @ParamType("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
-     * @ReturnType("Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse")
      */
     public function setResponse(TestResponse $response)
     {
@@ -166,9 +169,10 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     }
 
     /**
-     * @param ManagerInterface $manager
-     * @ParamType("@manager")
+     * @ParamType("manager", type="@abc.manager")
      * @ReturnType("string")
+     *
+     * @param ManagerInterface $manager
      * @return null|string
      */
     public function manageJob(ManagerInterface $manager)
@@ -184,7 +188,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      */
     public function cancel()
     {
-        while(!$this->controller->doExit()) {
+        while (!$this->controller->doExit()) {
             return 'running';
         }
 
@@ -192,10 +196,12 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     }
 
     /**
+     * @ParamType("message", type="string")
+     * @ParamType("code", type="string")
+     *
      * @param $message
      * @param $code
      * @throws \Exception
-     * @ParamType({"string","integer"})
      */
     public function throwException($message, $code)
     {
@@ -203,9 +209,11 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     }
 
     /**
+     * @ParamType("message", type="string")
+     * @ParamType("logger", type="@abc.logger")
+     *
      * @param string          $message
      * @param LoggerInterface $logger
-     * @ParamType({"string", "@logger"})
      */
     public function log($message, LoggerInterface $logger)
     {
@@ -215,7 +223,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
     /**
      * Logs the info message 'invoked parameterless'.
      *
-     * @ParamType({"string", "@logger"})
+     * @ParamType("logger", type="@abc.logger")
      *
      * @param LoggerInterface $logger
      * @return void

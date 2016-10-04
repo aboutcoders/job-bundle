@@ -35,8 +35,8 @@ class JobManagerTest extends DatabaseKernelTestCase
         $this->subject = $this->getContainer()->get('abc.job.job_manager');
     }
 
-    public function testSerializesParameters() {
-
+    public function testSerializesParameters()
+    {
         $job = $this->subject->create('abc.sleeper', [5]);
         $job->setStatus(Status::REQUESTED());
 

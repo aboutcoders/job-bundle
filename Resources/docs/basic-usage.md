@@ -54,7 +54,8 @@ use Psr\Log\LoggerInterface;
 class MyJob
 {
     /**
-     * @ParamType({"string", "@abc.job.logger"})
+     * @ParamType("to", type="string")
+     * @ParamType("logger", type="@abc.logger")
      * @ReturnType("string")
      */
     public function sayHello($to, LoggerInterface $logger)
@@ -70,11 +71,11 @@ class MyJob
 
 If the method of the class that you want to invoke as job requires parameters or returns a value you need to annotate the method. Please note the annotations __@ParamType__ and __@ReturnType__. They are used to specify the type of parameters the method is invoked with as well as the type of the return value. Since jobs are executed in the background the parameters must be persisted and therefor serialized when a job is added to the queue. Serialization and deserialization is done using the [JMS Serializer](http://jmsyst.com/libs/serializer).
 
-In the above example there is a special parameter `@abc.job.logger`. This parameter references a so called [runtime parameter](./runtime-parameters.md). In contrast to regular parameters which are serialized when a job is added to the queue runtime parameters are provided at runtime of a job using the event dispatcher.
+In the above example there is a special parameter `@abc.logger`. This parameter references a so called [runtime parameter](./runtime-parameters.md). In contrast to regular parameters which are serialized when a job is added to the queue runtime parameters are provided at runtime of a job using the event dispatcher.
 
 __Note:__ Do not mix runtime parameters with service ids inside the dependency injection container. However you can of course inject any service from the service container as a runtime parameter.
 
-The previous example uses the default runtime parameter `@abc.job.logger` that is provided by the AbcJobBundle. If this parameter is defined, a dedicated PSR compliant logger will be injected into the method which will log methods only for this job. Please refer to the chapter [Logging]() if you want to know more about the logging features.
+The previous example uses the default runtime parameter `@abc.logger` that is provided by the AbcJobBundle. If this parameter is defined, a dedicated PSR compliant logger will be injected into the method which will log methods only for this job. Please refer to the chapter [Logging]() if you want to know more about the logging features.
 
 ### Step 2: Register the class in the service container
 

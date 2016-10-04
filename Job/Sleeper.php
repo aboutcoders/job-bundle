@@ -36,16 +36,16 @@ class Sleeper implements ControllerAwareInterface
     }
 
     /**
+     * @ParamType("seconds", type="integer")
+     * @ParamType("logger", type="@abc.logger")
      * @param                 $seconds
      * @param LoggerInterface $logger
-     * @ParamType({"integer", "@logger"})
      */
     public function sleep($seconds, LoggerInterface $logger)
     {
         $logger->info('start sleeping for {seconds}', ['seconds' => $seconds]);
 
         $start = time();
-
         do {
 
             sleep(1);

@@ -10,8 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\Tests\Serializer\EventDispatcher;
 
-use Abc\Bundle\JobBundle\Job\JobTypeInterface;
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
@@ -23,11 +21,6 @@ use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
 class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $registry;
-
-    /**
      * @var JobDeserializationSubscriber
      */
     private $subject;
@@ -37,8 +30,7 @@ class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->subject  = new JobDeserializationSubscriber($this->registry);
+        $this->subject = new JobDeserializationSubscriber();
     }
 
     public function testGetSubscribedEvents()
@@ -53,21 +45,13 @@ class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnPreDeserialize(array $type, array $data)
     {
-        $event                  = $this->setupEvent($type, $data);
-        $serializableParameters = ['paramType1'];
-
-        $jobType = $this->getMock(JobTypeInterface::class);
-        $jobType->expects($this->any())
-            ->method('getSerializableParameterTypes')
-            ->willReturn($serializableParameters);
-
-        $this->setUpRegistry($data['type'], $jobType);
+        $event = $this->setupEvent($type, $data);
 
         $this->subject->onPreDeserialize($event);
 
         $data = $event->getData();
 
-        $this->assertEquals(['abc.job.params' => $serializableParameters], array_pop($data['parameters']));
+        $this->assertEquals(['abc.job.type' => $data['type']], array_pop($data['parameters']));
     }
 
     /**
@@ -77,22 +61,14 @@ class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnPreDeserializeOmitsAddingTypes(array $type, array $data)
     {
-        $event                  = $this->setupEvent($type, $data);
-        $serializableParameters = ['paramType1'];
-
-        $jobType = $this->getMock(JobTypeInterface::class);
-        $jobType->expects($this->any())
-            ->method('getSerializableParameterTypes')
-            ->willReturn($serializableParameters);
-
-        $this->setUpRegistry($data['type'], $jobType);
+        $event = $this->setupEvent($type, $data);
 
         $this->subject->onPreDeserialize($event);
 
         $data = $event->getData();
 
         if (isset($data['parameters'])) {
-            $this->assertArrayNotHasKey('abc.job.params', $data['parameters']);
+            $this->assertArrayNotHasKey('abc.job.type', $data['parameters']);
         }
     }
 
@@ -136,17 +112,5 @@ class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
         $event->setData($data);
 
         return $event;
-    }
-
-    /**
-     * @param string           $type
-     * @param JobTypeInterface $jobType
-     */
-    private function setUpRegistry($type, JobTypeInterface $jobType)
-    {
-        $this->registry->expects($this->any())
-            ->method('get')
-            ->with($type)
-            ->willReturn($jobType);
     }
 }

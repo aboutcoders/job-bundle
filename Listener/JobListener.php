@@ -55,14 +55,14 @@ class JobListener
      */
     public function onPreExecute(ExecutionEvent $event)
     {
-        $event->getContext()->set('manager', $this->manager);
+        $event->getContext()->set('abc.manager', $this->manager);
 
-        $this->logger->debug('Added runtime parameter "manager" to context', ['manager' => $this->manager]);
+        $this->logger->debug('Added runtime parameter "manager" to context', ['abc.manager' => $this->manager]);
 
         $logger = $this->factory->create($event->getJob());
 
-        $event->getContext()->set('logger', $logger);
+        $event->getContext()->set('abc.logger', $logger);
 
-        $this->logger->debug('Added runtime parameter "logger" to context', ['logger' => $logger]);
+        $this->logger->debug('Added runtime parameter "logger" to context', ['abc.logger' => $logger]);
     }
 }

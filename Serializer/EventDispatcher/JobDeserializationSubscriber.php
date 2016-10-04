@@ -10,7 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\Serializer\EventDispatcher;
 
-use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\Job;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
@@ -20,19 +19,6 @@ use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
  */
 class JobDeserializationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var JobTypeRegistry
-     */
-    private $registry;
-
-    /**
-     * @param JobTypeRegistry $registry
-     */
-    public function __construct(JobTypeRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,7 +30,7 @@ class JobDeserializationSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Appends an array element to the parameters of a job that provides information types of the job parameters.
+     * Appends an array element to the parameters of a job that provides information about the job type.
      *
      * @param PreDeserializeEvent $event
      */
@@ -54,12 +40,8 @@ class JobDeserializationSubscriber implements EventSubscriberInterface
         if (isset($type['name']) && ($type['name'] == Job::class || is_subclass_of($type['name'], Job::class))) {
             $data = $event->getData();
             if (isset($data['type']) && isset($data['parameters']) && is_array($data['parameters']) && count($data['parameters']) > 0) {
-                $jobType = $this->registry->get($data['type']);
-                $serializableParameters = $jobType->getSerializableParameterTypes();
-                if (count($serializableParameters) > 0) {
-                    array_push($data['parameters'], ['abc.job.params' => $serializableParameters]);
-                    $event->setData($data);
-                }
+                array_push($data['parameters'], ['abc.job.type' => $data['type']]);
+                $event->setData($data);
             }
         }
     }
