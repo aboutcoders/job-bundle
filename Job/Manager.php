@@ -26,6 +26,7 @@ use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -94,7 +95,12 @@ class Manager implements ManagerInterface
     protected $logger;
 
     /**
-     * @var
+     * @var Stopwatch
+     */
+    protected $stopwatch;
+
+    /**
+     * @var array
      */
     private $jobLogger = array();
 
@@ -132,6 +138,7 @@ class Manager implements ManagerInterface
         $this->locker        = $locker;
         $this->validator     = $validator;
         $this->logger        = $logger == null ? new NullLogger() : $logger;
+        $this->stopwatch     = new Stopwatch();
     }
 
     /**
@@ -243,6 +250,8 @@ class Manager implements ManagerInterface
      */
     public function onMessage(Message $message)
     {
+        $this->stopwatch->start('processMessage');
+
         $job = $this->findJob($message->getTicket());
 
         if ($job->getStatus() == Status::PROCESSING() || $job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::ERROR()) {
@@ -264,10 +273,11 @@ class Manager implements ManagerInterface
         $this->dispatchExecutionEvent(JobEvents::JOB_PRE_EXECUTE, $event);
 
         $job->setStatus(Status::PROCESSING());
+        $job->setProcessingTime(0);
         $this->jobManager->save($job);
 
         $response       = null;
-        $executionStart = microtime(true);
+        $this->stopwatch->start('processJob');
 
         try {
             $this->logger->debug(sprintf('Execute job %s of type "%s"', $job->getTicket(), $job->getType()), [
@@ -276,8 +286,6 @@ class Manager implements ManagerInterface
 
             // invoke the job
             $response = $this->invoker->invoke($job, $event->getContext());
-
-            $job->setResponse($response);
 
             if ($job->getStatus() != Status::CANCELLED()) {
                 $status = $job->hasSchedules() ? Status::SLEEPING() : Status::PROCESSED();
@@ -300,9 +308,7 @@ class Manager implements ManagerInterface
 
         $this->releaseLock($job);
 
-        $processingTime = $this->helper->calculateProcessingTime($executionStart);
-
-        $this->helper->updateJob($job, $status, $processingTime, $response);
+        $this->helper->updateJob($job, $status, $this->stopwatch->stop('processJob')->getDuration(), $response);
         $this->jobManager->save($job);
 
         if (Status::isTerminated($job->getStatus())) {

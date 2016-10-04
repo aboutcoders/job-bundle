@@ -75,9 +75,9 @@ class JobSerializationTest extends KernelTestCase
     public static function provideJobs()
     {
         return [
-            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5)],
-            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5, [new Message('to@domain.tld', 'from@domain.tld', 'Message Subject', 'Message Body')])],
-            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5, null, [self::createSchedule()])],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 12345)],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 12345, [new Message('to@domain.tld', 'from@domain.tld', 'Message Subject', 'Message Body')])],
+            [self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 12345, null, [self::createSchedule()])],
         ];
     }
 
@@ -85,8 +85,8 @@ class JobSerializationTest extends KernelTestCase
     {
         return [
             [
-                self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 0.5),
-                '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":0.5}'
+                self::createJob('JobTicket', 'abc.mailer', Status::PROCESSING(), 12345),
+                '{"ticket":"JobTicket","type":"abc.mailer","status":"PROCESSING","processing_time":12345}'
             ],
             [
                 self::createJob(null, 'abc.mailer', null, null, [new Message('to@domain.tld', 'from@domain.tld', 'Message Subject', 'Message Body')]),

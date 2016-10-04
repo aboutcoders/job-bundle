@@ -78,12 +78,12 @@ interface JobInterface
     public function getResponse();
 
     /**
-     * @return double The processing time in microseconds
+     * @return int The processing time in milliseconds
      */
     public function getProcessingTime();
 
     /**
-     * @return int The execution time from request creation to termination in seconds
+     * @return int The total execution time from creation to termination in seconds
      */
     public function getExecutionTime();
 

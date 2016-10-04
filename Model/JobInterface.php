@@ -46,10 +46,10 @@ interface JobInterface extends BaseJobInterface
     public function setResponse($response = null);
 
     /**
-     * @param double $processingTime The processing time in microseconds
+     * @param integer $milliseconds The processing time in milliseconds
      * @return void
      */
-    public function setProcessingTime($processingTime);
+    public function setProcessingTime($milliseconds);
 
     /**
      * @param \DateTime $createdAt

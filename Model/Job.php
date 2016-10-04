@@ -51,8 +51,8 @@ class Job implements JobInterface
     protected $parameters;
 
     /**
-     * @JMS\Type("double")
-     * @var double
+     * @JMS\Type("integer")
+     * @var integer
      */
     protected $processingTime;
 
@@ -247,9 +247,9 @@ class Job implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function setProcessingTime($processingTime)
+    public function setProcessingTime($milliseconds)
     {
-        $this->processingTime = $processingTime;
+        $this->processingTime = $milliseconds;
     }
 
     /**
@@ -284,11 +284,10 @@ class Job implements JobInterface
     public function __clone()
     {
         $this->ticket = null;
-
     }
 
     /**
-     * Ensures that member variable $schedules is an ArrayCollection after deserialization
+     * Ensures that the member variable $schedules is an ArrayCollection after deserialization
      *
      * @JMS\PostDeserialize
      */

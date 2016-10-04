@@ -64,17 +64,6 @@ class JobHelper
     }
 
     /**
-     * Calculates the processing time
-     *
-     * @param float $executionStart The microtime when the execution was started
-     * @return double The processing time
-     */
-    public function calculateProcessingTime($executionStart)
-    {
-        return (double)microtime(true) - $executionStart;
-    }
-
-    /**
      * @param EntityJobInterface $job
      * @return LoggerInterface
      */
