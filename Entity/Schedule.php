@@ -12,22 +12,28 @@ namespace Abc\Bundle\JobBundle\Entity;
 
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\Schedule as BaseSchedule;
-use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation as JMS;
 
 /**
- * @ExclusionPolicy("all")
+ * @JMS\ExclusionPolicy("all")
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 class Schedule extends BaseSchedule
 {
-    /** @var integer */
+    /**
+     * @var integer
+     */
     protected $id;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $jobTicket;
 
-    /** @var JobInterface */
+    /**
+     * @var JobInterface
+     */
     protected $job;
 
     /**
