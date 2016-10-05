@@ -15,7 +15,7 @@ use Abc\Bundle\JobBundle\Model\Schedule as BaseSchedule;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @JMS\ExclusionPolicy("all")
+ * @JMSExclusionPolicy("all")
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
@@ -35,6 +35,15 @@ class Schedule extends BaseSchedule
      * @var JobInterface
      */
     protected $job;
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return integer

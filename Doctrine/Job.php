@@ -137,6 +137,41 @@ class Job extends BaseJob
     }
 
     /**
+     * @param string $serializedParameters
+     * @return void
+     */
+    public function setSerializedParameters($serializedParameters)
+    {
+        $this->serializedParameters = $serializedParameters;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSerializedParameters()
+    {
+        return $this->serializedParameters;
+    }
+
+    /**
+     * @param string $serializedResponse
+     * @return void
+     */
+    public function setSerializedResponse($serializedResponse)
+    {
+        $this->serializedResponse = $serializedResponse;
+    }
+
+
+    /**
+     * @return null|string
+     */
+    public function getSerializedResponse()
+    {
+        return $this->serializedResponse;
+    }
+
+    /**
      * @return SerializationHelper
      * @throws \RuntimeException If the serializer is not set
      */
