@@ -60,7 +60,7 @@ class ScheduleManagerTest extends DatabaseKernelTestCase
 
         $schedule2 = $scheduleManager->create();
         $schedule2->setType('cron');
-        $schedule2->setExpression('foobar');
+        $schedule2->setExpression('barfoo');
         $schedule2->setIsActive(false);
 
         $job2 = $jobManager->create('foo');
@@ -73,6 +73,6 @@ class ScheduleManagerTest extends DatabaseKernelTestCase
         $schedules = $scheduleManager->findSchedules();
 
         $this->assertCount(1, $schedules);
-        $this->assertContains($schedule1, $schedules);
+        $this->assertEquals($schedule1->getExpression(), $schedules[0]->getExpression());
     }
 }

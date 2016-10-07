@@ -83,7 +83,6 @@ abstract class JobManager extends BaseJobManager
         if($andFlush)
         {
             $this->objectManager->flush();
-            $this->objectManager->detach($job);
         }
     }
 

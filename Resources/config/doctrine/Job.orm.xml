@@ -20,7 +20,7 @@
         </field>
         <field name="terminatedAt" column="terminated_at" type="datetime" nullable="true"/>
 
-        <one-to-many field="schedules" target-entity="Abc\Bundle\JobBundle\Entity\Schedule" mapped-by="job" orphan-removal="true">
+        <one-to-many field="schedules" target-entity="Abc\Bundle\JobBundle\Entity\Schedule" mapped-by="job" orphan-removal="true" fetch="EAGER">
             <cascade>
                 <cascade-all/>
             </cascade>

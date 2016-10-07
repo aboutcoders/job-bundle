@@ -53,60 +53,6 @@ class JobManager extends BaseJobManager
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function findByTickets(array $tickets)
-    {
-        $queryBuilder = $this->createQueryBuilder();
-        $queryBuilder->select();
-
-        $queryBuilder = $this->buildMatchingQueryForCriteria($queryBuilder, array('ticket' => $tickets));
-
-        return $queryBuilder->getQuery()->getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function findByTypes(array $types)
-    {
-        $queryBuilder = $this->createQueryBuilder();
-        $queryBuilder->select();
-
-        $queryBuilder = $this->buildMatchingQueryForCriteria($queryBuilder, array('type' => $types));
-
-        return $queryBuilder->getQuery()->getResult();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function findByAgeAndTypes($days, array $types = array())
-    {
-        $qb = $this->em->createQueryBuilder();
-
-        $terminationDate = new \DateTime;
-        $terminationDate->setTimestamp(strtotime(sprintf('today - %d days', $days)));
-
-        $condition = $qb->expr()->lte('job.terminatedAt', ':terminatedAt');
-        $parameters = array(':terminatedAt' => $terminationDate);
-
-        if(is_array($types) && count($types) > 0)
-        {
-            $parameters[':types'] = $types;
-            $condition = $qb->expr()->andX($condition, $qb->expr()->in('job.type', ':types'));
-        }
-
-        $qb->select('job')
-            ->from($this->getClass(), 'job')
-            ->where($condition);
-
-        $qb->setParameters($parameters);
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
      * @param \Doctrine\ORM\QueryBuilder $queryBuilder
      * @param array                      $criteria
      *

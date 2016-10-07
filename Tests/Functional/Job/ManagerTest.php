@@ -31,7 +31,7 @@ class ManagerTest extends DatabaseKernelTestCase
         $job = $this->getJobManager()->addJob('log', array('message'));
 
         $this->processJobs();
-        
+
         $logs = $this->getJobManager()->getLogs($job->getTicket());
 
         $this->assertTrue($this->containsMessage('message', $logs));
@@ -201,7 +201,8 @@ class ManagerTest extends DatabaseKernelTestCase
         return $this->getContainer()->get('abc.job.manager');
     }
 
-    protected function processJobs() {
+    protected function processJobs()
+    {
         /**
          * @var ConsumerInterface $consumer
          */
@@ -221,13 +222,13 @@ class ManagerTest extends DatabaseKernelTestCase
 
     /**
      * @param string $key
-     * @param array $logs
+     * @param array  $logs
      * @return bool
      */
     private function containsMessage($key, $logs)
     {
         foreach ($logs as $log) {
-            if(false !== strpos($log['message'], $key)) {
+            if (false !== strpos($log['message'], $key)) {
                 return true;
             }
         }

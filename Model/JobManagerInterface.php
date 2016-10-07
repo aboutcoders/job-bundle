@@ -83,25 +83,6 @@ interface JobManagerInterface
     public function findByTicket($ticket);
 
     /**
-     * @param array $tickets
-     * @return JobInterface[]
-     */
-    public function findByTickets(array $tickets);
-
-    /**
-     * @param array $types
-     * @return JobInterface[]
-     */
-    public function findByTypes(array $types);
-
-    /**
-     * @param int   $days The number of days since the jobs terminated
-     * @param array $tickets Optional, if specified only jobs of the given types are returned
-     * @return JobInterface[]
-     */
-    public function findByAgeAndTypes($days, array $tickets = array());
-    
-    /**
      * @param BaseJobInterface $job
      * @return boolean
      */
