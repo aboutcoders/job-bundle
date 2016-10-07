@@ -44,8 +44,8 @@ class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->metadataFactory = $this->getMock(MetadataFactoryInterface::class);
-        $this->queueConfig     = $this->getMock(QueueConfigInterface::class);
+        $this->metadataFactory = $this->createMock(MetadataFactoryInterface::class);
+        $this->queueConfig     = $this->createMock(QueueConfigInterface::class);
         $this->subject         = new JobTypeRegistry($this->metadataFactory, $this->queueConfig);
     }
 

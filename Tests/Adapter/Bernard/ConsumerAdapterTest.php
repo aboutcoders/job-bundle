@@ -47,7 +47,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testConsume() {
 
-        $queue = $this->getMock(Queue::class);
+        $queue = $this->createMock(Queue::class);
         $options = array('foo' => 'bar');
 
         $this->queueFactory->expects($this->once())

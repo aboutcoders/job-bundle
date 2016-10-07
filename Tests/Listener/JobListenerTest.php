@@ -43,8 +43,8 @@ class JobListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager = $this->getMock(ManagerInterface::class);
-        $this->factory = $this->getMock(LoggerFactoryInterface::class);
+        $this->manager = $this->createMock(ManagerInterface::class);
+        $this->factory = $this->createMock(LoggerFactoryInterface::class);
         $this->subject = new JobListener($this->manager, $this->factory);
     }
 

@@ -38,7 +38,7 @@ class AgentControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->agentManager = $this->getMock(AgentManagerInterface::class);
+        $this->agentManager = $this->createMock(AgentManagerInterface::class);
         $this->serializer   = SerializerBuilder::create()->build();
     }
 

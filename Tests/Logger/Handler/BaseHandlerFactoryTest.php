@@ -46,8 +46,8 @@ class BaseHandlerFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testInitHandler() {
 
-        $handler = $this->getMock(HandlerInterface::class);
-        $formatter = $this->getMock(FormatterInterface::class);
+        $handler = $this->createMock(HandlerInterface::class);
+        $formatter = $this->createMock(FormatterInterface::class);
         $processors = ['foobar'];
 
         $this->subject->setFormatter($formatter);

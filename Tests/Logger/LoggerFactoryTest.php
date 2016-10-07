@@ -56,9 +56,9 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setType('JobType');
 
-        $handler = $this->getMock(HandlerInterface::class);
+        $handler = $this->createMock(HandlerInterface::class);
         $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
-        $jobType = $this->getMock(JobTypeInterface::class);
+        $jobType = $this->createMock(JobTypeInterface::class);
 
         $this->handlerFactory->register($factory);
 
@@ -91,10 +91,10 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         $job = new Job();
         $job->setType('JobType');
 
-        $handler = $this->getMock(HandlerInterface::class);
-        $extraHandler = $this->getMock(HandlerInterface::class);
+        $handler = $this->createMock(HandlerInterface::class);
+        $extraHandler = $this->createMock(HandlerInterface::class);
         $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
-        $jobType = $this->getMock(JobTypeInterface::class);;
+        $jobType = $this->createMock(JobTypeInterface::class);;
 
         $this->handlerFactory->register($factory);
 

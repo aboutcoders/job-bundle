@@ -199,7 +199,7 @@ class ServiceTest extends KernelTestCase
         /**
          * @var JobInterface $job
          */
-        $job = $this->getMock(Job::class);
+        $job = $this->createMock(Job::class);
 
         $controller = $factory->create($job);
 

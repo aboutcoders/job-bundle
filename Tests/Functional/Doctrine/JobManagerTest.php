@@ -77,7 +77,7 @@ class JobManagerTest extends DatabaseKernelTestCase
         /**
          * @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context
          */
-        $context   = $this->getMock(ExecutionContext::class, [], [], '', false);
+        $context   = $this->createMock(ExecutionContext::class, [], [], '', false);
         $validator = new UuidValidator();
         $validator->initialize($context);
 

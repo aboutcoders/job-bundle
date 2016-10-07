@@ -59,8 +59,8 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager = $this->getMock(JobManagerInterface::class);
-        $this->job     = $this->getMock(JobInterface::class);
+        $this->manager = $this->createMock(JobManagerInterface::class);
+        $this->job     = $this->createMock(JobInterface::class);
         $this->time    = $this->getFunctionMock(StatusControllerTest::TEST_SUBJECT_NAMESPACE, 'time');
 
         $this->manager->expects($this->any())
@@ -83,7 +83,7 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructValidatesJob()
     {
-        $job = $this->getMock(\Abc\Bundle\JobBundle\Job\JobInterface::class);
+        $job = $this->createMock(\Abc\Bundle\JobBundle\Job\JobInterface::class);
 
         new StatusController($job, $this->manager, -1);
     }

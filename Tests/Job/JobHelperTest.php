@@ -40,7 +40,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->loggerFactory = $this->getMock(LoggerFactoryInterface::class);
+        $this->loggerFactory = $this->createMock(LoggerFactoryInterface::class);
 
         $this->subject = new JobHelper($this->loggerFactory);
     }
@@ -163,8 +163,8 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
             [$this->createJob('JobType')],
             [$this->createJob('JobType', Status::CANCELLED())],
             [$this->createJob('JobType', Status::CANCELLED(), array('foobar'))],
-            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->getMock(ScheduleInterface::class))],
-            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->getMock(ScheduleInterface::class), 'response')],
+            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->createMock(ScheduleInterface::class))],
+            [$this->createJob('JobType', Status::CANCELLED(), array('foobar'), $this->createMock(ScheduleInterface::class), 'response')],
         ];
     }
 

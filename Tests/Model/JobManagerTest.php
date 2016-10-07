@@ -87,7 +87,7 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
         /**
          * @var JobInterface $foreignJob
          */
-        $foreignJob = $this->getMock(JobInterface::class);
+        $foreignJob = $this->createMock(JobInterface::class);
 
         $this->assertFalse($this->subject->isManagerOf($foreignJob));
     }

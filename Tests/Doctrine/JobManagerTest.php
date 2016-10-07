@@ -64,9 +64,9 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->class               = Job::class;
-        $this->classMetaData       = $this->getMock(ClassMetadata::class);
-        $this->objectManager       = $this->getMock(ObjectManager::class);
-        $this->repository          = $this->getMock(ObjectRepository::class);
+        $this->classMetaData       = $this->createMock(ClassMetadata::class);
+        $this->objectManager       = $this->createMock(ObjectManager::class);
+        $this->repository          = $this->createMock(ObjectRepository::class);
         $this->scheduleManager     = $this->getMockBuilder(ScheduleManager::class)->disableOriginalConstructor()->getMock();
         $this->serializationHelper = $this->getMockBuilder(SerializationHelper::class)->disableOriginalConstructor()->getMock();
 

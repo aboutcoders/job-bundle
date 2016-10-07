@@ -37,7 +37,7 @@ class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->producer = $this->getMock(ProducerInterface::class);
+        $this->producer = $this->createMock(ProducerInterface::class);
         $this->subject  = new ScheduleListener($this->producer);
     }
 

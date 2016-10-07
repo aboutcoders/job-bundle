@@ -50,7 +50,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $this->producer = $this->getMockBuilder(Producer::class)->disableOriginalConstructor()->getMock();
         $this->registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->manager  = $this->getMock(ManagerInterface::class);
+        $this->manager  = $this->createMock(ManagerInterface::class);
 
         $this->subject = new ProducerAdapter($this->producer, $this->registry);
         $this->subject->setManager($this->manager);
@@ -63,7 +63,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $queue   = 'QueueName';
         $message = new Message($type, $ticket);
 
-        $jobType = $this->getMock(JobTypeInterface::class);
+        $jobType = $this->createMock(JobTypeInterface::class);
         $jobType->expects($this->once())
             ->method('getQueue')
             ->willReturn($queue);
