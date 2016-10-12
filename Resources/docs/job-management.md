@@ -169,7 +169,7 @@ Alternatively you can use the method ´equals´ of the Status class.
 ```php
 $status = $manager->getStatus($ticket));
 
-if(Status::equals(Status::PROCESSED(), $status))
+if(Status::PROCESSED()->equals($status))
 {
     // ...
 }

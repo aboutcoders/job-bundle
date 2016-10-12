@@ -14,7 +14,7 @@
     "require": {
         "php": ">=5.4.0",
         "symfony/symfony": "~2.6|~3.0",
-        "myclabs/php-enum": "~1.2",
+        "myclabs/php-enum": "~1.5",
         "gedmo/doctrine-extensions": "~2.0",
         "jms/serializer-bundle": "~1.0",
         "nelmio/api-doc-bundle": "~2",

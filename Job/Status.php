@@ -81,13 +81,4 @@ class Status extends Enum
 
         return $result;
     }
-
-    /**
-     * @param Status $expected
-     * @param Status $given
-     * @return bool Whether the status of two instances is equal
-     */
-    public static function equals(Status $expected, Status $given) {
-        return $expected->getValue() == $given->getValue();
-    }
 }
