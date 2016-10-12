@@ -37,7 +37,7 @@ class JobAwareOrmHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager = $this->getMock(LogManagerInterface::class);;
+        $this->manager = $this->createMock(LogManagerInterface::class);;
         $this->subject = $this->getMockBuilder(JobAwareOrmHandler::class)
             ->setConstructorArgs([$this->manager])
             ->setMethods(['populateLog'])

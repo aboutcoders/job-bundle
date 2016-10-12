@@ -33,7 +33,7 @@ class ConsumerCommandTest extends KernelTestCase
     {
         parent::setUp();
 
-        $this->consumer = $this->getMock(ConsumerInterface::class);
+        $this->consumer = $this->createMock(ConsumerInterface::class);
     }
 
     /**

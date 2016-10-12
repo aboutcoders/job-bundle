@@ -74,8 +74,8 @@ class JobValidatorTest extends \PHPUnit_Framework_TestCase
         $job->setType('foobar');
         $job->setParameters(['JobParameters']);
 
-        $validator           = $this->getMock(ValidatorInterface::class);
-        $contextualValidator = $this->getMock(ContextualValidatorInterface::class);
+        $validator           = $this->createMock(ValidatorInterface::class);
+        $contextualValidator = $this->createMock(ContextualValidatorInterface::class);
 
         $this->context->expects($this->once())
             ->method('getValidator')

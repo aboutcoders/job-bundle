@@ -37,10 +37,10 @@ class OrmHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager = $this->getMock(LogManagerInterface::class);
+        $this->manager = $this->createMock(LogManagerInterface::class);
 
         /** @var FormatterInterface|\PHPUnit_Framework_MockObject_MockObject $formatter */
-        $formatter = $this->getMock(FormatterInterface::class);
+        $formatter = $this->createMock(FormatterInterface::class);
 
         $formatter->expects($this->any())
             ->method('format')

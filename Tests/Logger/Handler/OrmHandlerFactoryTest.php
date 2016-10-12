@@ -48,7 +48,7 @@ class OrmHandlerFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->level   = -100;
         $this->bubble  = false;
-        $this->manager = $this->getMock(LogManagerInterface::class);
+        $this->manager = $this->createMock(LogManagerInterface::class);
         $this->subject = new OrmHandlerFactory($this->level, $this->bubble, $this->manager);
     }
 

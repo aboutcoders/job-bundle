@@ -45,8 +45,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager  = $this->getMock(JobManagerInterface::class);
-        $this->job      = $this->getMock(JobInterface::class);
+        $this->manager  = $this->createMock(JobManagerInterface::class);
+        $this->job      = $this->createMock(JobInterface::class);
         $this->interval = 250;
 
         $this->manager->expects($this->any())
@@ -74,7 +74,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         /**
          * @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject
          */
-        $otherController = $this->getMock(ControllerInterface::class);
+        $otherController = $this->createMock(ControllerInterface::class);
 
         $this->subject->addController($otherController);
 

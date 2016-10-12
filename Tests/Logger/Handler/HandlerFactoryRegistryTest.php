@@ -40,10 +40,10 @@ class HandlerFactoryRegistryTest extends \PHPUnit_Framework_TestCase
     public function testCreateHandlers($level)
     {
         $job      = new Job();
-        $factory1 = $this->getMock(HandlerFactoryInterface::class);
-        $handler1 = $this->getMock(HandlerInterface::class);
-        $factory2 = $this->getMock(HandlerFactoryInterface::class);
-        $handler2 = $this->getMock(HandlerInterface::class);
+        $factory1 = $this->createMock(HandlerFactoryInterface::class);
+        $handler1 = $this->createMock(HandlerInterface::class);
+        $factory2 = $this->createMock(HandlerFactoryInterface::class);
+        $handler2 = $this->createMock(HandlerInterface::class);
 
         $factory1->expects($this->once())
             ->method('createHandler')

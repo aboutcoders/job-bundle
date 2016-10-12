@@ -56,7 +56,7 @@ class JobTypeValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWithTypeNotRegistered()
     {
         $value = 'foobar';
-        $builder = $this->getMock(ConstraintViolationBuilderInterface::class);
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $this->registry->expects($this->once())
             ->method('has')

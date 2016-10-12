@@ -54,10 +54,10 @@ class JobControllerTest extends DatabaseWebTestCase
     {
         parent::setUp();
 
-        $this->manager       = $this->getMock(ManagerInterface::class);
-        $this->serializer    = $this->getMock(SerializerInterface::class);
-        $this->validator     = $this->getMock(ValidatorInterface::class);
-        $this->entityManager = $this->getMock(JobManagerInterface::class);
+        $this->manager       = $this->createMock(ManagerInterface::class);
+        $this->serializer    = $this->createMock(SerializerInterface::class);
+        $this->validator     = $this->createMock(ValidatorInterface::class);
+        $this->entityManager = $this->createMock(JobManagerInterface::class);
     }
 
     /**

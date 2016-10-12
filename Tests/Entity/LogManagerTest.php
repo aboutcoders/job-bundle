@@ -40,13 +40,13 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $class         = Log::class;
-        $classMetaData = $this->getMock(ClassMetadata::class);
+        $classMetaData = $this->createMock(ClassMetadata::class);
 
         $classMetaData->expects($this->any())
             ->method('getName')
             ->willReturn($class);
 
-        $repository = $this->getMock(ObjectRepository::class);
+        $repository = $this->createMock(ObjectRepository::class);
 
         /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
         $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();

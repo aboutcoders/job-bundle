@@ -63,10 +63,10 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->backendProvider = $this->getMockBuilder(BackendProvider::class)->disableOriginalConstructor()->getMock();
-        $this->manager         = $this->getMock(ManagerInterface::class);
+        $this->manager         = $this->createMock(ManagerInterface::class);
         $this->registry        = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
-        $this->logger          = $this->getMock(LoggerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->logger          = $this->createMock(LoggerInterface::class);
 
         $this->registry->expects($this->any())
             ->method('getDefaultQueue')
@@ -87,9 +87,9 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $queue   = 'foobar';
         $message = new Message('type', 'ticket', 'callback');
-        $backend = $this->getMock(BackendInterface::class);
+        $backend = $this->createMock(BackendInterface::class);
 
-        $jobType = $this->getMock(JobTypeInterface::class);
+        $jobType = $this->createMock(JobTypeInterface::class);
         $jobType->expects($this->any())
             ->method('getQueue')
             ->willReturn($queue);
@@ -118,9 +118,9 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $queue   = 'foobar';
         $message = new Message('type', 'ticket', 'callback');
-        $backend = $this->getMock(BackendInterface::class);
+        $backend = $this->createMock(BackendInterface::class);
 
-        $jobType = $this->getMock(JobTypeInterface::class);
+        $jobType = $this->createMock(JobTypeInterface::class);
         $jobType->expects($this->any())
             ->method('getQueue')
             ->willReturn($queue);
@@ -195,7 +195,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 
     private function createConsumerEvent($type, $messageBody)
     {
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
 
         $message->expects($this->any())
             ->method('getBody')

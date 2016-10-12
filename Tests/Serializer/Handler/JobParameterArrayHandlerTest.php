@@ -69,7 +69,7 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeJobParameterArray()
     {
-        $visitor = $this->getMock(VisitorInterface::class);
+        $visitor = $this->createMock(VisitorInterface::class);
         $context = $this->getMockForAbstractClass(Context::class);
         $data    = ['data'];
         $type    = ['type'];
@@ -89,12 +89,12 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeserializeJobParameterArrayWithoutTypeAdded(array $data, array $type)
     {
-        $visitor   = $this->getMock(VisitorInterface::class);
-        $context   = $this->getMock(DeserializationContext::class);
+        $visitor   = $this->createMock(VisitorInterface::class);
+        $context   = $this->createMock(DeserializationContext::class);
         $navigator = new GraphNavigator(
-            $this->getMock(MetadataFactoryInterface::class),
-            $this->getMock(HandlerRegistryInterface::class),
-            $this->getMock(ObjectConstructorInterface::class));
+            $this->createMock(MetadataFactoryInterface::class),
+            $this->createMock(HandlerRegistryInterface::class),
+            $this->createMock(ObjectConstructorInterface::class));
 
         $expectedReturnValue = [];
         for ($i = 0; $i < count($data); $i++) {
@@ -135,8 +135,8 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeserializeJobParameterArrayWithTypeAdded(JobTypeInterface $jobType, array $data, array $parameters)
     {
-        $visitor          = $this->getMock(VisitorInterface::class);
-        $context          = $this->getMock(DeserializationContext::class);
+        $visitor          = $this->createMock(VisitorInterface::class);
+        $context          = $this->createMock(DeserializationContext::class);
         $dataWithoutTypes = $data;
         $dataWithoutTypes = array_pop($dataWithoutTypes);
 
@@ -174,8 +174,8 @@ class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeserializeJobParameterArrayTrowsInvalidArgumentException(array $data)
     {
-        $visitor = $this->getMock(VisitorInterface::class);
-        $context = $this->getMock(DeserializationContext::class);
+        $visitor = $this->createMock(VisitorInterface::class);
+        $context = $this->createMock(DeserializationContext::class);
         $type    = ['params' => []];
 
         $this->subject->deserializeJobParameterArray($visitor, $data, $type, $context);

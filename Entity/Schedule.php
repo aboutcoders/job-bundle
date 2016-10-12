@@ -15,7 +15,7 @@ use Abc\Bundle\JobBundle\Model\Schedule as BaseSchedule;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * @JMSExclusionPolicy("all")
+ * @JMS\ExclusionPolicy("all")
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */

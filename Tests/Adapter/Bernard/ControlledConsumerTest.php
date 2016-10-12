@@ -42,13 +42,13 @@ class ControlledConsumerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->router     = $this->getMockBuilder(Router::class)->disableOriginalConstructor()->getMock();
-        $this->dispatcher = $this->getMock(EventDispatcherInterface::class);
-        $this->controller = $this->getMock(ControllerInterface::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->controller = $this->createMock(ControllerInterface::class);
     }
 
     public function testConsumeChecksController()
     {
-        $queue = $this->getMock(Queue::class);
+        $queue = $this->createMock(Queue::class);
 
         $this->controller->expects($this->once())
             ->method('doExit')
@@ -63,7 +63,7 @@ class ControlledConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testInvokesParentTick()
     {
-        $queue = $this->getMock(Queue::class);
+        $queue = $this->createMock(Queue::class);
 
         $subject = $this->buildSubject(['configure']);
 

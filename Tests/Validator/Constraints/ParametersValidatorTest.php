@@ -71,8 +71,8 @@ class ParametersValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateWithInvalidValue()
     {
         $value      = 'foobar';
-        $builder    = $this->getMock(ConstraintViolationBuilderInterface::class);
-        $provider   = $this->getMock(ConstraintProviderInterface::class);
+        $builder    = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $provider   = $this->createMock(ConstraintProviderInterface::class);
         $constraint = $this->getMockForAbstractClass(Constraint::class);
 
         $this->registry->expects($this->once())
@@ -104,9 +104,9 @@ class ParametersValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateWithValue(array $parameters, array $constraints)
     {
-        $validator           = $this->getMock(ValidatorInterface::class);
-        $contextualValidator = $this->getMock(ContextualValidatorInterface::class);
-        $provider            = $this->getMock(ConstraintProviderInterface::class);
+        $validator           = $this->createMock(ValidatorInterface::class);
+        $contextualValidator = $this->createMock(ContextualValidatorInterface::class);
+        $provider            = $this->createMock(ConstraintProviderInterface::class);
 
         $this->subject->register($provider);
 

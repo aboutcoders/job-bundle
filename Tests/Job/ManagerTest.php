@@ -109,16 +109,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->registry      = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->jobManager    = $this->getMock(JobManagerInterface::class);
+        $this->jobManager    = $this->createMock(JobManagerInterface::class);
         $this->invoker       = $this->getMockBuilder(Invoker::class)->disableOriginalConstructor()->getMock();
-        $this->loggerFactory = $this->getMock(LoggerFactoryInterface::class);
-        $this->logManager    = $this->getMock(LogManagerInterface::class);
-        $this->dispatcher    = $this->getMock(EventDispatcherInterface::class);
+        $this->loggerFactory = $this->createMock(LoggerFactoryInterface::class);
+        $this->logManager    = $this->createMock(LogManagerInterface::class);
+        $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
         $this->helper        = $this->getMockBuilder(JobHelper::class)->disableOriginalConstructor()->getMock();
-        $this->locker        = $this->getMock(LockManagerInterface::class);
-        $this->validator     = $this->getMock(ValidatorInterface::class);
-        $this->logger        = $this->getMock(LoggerInterface::class);
-        $this->producer      = $this->getMock(ProducerInterface::class);
+        $this->locker        = $this->createMock(LockManagerInterface::class);
+        $this->validator     = $this->createMock(ValidatorInterface::class);
+        $this->logger        = $this->createMock(LoggerInterface::class);
+        $this->producer      = $this->createMock(ProducerInterface::class);
 
         $this->jobManager->method('getClass')
             ->willReturn('Abc\Bundle\JobBundle\Model\Job');
@@ -180,8 +180,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddEnsuresJobIsManaged()
     {
-        $job        = $this->getMock(JobInterface::class);
-        $managedJob = $this->getMock(JobInterface::class);
+        $job        = $this->createMock(JobInterface::class);
+        $managedJob = $this->createMock(JobInterface::class);
 
         $this->registry->expects($this->any())
             ->method('has')
@@ -237,8 +237,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $type       = 'JobType';
         $parameters = ['JobParameters'];
-        $schedule   = $this->getMock(ScheduleInterface::class);
-        $job        = $this->getMock(JobInterface::class);
+        $schedule   = $this->createMock(ScheduleInterface::class);
+        $job        = $this->createMock(JobInterface::class);
 
         $subject = $this->createMockedSubject(['add']);
 
@@ -593,12 +593,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($job, $this->isInstanceOf(Context::class))
             ->willReturn($response);
 
-        $this->helper->expects($this->once())
-            ->method('calculateProcessingTime')
-            ->with($this->greaterThanOrEqual($microTime))
-            ->willReturn('microtime');
-
-        $this->expectsCallsUpdateJob($job, Status::PROCESSED(), 'microtime', $response);
+        $this->expectsCallsUpdateJob($job, Status::PROCESSED(), 0, $response);
 
         $this->jobManager->expects($this->at(2))
             ->method('save')
@@ -659,12 +654,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->with($job, $this->isInstanceOf(Context::class))
             ->willThrowException($exception);
 
-        $this->helper->expects($this->once())
-            ->method('calculateProcessingTime')
-            ->with($this->greaterThanOrEqual($microTime))
-            ->willReturn('microtime');
-
-        $this->expectsCallsUpdateJob($job, Status::ERROR(), 'microtime');
+        $this->expectsCallsUpdateJob($job, Status::ERROR(), 0);
 
         $this->jobManager->expects($this->at(2))
             ->method('save')
@@ -877,7 +867,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param Status       $status         The expected second argument passed to updateJob
      * @param mixed|null   $processingTime The optional expected third argument passed to updateJob
      */
-    protected function expectsCallsUpdateJob(JobInterface $expectedJob, Status $status, $processingTime = null, $response = null)
+    protected function expectsCallsUpdateJob(JobInterface $expectedJob, Status $status, $processingTime = 0, $response = null)
     {
         if (null == $response) {
             $this->helper->expects($this->once())

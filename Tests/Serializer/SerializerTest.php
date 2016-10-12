@@ -36,7 +36,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->serializer = $this->getMock(JMSSerializerInterface::class);
+        $this->serializer = $this->createMock(JMSSerializerInterface::class);
         $this->subject    = new Serializer($this->serializer);
     }
 

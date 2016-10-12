@@ -57,10 +57,10 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->backendProvider        = $this->getMockBuilder(BackendProvider::class)->disableOriginalConstructor()->getMock();
-        $this->eventDispatcher        = $this->getMock(EventDispatcherInterface::class);
-        $this->notificationDispatcher = $this->getMock(EventDispatcherInterface::class);
-        $this->controller             = $this->getMock(ControllerInterface::class);
-        $this->backend                = $this->getMock(BackendInterface::class);
+        $this->eventDispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $this->notificationDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->controller             = $this->createMock(ControllerInterface::class);
+        $this->backend                = $this->createMock(BackendInterface::class);
 
         $this->subject = new ConsumerAdapter($this->backendProvider, $this->eventDispatcher, $this->notificationDispatcher, $this->controller);
     }
@@ -68,7 +68,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testConsume()
     {
         $queue = 'foobar';
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $iterator = new TestIterator([$message]);
 
         $this->backendProvider->expects($this->any())
@@ -95,7 +95,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testConsumeChecksController()
     {
         $queue = 'foobar';
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $iterator = new TestIterator([$message, $message]);
 
         $this->backendProvider->expects($this->once())
@@ -120,7 +120,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testConsumeChecksMaxRuntime()
     {
         $queue = 'foobar';
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $iterator = new TestIterator([$message, $message]);
 
         $this->backendProvider->expects($this->once())
@@ -143,7 +143,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testConsumeChecksMaxMessages()
     {
         $queue = 'foobar';
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $iterator = new TestIterator([$message, $message]);
 
         $this->backendProvider->expects($this->once())
@@ -166,7 +166,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testConsumeIteratesOverAllMessages()
     {
         $queue = 'foobar';
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $iterator = new TestIterator([$message, $message]);
 
         $this->backendProvider->expects($this->any())

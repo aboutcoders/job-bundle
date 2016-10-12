@@ -50,7 +50,7 @@ class StatusValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWithInvalidType()
     {
         $value   = 'foobar';
-        $builder = $this->getMock(ConstraintViolationBuilderInterface::class);
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
 
         $this->context->expects($this->once())
             ->method('buildViolation')

@@ -51,12 +51,12 @@ class ControllerTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->manager    = $this->getMock(ManagerInterface::class);
-        $this->serializer = $this->getMock(SerializerInterface::class);
-        $this->validator  = $this->getMock(ValidatorInterface::class);
-        $this->jobManager = $this->getMock(JobManagerInterface::class);
+        $this->manager    = $this->createMock(ManagerInterface::class);
+        $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->validator  = $this->createMock(ValidatorInterface::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $services        = [
             'abc.job.manager'     => $this->manager,
             'abc.job.job_manager' => $this->jobManager,
