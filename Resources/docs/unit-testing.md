@@ -70,3 +70,44 @@ class MyJobTest extends JobTestCase
     }
 }
 ```
+
+## Validating parameters
+
+With the methods `assertValid` and `assertNotValid` you can test if the parameters of a job are valid or not.
+
+```php
+namespace Tests\AppBundle\Job\MyJob;
+
+use Abc\Bundle\JobBundle\Test\JobTestCase;
+
+class MyJobTest extends JobTestCase
+{
+    public function testValidation()
+    {
+        self::bootKernel();
+        
+        $this->assertValid('say_hello', ['World']);
+        $this->assertNotValid('say_hello', []);
+    }
+}
+```
+
+The method `validateParameters` returns the list of validation errors and thereby allows more specific tests:
+
+```php
+namespace Tests\AppBundle\Job\MyJob;
+
+use Abc\Bundle\JobBundle\Test\JobTestCase;
+
+class MyJobTest extends JobTestCase
+{
+    public function testValidation()
+    {
+        self::bootKernel();
+        
+        $errors = $this->validateParameters('say_hello', []);
+        
+        // ...
+    }
+}
+```

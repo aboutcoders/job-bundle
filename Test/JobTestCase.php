@@ -18,8 +18,10 @@ use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
+use Abc\Bundle\JobBundle\Validator\Constraints as AssertJob;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
@@ -38,7 +40,7 @@ abstract class JobTestCase extends KernelTestCase
      * Asserts that job will be invoked with the given parameters.
      *
      * @param string $type       The job type
-     * @param array  $parameters The parameters the job will be invoked ith
+     * @param array  $parameters The job parameters
      */
     public function assertInvokesJob($type, array $parameters = array())
     {
@@ -58,14 +60,16 @@ abstract class JobTestCase extends KernelTestCase
         // expect mock is called with the given parameters
         call_user_func_array([$callable, 'with'], $resolvedParameters);
 
-        // execute the job
+        // invoke the job
         call_user_func_array([$mock, $method], $resolvedParameters);
     }
 
     /**
-     * @param string $type The job type
+     * Asserts that a job is registered.
+     *
+     * @param string $type              The job type
      * @param string $expectedServiceId The expected id of the service
-     * @param string $expectedMethod The expected name of the method
+     * @param string $expectedMethod    The expected name of the method
      */
     public static function assertJobIsRegistered($type, $expectedServiceId, $expectedMethod)
     {
@@ -75,9 +79,35 @@ abstract class JobTestCase extends KernelTestCase
     }
 
     /**
-     * @param string $type       The type of the job
-     * @param array  $parameters The parameters of the job
-     * @return array The parameters the job will be invoked with
+     * Asserts that job parameters are valid.
+     *
+     * @param string $type       The job type
+     * @param array  $parameters The job parameters
+     * @return bool
+     */
+    public static function assertValid($type, array $parameters)
+    {
+        return static::validateParameters($type, $parameters)->count() == 0;
+    }
+
+    /**
+     * Asserts that job parameters are not valid.
+     *
+     * @param string $type       The job type
+     * @param array  $parameters The job parameters
+     * @return bool
+     */
+    public static function assertNotValid($type, array $parameters)
+    {
+        return static::validateParameters($type, $parameters)->count() > 0;
+    }
+
+    /**
+     * Resolves the parameters of a job.
+     *
+     * @param string $type       The job type
+     * @param array  $parameters The job parameters
+     * @return array The parameters the job can be invoked with
      */
     public function resolveParameters($type, array $parameters)
     {
@@ -102,6 +132,18 @@ abstract class JobTestCase extends KernelTestCase
         static::getDispatcher()->dispatch(JobEvents::JOB_PRE_EXECUTE, $event);
 
         return Invoker::resolveParameters(static::getJobType($type), $event->getContext(), $deserializedParameters);
+    }
+
+    /**
+     * Validates the parameters of a job.
+     *
+     * @param string $type       The job type
+     * @param array  $parameters The job parameters
+     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+     */
+    public static function validateParameters($type, array $parameters)
+    {
+        return static::getValidator()->validate($parameters, new AssertJob\Parameters(['type' => $type]));
     }
 
     /**
@@ -135,5 +177,13 @@ abstract class JobTestCase extends KernelTestCase
     private static function getDispatcher()
     {
         return static::$kernel->getContainer()->get('event_dispatcher');
+    }
+
+    /**
+     * @return ValidatorInterface
+     */
+    private static function getValidator()
+    {
+        return static::$kernel->getContainer()->get('abc.job.validator');
     }
 }

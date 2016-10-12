@@ -48,8 +48,6 @@ Please note that this bundle is still in development and thus we might need to c
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ### Missing Features For The Stable Release
-- Add test case to validate parameters of custom jobs
-- Document & unit test job creation when $manager->update is invoked & job does not exist
 - Add consumer management
 
 ### Planned Features

@@ -18,15 +18,29 @@ use Abc\Bundle\JobBundle\Test\JobTestCase;
  */
 class MailerTest extends JobTestCase
 {
-    public function testJobIsRegistered()
+    public function testRegistration()
     {
         $this->assertJobIsRegistered('abc.mailer', 'abc.job.mailer', 'send');
     }
 
-    public function testParameters()
+    public function testInvocation()
     {
         $message = new Message('mail@domain.tld', 'to@domain.td', 'Subject', 'MessageBody');
 
         $this->assertInvokesJob('abc.mailer', [$message]);
+    }
+
+    public function testValidationSucceeds()
+    {
+        $message = new Message('mail@domain.tld', 'to@domain.td', 'Subject', 'MessageBody');
+
+        $this->assertValid('abc.mailer', [$message]);
+    }
+
+    public function testValidationFails()
+    {
+        $message = new Message('foobar', 'to@domain.td', 'Subject', 'MessageBody');
+
+        $this->assertNotValid('abc.mailer', [$message]);
     }
 }
