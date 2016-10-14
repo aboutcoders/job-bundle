@@ -10,7 +10,6 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
-use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -24,7 +23,7 @@ class RegisterSonataListenersPass implements CompilerPassInterface
     /**
      * @var string
      */
-    private $queueEngineService;
+    private $producerService;
 
     /**
      * @var string
@@ -37,15 +36,15 @@ class RegisterSonataListenersPass implements CompilerPassInterface
     private $jobTag;
 
     /**
-     * @param string $dispatcherService Service name of the sonata event dispatcher in processed container
-     * @param string $queueEngineService
+     * @param string $dispatcherService
+     * @param string $producerService
      * @param string $jobTag
      */
-    public function __construct($dispatcherService = 'sonata.notification.dispatcher', $queueEngineService = 'abc.job.producer', $jobTag = 'abc.job')
+    public function __construct($dispatcherService = 'sonata.notification.dispatcher', $producerService = 'abc.job.producer', $jobTag = 'abc.job')
     {
-        $this->dispatcherService  = $dispatcherService;
-        $this->queueEngineService = $queueEngineService;
-        $this->jobTag             = $jobTag;
+        $this->dispatcherService = $dispatcherService;
+        $this->producerService   = $producerService;
+        $this->jobTag            = $jobTag;
     }
 
     /**
@@ -53,25 +52,20 @@ class RegisterSonataListenersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if(!($container->hasDefinition($this->queueEngineService) || !$container->hasAlias($this->queueEngineService))
+        if (!($container->hasDefinition($this->producerService) || !$container->hasAlias($this->producerService))
             && !($container->hasDefinition($this->dispatcherService) || $container->hasAlias($this->dispatcherService))
-        )
-        {
+        ) {
             return;
         }
 
         $dispatcher = $container->getDefinition($this->dispatcherService);
-
-        foreach($container->findTaggedServiceIds($this->jobTag) as $id => $tags)
-        {
-            foreach($tags as $tag)
-            {
-                // workaround
+        foreach ($container->findTaggedServiceIds($this->jobTag) as $id => $tags) {
+            foreach ($tags as $tag) {
                 $dispatcher->addMethodCall(
                     'addListenerService',
                     array(
                         $tag['type'],
-                        array($this->queueEngineService, 'process')
+                        array($this->producerService, 'process')
                     )
                 );
             }

@@ -14,6 +14,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Bernard\Message\DefaultMessage;
 use Bernard\Producer;
 use Psr\Log\LoggerInterface;
@@ -40,20 +41,27 @@ class ProducerAdapter implements ProducerInterface
     private $manager;
 
     /**
+     * @var SerializationHelper
+     */
+    protected $serializer;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
-     * @param Producer         $producer
-     * @param JobTypeRegistry  $registry
-     * @param LoggerInterface  $logger
+     * @param Producer            $producer
+     * @param JobTypeRegistry     $registry
+     * @param SerializationHelper $serializer
+     * @param LoggerInterface     $logger
      */
-    public function __construct(Producer $producer, JobTypeRegistry $registry, LoggerInterface $logger = null)
+    public function __construct(Producer $producer, JobTypeRegistry $registry, SerializationHelper $serializer, LoggerInterface $logger = null)
     {
-        $this->producer = $producer;
-        $this->registry = $registry;
-        $this->logger   = $logger == null ? new NullLogger() : $logger;
+        $this->producer   = $producer;
+        $this->registry   = $registry;
+        $this->serializer = $serializer;
+        $this->logger     = $logger == null ? new NullLogger() : $logger;
     }
 
     /**
@@ -69,32 +77,39 @@ class ProducerAdapter implements ProducerInterface
      */
     public function produce(Message $message)
     {
-        $producerMessage = new DefaultMessage('ConsumeJob', [
-            'type' => $message->getType(),
-            'ticket' => $message->getTicket()
-        ]);
+        $arguments = ['type' => $message->getType()];
+        if ($message->getTicket() != null) {
+            $arguments['ticket'] = $message->getTicket();
+        }
 
-        $this->logger->debug('Publish message to bernard queue backend', ['message' => $message]);
+        if ($message->getParameters() != null) {
+            $arguments['parameters'] = $this->serializer->serializeParameters($message->getType(), $message->getParameters());
+        }
+
+        $producerMessage = new DefaultMessage('ConsumeJob', $arguments);
+
+        $this->logger->debug('Publish message to bernard backend', ['message' => $message]);
 
         $this->producer->produce($producerMessage, $this->registry->get($message->getType())->getQueue());
     }
 
     /**
-     * Dispatches messages to the job manager.
+     * Forwards messages to the job manager.
      *
      * This method is registered as the message handler for messages with name "ConsumeJob".
      *
      * @param DefaultMessage $message
      */
-    public function consumeJob(DefaultMessage $message){
+    public function consumeJob(DefaultMessage $message)
+    {
+        $msg = new Message($message->type, $message->ticket);
 
-        $ticket = $message->ticket;
-        $type = $message->type;
+        if (null != $message->parameters) {
+            $msg->setParameters($this->serializer->deserializeParameters($message->type, $message->parameters));
+        }
 
-        $this->logger->debug('Consume message from bernard backend', [
-            'message' => $message
-        ]);
+        $this->logger->debug('Consume message from bernard backend', ['message' => $message]);
 
-        $this->manager->onMessage(new Message($type, $ticket));
+        $this->manager->handleMessage($msg);
     }
 }

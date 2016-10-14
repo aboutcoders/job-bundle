@@ -15,6 +15,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Bernard\Message\DefaultMessage;
 use Bernard\Producer;
 
@@ -39,6 +40,11 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     private $manager;
 
     /**
+     * @var SerializationHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $serializer;
+
+    /**
      * @var ProducerAdapter
      */
     private $subject;
@@ -48,30 +54,39 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->producer = $this->getMockBuilder(Producer::class)->disableOriginalConstructor()->getMock();
-        $this->registry = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->manager  = $this->createMock(ManagerInterface::class);
-
-        $this->subject = new ProducerAdapter($this->producer, $this->registry);
+        $this->producer   = $this->createMock(Producer::class);
+        $this->registry   = $this->createMock(JobTypeRegistry::class);
+        $this->manager    = $this->createMock(ManagerInterface::class);
+        $this->serializer = $this->createMock(SerializationHelper::class);
+        $this->subject    = new ProducerAdapter($this->producer, $this->registry, $this->serializer);
         $this->subject->setManager($this->manager);
     }
 
-    public function testProduce()
+    /**
+     * @dataProvider provideMessage
+     * @param Message $message
+     */
+    public function testProduce(Message $message)
     {
-        $type    = 'JobType';
-        $ticket  = 'JobTicket';
         $queue   = 'QueueName';
-        $message = new Message($type, $ticket);
-
         $jobType = $this->createMock(JobTypeInterface::class);
         $jobType->expects($this->once())
             ->method('getQueue')
             ->willReturn($queue);
 
-        $producerMessage = new DefaultMessage('ConsumeJob', [
-            'type'   => $type,
-            'ticket' => $ticket
-        ]);
+        $arguments = ['type' => $message->getType()];
+        if (null != $message->getTicket()) {
+            $arguments['ticket'] = $message->getTicket();
+        }
+        if (null != $message->getParameters()) {
+            $arguments['parameters'] = 'SerializedParameters';
+            $this->serializer->expects($this->once())
+                ->method('serializeParameters')
+                ->with($message->getType(), $message->getParameters())
+                ->willReturn('SerializedParameters');
+        }
+
+        $producerMessage = new DefaultMessage('ConsumeJob', $arguments);
 
         $this->registry->expects($this->once())
             ->method('get')
@@ -85,20 +100,58 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $this->subject->produce($message);
     }
 
-    public function testConsumeJob()
+    /**
+     * @dataProvider getMessageParameters
+     * @param      $type
+     * @param null $ticket
+     * @param null $parameters
+     */
+    public function testConsumeJob($type, $ticket = null, $parameters = null)
     {
-        $type   = 'JobType';
-        $ticket = 'JobTicket';
+        $expectedMessage = new Message($type, $ticket);
+        $arguments       = ['type' => $type];
+        if (null != $ticket) {
+            $arguments['ticket'] = $ticket;
+        }
+        if (null != $parameters) {
+            $expectedMessage->setParameters(['DeserializedParameters']);
+            $arguments['parameters'] = $parameters;
+            $this->serializer->expects($this->once())
+                ->method('deserializeParameters')
+                ->with($type, $parameters)
+                ->willReturn(['DeserializedParameters']);
+        }
 
-        $producerMessage = new DefaultMessage('ConsumeJob', [
-            'type'   => $type,
-            'ticket' => $ticket
-        ]);
+        $producerMessage = new DefaultMessage('ConsumeJob', $arguments);
 
         $this->manager->expects($this->once())
-            ->method('onMessage')
-            ->with(new Message($type, $ticket));
+            ->method('handleMessage')
+            ->with($expectedMessage);
 
         $this->subject->consumeJob($producerMessage);
+    }
+
+    /**
+     * @return array
+     */
+    public static function provideMessage()
+    {
+        return [
+            [new Message('JobType')],
+            [new Message('JobType', 'JobTicket')],
+            [new Message('JobType', 'JobTicket', array('foobar'))]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMessageParameters()
+    {
+        return [
+            ['JobType', 'JobTicket'],
+            ['JobType', 'JobTicket'],
+            ['JobType', 'JobTicket', 'SerializedParameters'],
+        ];
     }
 }

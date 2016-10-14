@@ -50,13 +50,12 @@ class ScheduleListener
     public function onSchedule(SchedulerEvent $event)
     {
         $schedule = $event->getSchedule();
-        if($schedule instanceof Schedule)
-        {
+        if ($schedule instanceof Schedule) {
+
             $this->logger->debug('Process schedule {schedule}', array('schedule' => $schedule));
 
-            if($job = $schedule->getJob())
-            {
-                $message = new Message($job->getType(), $job->getTicket(), $job->getTicket());
+            if ($job = $schedule->getJob()) {
+                $message = new Message($job->getType(), $job->getTicket());
 
                 $this->queueEngine->produce($message);
 

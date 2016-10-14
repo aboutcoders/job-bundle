@@ -16,9 +16,11 @@ use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
+use Abc\Bundle\JobBundle\Job\Queue\MessageInterface;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface as LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Event\JobEvents;
+use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
@@ -187,10 +189,18 @@ class Manager implements ManagerInterface
         ]);
 
         if (!$job->hasSchedules()) {
-            $this->publishJob($job);
+            $this->doPublishJob($job->getType(), $job->getTicket());
         }
 
         return $job;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function publishJob($type, array $parameters = null)
+    {
+        $this->doPublishJob($type, null, $parameters);
     }
 
     /**
@@ -248,24 +258,28 @@ class Manager implements ManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function onMessage(Message $message)
+    public function handleMessage(MessageInterface $message)
     {
-        $this->stopwatch->start('processMessage');
+        if (null != $message->getTicket()) {
+            $job = $this->findJob($message->getTicket());
 
-        $job = $this->findJob($message->getTicket());
+            if ($job->getStatus() == Status::PROCESSING() || $job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::ERROR()) {
 
-        if ($job->getStatus() == Status::PROCESSING() || $job->getStatus() == Status::CANCELLED() || $job->getStatus() == Status::ERROR()) {
+                $this->logger->notice(sprintf('Skipped execution of job %s (status: %s)', $job->getTicket(), $job->getStatus()));
 
-            $this->logger->notice(sprintf('Skipped execution of job %s (status: %s)', $job->getTicket(), $job->getStatus()));
+                return;
+            }
+            try {
+                $this->locker->lock($this->getLockName($job));
+            } catch (LockException $e) {
+                $this->logger->warning('Failed to get lock for job ' . $job->getTicket());
 
-            return;
-        }
-        try {
-            $this->locker->lock($this->getLockName($job));
-        } catch (LockException $e) {
-            $this->logger->warning('Failed to get lock for job ' . $job->getTicket());
-
-            return;
+                return;
+            }
+        } else {
+            $job = new Job();
+            $job->setType($message->getType());
+            $job->setParameters($message->getParameters());
         }
 
         $event = new ExecutionEvent($job, new Context());
@@ -274,9 +288,12 @@ class Manager implements ManagerInterface
 
         $job->setStatus(Status::PROCESSING());
         $job->setProcessingTime(0);
-        $this->jobManager->save($job);
 
-        $response       = null;
+        if ($job->getTicket() != null) {
+            $this->jobManager->save($job);
+        }
+
+        $response = null;
         $this->stopwatch->start('processJob');
 
         try {
@@ -306,10 +323,11 @@ class Manager implements ManagerInterface
             $status   = Status::ERROR();
         }
 
-        $this->releaseLock($job);
-
-        $this->helper->updateJob($job, $status, $this->stopwatch->stop('processJob')->getDuration(), $response);
-        $this->jobManager->save($job);
+        if ($job->getTicket() != null) {
+            $this->releaseLock($job);
+            $this->helper->updateJob($job, $status, $this->stopwatch->stop('processJob')->getDuration(), $response);
+            $this->jobManager->save($job);
+        }
 
         if (Status::isTerminated($job->getStatus())) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
@@ -357,18 +375,24 @@ class Manager implements ManagerInterface
     }
 
     /**
-     * @param JobInterface $job
+     * @param string      $type
+     * @param string|null $ticket
+     * @param array|null  $parameters
      * @throws \Exception
      */
-    protected function publishJob(JobInterface $job)
+    protected function doPublishJob($type, $ticket = null, array $parameters = null)
     {
-        $message = new Message($job->getType(), $job->getTicket());
+        $message = new Message($type, $ticket);
+        if (null != $parameters) {
+            $message->setParameters($parameters);
+        }
 
         try {
             $this->producer->produce($message);
         } catch (\Exception $e) {
-            $this->logger->critical(sprintf('Failed to publish message for job %s (Error: %s)', $job->getTicket(), $e->getMessage()), [
-                'job'       => $job,
+
+            $this->logger->critical(sprintf('Failed to publish message (Error: %s)', $e->getMessage()), [
+                'message'   => $message,
                 'exception' => $e
             ]);
 
@@ -436,6 +460,10 @@ class Manager implements ManagerInterface
      */
     private function getJobLogger(JobInterface $job)
     {
+        if (null == $job->getTicket()) {
+            return new NullLogger();
+        }
+
         if (!isset($this->jobLogger[0]) || $job !== $this->jobLogger[0]) {
             $this->jobLogger[0] = $job;
             $this->jobLogger[1] = $this->loggerFactory->create($job);

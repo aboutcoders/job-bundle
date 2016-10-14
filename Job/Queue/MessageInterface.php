@@ -11,18 +11,24 @@
 namespace Abc\Bundle\JobBundle\Job\Queue;
 
 /**
- * Consumes messages from a queue backend.
+ * The message to be published/consumed with the queue backend
  *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-interface ConsumerInterface
+interface MessageInterface
 {
     /**
-     * Consumes messages from the queue.
-     *
-     * @param string $queue The name of the queue
-     * @param array  $options
-     * @return void
+     * @return string
      */
-    public function consume($queue, array $options = []);
+    public function getType();
+
+    /**
+     * @return string|null
+     */
+    public function getTicket();
+
+    /**
+     * @return array|null
+     */
+    public function getParameters();
 }

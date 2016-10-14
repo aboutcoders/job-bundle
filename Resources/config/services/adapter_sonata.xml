@@ -10,6 +10,7 @@
             <argument type="service" id="abc.job.sonata.backend_provider"/>
             <argument type="service" id="sonata.notification.dispatcher"/>
             <argument type="service" id="abc.job.registry"/>
+            <argument type="service" id="abc.job.serialization_helper"/>
             <argument type="service" id="logger" on-invalid="null"/>
             <call method="setManager">
                 <argument type="service" id="abc.job.manager"/>

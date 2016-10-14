@@ -12,7 +12,7 @@ namespace Abc\Bundle\JobBundle\Job;
 
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
 use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
-use Abc\Bundle\JobBundle\Job\Queue\Message;
+use Abc\Bundle\JobBundle\Job\Queue\MessageInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
 
 /**
@@ -29,8 +29,6 @@ interface ManagerInterface
     /**
      * Adds a job.
      *
-     * If job is not configured with any schedules the job will be published to the queue at once.
-     *
      * @param JobInterface $job
      * @return JobInterface The added job
      * @throws ValidationFailedException
@@ -39,8 +37,6 @@ interface ManagerInterface
 
     /**
      * Adds a job.
-     *
-     * If job is not configured with any schedules the job will be published to the queue at once.
      *
      * @param string                 $type       The job type
      * @param array|null             $parameters The job parameters
@@ -51,7 +47,18 @@ interface ManagerInterface
     public function addJob($type, array $parameters = null, ScheduleInterface $schedule = null);
 
     /**
-     * Updates existing job or creates job if it does not exist.
+     * Publishes a job.
+     *
+     * Publishes the job directly to the queue backend without adding it to the job to the manager
+     *
+     * @param $type
+     * @param $parameters
+     * @return mixed
+     */
+    public function publishJob($type, array $parameters = null);
+
+    /**
+     * Updates an existing job.
      *
      * @param JobInterface $job
      * @return JobInterface The updated job
@@ -74,7 +81,7 @@ interface ManagerInterface
     /**
      * Restarts a job.
      *
-     * @param string $ticket
+     * @param string $ticket The job ticket
      * @return JobInterface The restarted job
      * @throws TicketNotFoundException
      * @throws \RuntimeException
@@ -94,20 +101,19 @@ interface ManagerInterface
     /**
      * Returns the logs of a job.
      *
-     * @param string $ticket
+     * @param string $ticket The job ticket
      * @return array An array of Monolog compliant log records
      * @throws TicketNotFoundException
      */
     public function getLogs($ticket);
 
     /**
-     * Handles a message from the queue engine.
+     * Handles a message from the queue backend.
      *
-     * @param Message $message
+     * @param MessageInterface $message
      * @return void
      * @throws TicketNotFoundException
      * @throws \RuntimeException
      */
-    public function onMessage(Message $message);
-
+    public function handleMessage(MessageInterface $message);
 }

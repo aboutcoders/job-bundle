@@ -255,6 +255,25 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider providePublishJobParams
+     * @param      $type
+     * @param null $parameters
+     */
+    public function testPublishJob($type, $parameters = null)
+    {
+        $message = new Message($type);
+        if (null != $parameters) {
+            $message->setParameters($parameters);
+        }
+
+        $this->producer->expects($this->once())
+            ->method('produce')
+            ->with($this->equalTo($message));
+
+        $this->subject->publishJob($type, $parameters);
+    }
+
+    /**
      * @param Status $status
      * @dataProvider provideUnterminatedStatus
      */
@@ -416,7 +435,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('logs', $this->subject->getLogs($job->getTicket()));
     }
 
-    public function testOnMessageHandlesExecutionEventExceptions()
+    public function testHandleMessageHandlesExecutionEventExceptions()
     {
         $job     = new Job();
         $message = new Message('type', 'ticket');
@@ -433,10 +452,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->invoker->expects($this->once())
             ->method('invoke');
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageDispatchesExecutionEvents()
+    public function testHandleMessageDispatchesExecutionEvents()
     {
         $job     = new Job();
         $message = new Message('type', 'ticket');
@@ -482,13 +501,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageSetsStatusToProcessing()
+    public function testHandleMessageSetsStatusToProcessing()
     {
-        $job     = new Job();
-        $message = new Message('type', 'ticket');
+        $job = new Job();
+        $job->setTicket('JobTicket');
+        $message = new Message('JobType', 'JobTicket');
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -515,13 +535,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageLockAndUnlockJob()
+    public function testHandleMessageLockAndUnlockJob()
     {
-        $job     = new Job();
-        $message = new Message('type', 'ticket');
+        $job = new Job();
+        $job->setTicket('JobTicket');
+        $message = new Message('JobType', 'JobTicket');
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -535,10 +556,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->locker->expects($this->once())
             ->method('release')
             ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageSkipInvocationIfJobIsLocked()
+    public function testHandleMessageSkipInvocationIfJobIsLocked()
     {
         $job     = new Job();
         $message = new Message('type', 'ticket');
@@ -562,14 +583,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->locker->expects($this->never())
             ->method('release');
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageInvokesJob()
+    public function testHandleMessageInvokesJob()
     {
         $type       = 'JobType';
         $ticket     = 'JobTicket';
-        $microTime  = microtime(true);
         $parameters = ['parameters'];
         $response   = 'response';
 
@@ -605,10 +625,28 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageWithScheduledJob()
+    public function testHandleMessageInvokesJobWithUnManagedJob()
+    {
+        $type       = 'JobType';
+        $parameters = ['parameters'];
+        $response   = 'response';
+
+        $job = new Job($type);;
+        $job->setParameters($parameters);
+
+        $message = new Message($type);
+
+        $this->invoker->expects($this->once())
+            ->method('invoke')
+            ->willReturn($response);
+
+        $this->subject->handleMessage($message);
+    }
+
+    public function testHandleMessageWithScheduledJob()
     {
         $message = new Message('type', 'ticket');
 
@@ -629,14 +667,33 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectEventNeverDispatched(JobEvents::JOB_TERMINATED);
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageHandlesExceptionsThrownByJob()
+    public function testHandleMessageWithUnManagedJob()
     {
-        $job       = new Job();
-        $microTime = microtime(true);
-        $message   = new Message('type', 'ticket');
+        $message = new Message('JobType');
+
+        $this->jobManager->expects($this->never())
+            ->method('save');
+
+        $this->locker->expects($this->never())
+            ->method('lock');
+
+        $this->locker->expects($this->never())
+            ->method('release');
+
+        $this->helper->expects($this->never())
+            ->method('updateJob');
+
+        $this->subject->handleMessage($message);
+    }
+
+    public function testHandleMessageHandlesExceptionsThrownByJob()
+    {
+        $job = new Job();
+        $job->setTicket('JobTicket');
+        $message   = new Message('JobType', 'JobTicket');
         $exception = new \Exception('foo', 100);
 
         $this->loggerFactory->expects($this->once())
@@ -671,13 +728,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('release')
             ->with(Manager::JOB_LOCK_PREFIX . $job->getTicket());
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
-    public function testOnMessageNotUpdatesStatusIfJobWasCancelled()
+    public function testHandleMessageNotUpdatesStatusIfJobWasCancelled()
     {
-        $job     = new Job();
-        $message = new Message('type', 'ticket');
+        $job = new Job();
+        $job->setTicket('JobTicket');
+        $message = new Message('JobType', 'JobTicket');
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -692,13 +750,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectsCallsUpdateJob($job, Status::CANCELLED());
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
     /**
      * @expectedException \Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException
      */
-    public function testOnMessageThrowsTicketNotFoundException()
+    public function testHandleMessageThrowsTicketNotFoundException()
     {
         $ticket  = 'ticketValue';
         $message = new Message('type', $ticket);
@@ -711,14 +769,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->locker->expects($this->never())
             ->method('lock');
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
     /**
      * @param Status $status
      * @dataProvider provideStatusToSkip
      */
-    public function testOnMessageSkipsExecutionIfStatusIs(Status $status)
+    public function testHandleMessageSkipsExecutionIfStatusIs(Status $status)
     {
         $message = new Message('job-type', 'job-ticket');
 
@@ -737,7 +795,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->locker->expects($this->never())
             ->method('lock');
 
-        $this->subject->onMessage($message);
+        $this->subject->handleMessage($message);
     }
 
     public function testRestart()
@@ -766,6 +824,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $job->setTicket('JobTicket');
 
         $existingJob = new Job();
+        $existingJob->setTicket($job->getTicket());
 
         $this->jobManager->expects($this->once())
             ->method('findByTicket')
@@ -789,6 +848,20 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $this->subject->update($job);
     }
 
+    /**
+     * @return array
+     */
+    public static function providePublishJobParams()
+    {
+        return [
+            ['JobType'],
+            ['JobType', array('foobar')]
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public static function provideStatusToSkip()
     {
         return [
@@ -797,6 +870,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function provideUnterminatedStatus()
     {
         $result = [];
@@ -807,6 +883,9 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public static function provideTerminatedStatus()
     {
         $result = [];

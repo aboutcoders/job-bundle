@@ -13,12 +13,14 @@ namespace Abc\Bundle\JobBundle\Job\Queue;
 use Abc\Bundle\JobBundle\Job\ManagerAwareInterface;
 
 /**
+ * Sends messages to a queue backend.
+ *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
 interface ProducerInterface extends ManagerAwareInterface
 {
     /**
-     * Sends a message to the queue.
+     * Sends a message to the queue backend.
      *
      * @param Message $message
      * @return void

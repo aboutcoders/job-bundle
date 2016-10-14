@@ -16,7 +16,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Psr\Log\LoggerInterface;
+use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
 use Sonata\NotificationBundle\Model\MessageInterface;
@@ -48,9 +48,9 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     private $manager;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SerializationHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $logger;
+    private $serializer;
 
     /**
      * @var ProducerAdapter
@@ -62,17 +62,17 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->backendProvider = $this->getMockBuilder(BackendProvider::class)->disableOriginalConstructor()->getMock();
+        $this->backendProvider = $this->createMock(BackendProvider::class);
         $this->manager         = $this->createMock(ManagerInterface::class);
-        $this->registry        = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->registry        = $this->createMock(JobTypeRegistry::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->serializer      = $this->createMock(SerializationHelper::class);
 
         $this->registry->expects($this->any())
             ->method('getDefaultQueue')
             ->willReturn('default');
 
-        $this->subject = new ProducerAdapter($this->backendProvider, $this->eventDispatcher, $this->registry, $this->logger);
+        $this->subject = new ProducerAdapter($this->backendProvider, $this->eventDispatcher, $this->registry, $this->serializer);
         $this->subject->setManager($this->manager);
     }
 
@@ -83,10 +83,13 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeSame($this->manager, 'manager', $this->subject);
     }
 
-    public function testProduce()
+    /**
+     * @dataProvider provideMessage
+     * @param Message $message
+     */
+    public function testProduce(Message $message)
     {
         $queue   = 'foobar';
-        $message = new Message('type', 'ticket', 'callback');
         $backend = $this->createMock(BackendInterface::class);
 
         $jobType = $this->createMock(JobTypeInterface::class);
@@ -96,7 +99,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->expects($this->any())
             ->method('get')
-            ->with('type')
+            ->with('JobType')
             ->willReturn($jobType);
 
         $this->backendProvider->expects($this->once())
@@ -104,9 +107,22 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
             ->with($queue)
             ->willReturn($backend);
 
+        $expectedBody['type'] = $message->getType();
+        if (null != $message->getTicket()) {
+            $expectedBody['ticket'] = $message->getTicket();
+        }
+        if (null != $message->getParameters()) {
+            $expectedBody['parameters'] = 'SerializedParameters';
+
+            $this->serializer->expects($this->once())
+                ->method('serializeParameters')
+                ->with($message->getType(), $message->getParameters())
+                ->willReturn('SerializedParameters');
+        }
+
         $backend->expects($this->once())
             ->method('createAndPublish')
-            ->with('type', ['ticket' => 'ticket']);
+            ->with('JobType', $expectedBody);
 
         $this->subject->produce($message);
     }
@@ -117,7 +133,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testProduceThrowsExceptionsThrownByBackend()
     {
         $queue   = 'foobar';
-        $message = new Message('type', 'ticket', 'callback');
+        $message = new Message('type', 'ticket');
         $backend = $this->createMock(BackendInterface::class);
 
         $jobType = $this->createMock(JobTypeInterface::class);
@@ -143,54 +159,54 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $type
-     * @param string $ticket
-     * @dataProvider getEventData
+     * @dataProvider getMessageParameters
+     * @param string      $type
+     * @param string      $ticket
+     * @param string|null $parameters
      */
-    public function testProcess($type, $ticket)
+    public function testProcess($type, $ticket, $parameters = null)
     {
-        $body = array(
+        $body = [
+            'type'   => $type,
             'ticket' => $ticket
-        );
+        ];
+
+        $expectedMessage = new Message($type, $ticket);
+        if (null != $parameters) {
+            $body['parameters'] = $parameters;
+            $expectedMessage->setParameters(['DeserializedParameters']);
+
+            $this->serializer->expects($this->once())
+                ->method('deserializeParameters')
+                ->with('typeB', $parameters)
+                ->willReturn(['DeserializedParameters']);
+        }
 
         $event = $this->createConsumerEvent($type, $body);
 
-        $expectedMessage = new Message($type, $ticket);
-
         $this->manager->expects($this->once())
-            ->method('onMessage')
-            ->with($expectedMessage);
+            ->method('handleMessage')
+            ->with($this->equalTo($expectedMessage));
 
         $this->subject->process($event);
     }
 
-    /**
-     * @param ConsumerEvent $event
-     * @dataProvider getInvalidEvent
-     * @expectedException \InvalidArgumentException
-     */
-    public function testProcessThrowsInvalidArgumentException(ConsumerEvent $event)
+    public static function getMessageParameters()
     {
-        $this->manager->expects($this->never())
-            ->method('onMessage');
-
-        $this->subject->process($event);
+        return [
+            ['typeA', 'ticket_1'],
+            ['typeB', 'ticket_2'],
+            ['typeB', 'ticket_2', 'SerializedParameters'],
+        ];
     }
 
-    public static function getEventData()
+    public static function provideMessage()
     {
-        return array(
-            array('typeA', 'ticket_1'),
-            array('typeB', 'ticket_2')
-        );
-    }
-
-    public function getInvalidEvent()
-    {
-        return array(
-            array($this->createConsumerEvent('foobar', array())),
-            array($this->createConsumerEvent('foobar', array('foobar')))
-        );
+        return [
+            [new Message('JobType')],
+            [new Message('JobType', 'JobTicket')],
+            [new Message('JobType', 'JobTicket', array('foobar'))]
+        ];
     }
 
     private function createConsumerEvent($type, $messageBody)

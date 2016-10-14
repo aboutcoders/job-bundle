@@ -11,12 +11,10 @@
 namespace Abc\Bundle\JobBundle\Job\Queue;
 
 /**
- * Message to be exchanged between a queue engine and the job manager
- *
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class Message {
-
+class Message implements MessageInterface
+{
     /**
      * @var string
      */
@@ -28,17 +26,32 @@ class Message {
     protected $ticket;
 
     /**
-     * @param string $type
-     * @param string $ticket
+     * @var array
      */
-    function __construct($type, $ticket)
+    protected $parameters;
+
+    /**
+     * @param string     $type
+     * @param string     $ticket
+     * @param array|null $parameters
+     */
+    function __construct($type, $ticket = null, array $parameters = null)
     {
-        $this->type   = $type;
-        $this->ticket = $ticket;
+        $this->ticket     = $ticket;
+        $this->type       = $type;
+        $this->parameters = $parameters;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
+     */
+    public function getTicket()
+    {
+        return $this->ticket;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getType()
     {
@@ -46,10 +59,18 @@ class Message {
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getTicket()
+    public function getParameters()
     {
-        return $this->ticket;
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function setParameters(array $parameters)
+    {
+        $this->parameters = $parameters;
     }
 }
