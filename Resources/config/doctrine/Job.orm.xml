@@ -11,7 +11,7 @@
             <generator strategy="UUID"/>
         </id>
         <field name="type" type="string" length="255"/>
-        <field name="status" type="abc.job.status"/>
+        <field name="status" type="string" length="25"/>
         <field name="serializedParameters" column="serialized_parameters" type="text" nullable="true"/>
         <field name="serializedResponse" column="serialized_response" type="text" nullable="true"/>
         <field name="processingTime" column="processing_time" type="integer" nullable="true"/>

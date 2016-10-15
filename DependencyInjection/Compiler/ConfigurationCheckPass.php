@@ -27,11 +27,6 @@ final class ConfigurationCheckPass implements CompilerPassInterface
             throw new \RuntimeException('You need to enable the DoctrineBundle');
         }
 
-        // AbcEnumSerializerBundle
-        if(!$container->has('abc.enum.jms_serializer.handler')) {
-            throw new \RuntimeException('You need to enable the AbcEnumBundle');
-        }
-
         // AbcSchedulerBundle
         if(!$container->has('abc.scheduler.scheduler')) {
             throw new \RuntimeException('You need to enable the AbcSchedulerBundle');

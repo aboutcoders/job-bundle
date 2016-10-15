@@ -42,7 +42,6 @@ doctrine:
         path:     "%kernel.cache_dir%/sqlite.db"
         types:
             json: Sonata\Doctrine\Types\JsonType
-            abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
 
     orm:
         auto_generate_proxy_classes: true

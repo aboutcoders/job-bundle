@@ -86,8 +86,8 @@ class JobManagerTest extends DatabaseKernelTestCase
             [['type' => 'foo'], 1],
             [['type' => ['foo', 'bar']], 2],
             [['type' => 'undefined'], 0],
-            [['type' => 'foo', 'status' => 'REQUESTED'], 1],
-            [['type' => 'foo', 'status' => 'PROCESSING'], 0],
+            [['type' => 'foo', 'status' => Status::REQUESTED()], 1],
+            [['type' => 'foo', 'status' => Status::PROCESSING()], 0],
             [['type' => ['$match' => 'foo']], 2],
         ];
     }

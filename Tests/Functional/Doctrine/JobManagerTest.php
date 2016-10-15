@@ -69,6 +69,7 @@ class JobManagerTest extends DatabaseKernelTestCase
         $this->subject->save($job);
 
         $this->assertCount(1, $this->subject->findAll());
+
         //Just in case save operation is delayed
         $now = new \DateTime();
         $now->add(new \DateInterval('P5M'));
@@ -77,7 +78,7 @@ class JobManagerTest extends DatabaseKernelTestCase
         /**
          * @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject $context
          */
-        $context   = $this->createMock(ExecutionContext::class, [], [], '', false);
+        $context   = $this->createMock(ExecutionContext::class);
         $validator = new UuidValidator();
         $validator->initialize($context);
 
@@ -94,8 +95,8 @@ class JobManagerTest extends DatabaseKernelTestCase
 
     public function testHandlesParameterSerialization()
     {
-        $type           = 'foobar';
-        $parameters     = [['foo' => 'bar'], 'foobar'];
+        $type       = 'foobar';
+        $parameters = [['foo' => 'bar'], 'foobar'];
 
         $this->serializationHelper->expects($this->once())
             ->method('serializeParameters')
@@ -209,6 +210,16 @@ class JobManagerTest extends DatabaseKernelTestCase
         $this->subject->save($job);
 
         $this->assertCount(1, $this->subject->findAll());
+    }
+
+    public function testFindByWithStatus()
+    {
+        $job = $this->subject->create('JobType', null, new Schedule('Type', 'Expression'));
+        $job->setStatus(Status::REQUESTED());
+        $this->subject->save($job);
+
+        $this->assertCount(1, $this->subject->findBy(['status' => Status::REQUESTED()]));
+        $this->assertEmpty($this->subject->findBy(['status' => Status::PROCESSED()]));
     }
 
     /**

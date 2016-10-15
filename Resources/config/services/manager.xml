@@ -6,10 +6,6 @@
 
     <services>
 
-        <service id="abc.job.status" class="Abc\Bundle\JobBundle\Job\Status" public="false">
-            <tag name="abc.enum"/>
-        </service>
-
         <service id="abc.job.manager.default" class="Abc\Bundle\JobBundle\Job\Manager" public="true">
             <argument type="service" id="abc.job.registry" />
             <argument type="service" id="abc.job.job_manager"/>

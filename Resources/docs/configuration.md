@@ -11,21 +11,16 @@ Configure the adapter according to the message queue bundle you are using:
 # app/config/config.yml
 abc_job:
     adapter: sonata
-    register_default_jobs: true
 ```
+
+### Enable default jobs (Optional)
 
 If you want to register the default jobs shipped with this bundle you have to enable this within the configuration.
 
-### Register a doctrine mapping type
-
-The bundle requires registration of the following custom doctrine mapping type:
-
 ```yaml
 # app/config/config.yml
-doctrine:
-    dbal:
-        types:
-            abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
+abc_job:
+    register_default_jobs: true
 ```
 
 ### Import AbcJobBundle routing files (Optional)

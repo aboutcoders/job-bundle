@@ -300,7 +300,7 @@ class JobController extends BaseController
 
         if (isset($criteria['status'])) {
             try {
-                $criteria['status'] = $this->getSerializer()->deserialize(json_encode($criteria['status']), Status::class, 'json');
+                $criteria['status'] = new Status($criteria['status']);
             } catch (\Exception $e) {
                 throw new BadRequestHttpException('Invalid status defined in criteria');
             }

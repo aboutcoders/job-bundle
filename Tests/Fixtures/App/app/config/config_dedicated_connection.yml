@@ -47,7 +47,6 @@ doctrine:
 
         types:
             json: Sonata\Doctrine\Types\JsonType
-            abc.job.status: Abc\Bundle\JobBundle\Doctrine\Types\StatusType
     orm:
         default_entity_manager: default
         auto_generate_proxy_classes: true

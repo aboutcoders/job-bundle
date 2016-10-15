@@ -39,10 +39,16 @@ class Job implements JobInterface
     protected $type;
 
     /**
-     * @JMS\Type("Abc\Bundle\JobBundle\Job\Status")
-     * @var Status
+     * @JMS\Type("string")
+     * @var string
      */
     protected $status;
+
+    /**
+     * @JMS\Exclude
+     * @var Status
+     */
+    protected $enumStatus;
 
     /**
      * @JMS\Type("Abc\Bundle\JobBundle\Job\JobParameterArray");
@@ -159,7 +165,11 @@ class Job implements JobInterface
      */
     public function getStatus()
     {
-        return $this->status;
+        if(null != $this->status && null == $this->enumStatus) {
+            $this->enumStatus = new Status((string)$this->status);
+        }
+
+        return $this->enumStatus;
     }
 
     /**
@@ -167,7 +177,8 @@ class Job implements JobInterface
      */
     public function setStatus(Status $status)
     {
-        $this->status = $status;
+        $this->status = $status->getValue();
+        $this->enumStatus = $status;
     }
 
     /**
@@ -295,6 +306,9 @@ class Job implements JobInterface
     {
         if ($this->schedules == null) {
             $this->schedules = new ArrayCollection();
+        }
+        if($this->status != null && $this->enumStatus == null) {
+            $this->getStatus();
         }
     }
 }
