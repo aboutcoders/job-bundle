@@ -20,13 +20,27 @@ class ClassMetadata extends BaseClassMetadata
     /**
      * @var array
      */
-    protected $parameterNames, $parameterTypes, $parameterOptions = array();
-
+    protected $parameterNames = array();
 
     /**
      * @var array
      */
-    protected $returnTypes, $returnOptions = array();
+    protected $parameterTypes = array();
+
+    /**
+     * @var array
+     */
+    protected $parameterOptions = array();
+
+    /**
+     * @var array
+     */
+    protected $returnTypes = array();
+
+    /**
+     * @var array
+     */
+    protected $returnOptions = array();
 
     /**
      * Returns whether a method has ben added.
