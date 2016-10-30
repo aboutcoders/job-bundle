@@ -23,6 +23,9 @@ This bundle provides the following features:
   - Iron MQ
   - Pheanstalk
 
+## Demo Project
+Take a look at [aboutcoders/job-bundle-skeleton-app](https://github.com/aboutcoders/job-bundle-skeleton-app) to see how it can be used with Symfony project.
+
 ## Disclaimer
 
 Please note that this bundle is still in development and thus we might need to change things including the external API if necessary. We are planning to release the first stable release the next weeks.
@@ -47,13 +50,11 @@ Please note that this bundle is still in development and thus we might need to c
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
-
 ### Planned Features
 
 - Add support for CouchDB, MongoDB
 - Add support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
 - Integrate https://github.com/beberlei/metrics
-- Utilize stopwatch
 
 ## License
 
