@@ -24,4 +24,16 @@ class DoExitController implements ControllerInterface
     {
         return true;
     }
+
+    public function doStop()
+    {
+        return true;
+    }
+
+    public function doPause()
+    {
+        return false;
+    }
+
+
 }
