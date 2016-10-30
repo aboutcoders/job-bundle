@@ -188,7 +188,7 @@ class TestJob implements JobAwareInterface, ManagerAwareInterface, ControllerAwa
      */
     public function cancel()
     {
-        while (!$this->controller->doExit()) {
+        while (!$this->controller->doStop()) {
             return 'running';
         }
 

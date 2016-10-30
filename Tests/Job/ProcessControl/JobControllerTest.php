@@ -73,20 +73,20 @@ class JobControllerTest extends \PHPUnit_Framework_TestCase
     public function testDoExitControllerReturnsFalse()
     {
         $this->controller->expects($this->any())
-            ->method('doExit')
+            ->method('doStop')
             ->willReturn(false);
 
-        $this->assertFalse($this->subject->doExit());
+        $this->assertFalse($this->subject->doStop());
         $this->assertEquals(Status::REQUESTED(), $this->job->getStatus());
     }
 
     public function testDoExitControllerReturnsTrue()
     {
         $this->controller->expects($this->any())
-            ->method('doExit')
+            ->method('doStop')
             ->willReturn(true);
 
-        $this->assertTrue($this->subject->doExit());
+        $this->assertTrue($this->subject->doStop());
         $this->assertEquals(Status::CANCELLED(), $this->job->getStatus());
     }
 

@@ -89,7 +89,6 @@ class AbcJobExtension extends Extension
         $this->loadDefaultJobs($config, $loader, $container);
         $this->loadLogger($config, $loader, $container);
 
-        $loader->load('agent.xml');
         $loader->load('scheduler.xml');
         $loader->load('validator.xml');
         $loader->load('commands.xml');

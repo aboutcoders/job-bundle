@@ -51,7 +51,7 @@ class ControlledConsumerTest extends \PHPUnit_Framework_TestCase
         $queue = $this->createMock(Queue::class);
 
         $this->controller->expects($this->once())
-            ->method('doExit')
+            ->method('doStop')
             ->willReturn(true);
 
         $subject = $this->buildSubject(['invoke']);

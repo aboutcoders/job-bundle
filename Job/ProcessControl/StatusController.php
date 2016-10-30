@@ -70,7 +70,7 @@ class StatusController implements ControllerInterface
     /**
      * {@inheritdoc}
      */
-    public function doExit()
+    public function doStop()
     {
         $time = time();
         if (null === $this->lastCheck || (($this->lastCheck + $this->interval) <= $time)) {
@@ -80,4 +80,22 @@ class StatusController implements ControllerInterface
 
         return $this->job->getStatus() == Status::CANCELLING() || $this->job->getStatus() == Status::CANCELLED();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doExit()
+    {
+        return $this->doStop();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doPause()
+    {
+        return false;
+    }
+
+
 }

@@ -53,16 +53,6 @@ swiftmailer:
 bernard:
     driver: doctrine
 
-yz_supervisor:
-    default_environment: dev
-    servers:
-        dev:
-            localhost:
-                host:     ""
-                username: ""
-                password: ""
-                port:
-
 abc_resource_lock:
     db_driver: orm
 

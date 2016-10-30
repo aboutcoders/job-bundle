@@ -17,7 +17,7 @@ use Abc\Bundle\JobBundle\Job\Queue\ConsumerInterface;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\ScheduleManagerInterface;
 use Abc\Bundle\JobBundle\Test\DatabaseKernelTestCase;
-use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ProcessControl\DoExitController;
+use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ProcessControl\DoStopController;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestResponse;
 use Abc\Bundle\SchedulerBundle\Model\Schedule;
 
@@ -183,7 +183,7 @@ class ManagerTest extends DatabaseKernelTestCase
          * @var Factory $controllerFactory
          */
         $controllerFactory = $this->getContainer()->get('abc.job.controller_factory');
-        $controllerFactory->addController(new DoExitController());
+        $controllerFactory->addController(new DoStopController());
 
         $job = $this->getJobManager()->addJob('cancel');
 

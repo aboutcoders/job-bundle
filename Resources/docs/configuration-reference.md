@@ -47,7 +47,6 @@ abc_job:
     service:
         manager:                    abc.job.manager.default
         job_manager:                abc.job.job_manager.default
-        agent_manager:              abc.job.agent_manager.default
         schedule_manager:           abc.job.schedule_manager.default
         schedule_iterator:          abc.job.schedule_iterator.default
         schedule_manager_iterator:  abc.job.schedule_manager_iterator.default

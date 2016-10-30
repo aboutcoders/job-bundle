@@ -90,8 +90,8 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         // assert that additional controllers are in the chain
         $otherController->expects($this->once())
-            ->method('doExit');
+            ->method('doStop');
 
-        $controller->doExit();
+        $controller->doStop();
     }
 }

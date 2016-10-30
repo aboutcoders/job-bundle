@@ -96,17 +96,22 @@ class ConsumerAdapter implements ConsumerInterface
         $iterator = $backend->getIterator();
 
         foreach ($iterator as $message) {
-            $backend->handle($message, $this->notificationDispatcher);
 
-            $this->eventDispatcher->dispatch(IterateEvent::EVENT_NAME, new IterateEvent($iterator, $backend, $message));
+            if ($this->controller->doPause()) {
+                return true;
+            }
 
-            if ($this->controller->doExit()) {
+            if ($this->controller->doStop()) {
                 return false;
             }
 
             if (microtime(true) > $this->options['max-runtime']) {
                 return false;
             }
+
+            $backend->handle($message, $this->notificationDispatcher);
+
+            $this->eventDispatcher->dispatch(IterateEvent::EVENT_NAME, new IterateEvent($iterator, $backend, $message));
 
             if (null !== $this->options['max-messages'] && !(boolean)--$this->options['max-messages']) {
                 return false;

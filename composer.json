@@ -19,7 +19,7 @@
         "jms/serializer-bundle": "~1.0",
         "nelmio/api-doc-bundle": "~2",
         "doctrine/annotations": "1.*",
-        "aboutcoders/process-control": "~1.2",
+        "aboutcoders/process-control": "~1.3@dev",
         "aboutcoders/scheduler-bundle": "~1.2",
         "aboutcoders/resource-lock-bundle": "dev-master"
     },
@@ -32,10 +32,9 @@
         "symfony/monolog-bundle": "~2",
         "symfony/swiftmailer-bundle": "~2.3",
         "sonata-project/notification-bundle": "~2.2",
-        "yzalis/supervisor-bundle": "~1",
         "zendframework/zendxml": "~1",
         "bernard/bernard-bundle" : "dev-master",
-        "aboutcoders/process-control-bundle": "~1.2"
+        "aboutcoders/process-control-bundle": "~1.3@dev"
     },
     "suggest": {
         "aboutcoders/process-control-bundle": "Adds process control, requires ^1.2",

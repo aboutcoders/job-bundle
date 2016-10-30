@@ -165,7 +165,6 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('manager')->defaultValue('abc.job.manager.default')->end()
                             ->scalarNode('job_manager')->defaultValue('abc.job.job_manager.default')->end()
-                            ->scalarNode('agent_manager')->defaultValue('abc.job.agent_manager.default')->end()
                             ->scalarNode('schedule_manager')->defaultValue('abc.job.schedule_manager.default')->end()
                             ->scalarNode('schedule_iterator')->defaultValue('abc.job.schedule_iterator.default')->end()
                             ->scalarNode('schedule_manager_iterator')->defaultValue('abc.job.schedule_manager_iterator.default')->end()

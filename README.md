@@ -47,8 +47,6 @@ Please note that this bundle is still in development and thus we might need to c
 - [REST-API](./Resources/docs/rest-api.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
-### Missing Features For The Stable Release
-- Add consumer management
 
 ### Planned Features
 
@@ -56,3 +54,7 @@ Please note that this bundle is still in development and thus we might need to c
 - Add support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
 - Integrate https://github.com/beberlei/metrics
 - Utilize stopwatch
+
+## License
+
+The MIT License (MIT). Please see [License File](./LICENSE) for more information.

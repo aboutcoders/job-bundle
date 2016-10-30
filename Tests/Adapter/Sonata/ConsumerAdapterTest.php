@@ -108,10 +108,10 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
             ->willReturn($iterator);
 
         $this->controller->expects($this->any())
-            ->method('doExit')
+            ->method('doStop')
             ->willReturn(true);
 
-        $this->backend->expects($this->once())
+        $this->backend->expects($this->never())
             ->method('handle');
 
         $this->subject->consume($queue);
@@ -132,7 +132,7 @@ class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('getIterator')
             ->willReturn($iterator);
 
-        $this->backend->expects($this->once())
+        $this->backend->expects($this->never())
             ->method('handle');
 
         $this->subject->consume($queue, [

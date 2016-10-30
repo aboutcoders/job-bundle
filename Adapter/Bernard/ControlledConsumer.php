@@ -48,8 +48,12 @@ class ControlledConsumer extends BaseConsumer
         // weired, no clue why this is necessary, but somehow configure is not invoked otherwise
         $this->doConfigure($options);
 
-        if ($this->controller->doExit()) {
+        if ($this->controller->doStop()) {
             return false;
+        }
+
+        if ($this->controller->doPause()) {
+            return true;
         }
 
         return parent::tick($queue, $options);

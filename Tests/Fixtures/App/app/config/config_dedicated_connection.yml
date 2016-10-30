@@ -71,16 +71,6 @@ bernard:
     options:
         connection: abc_job_processing
 
-yz_supervisor:
-    default_environment: dev
-    servers:
-        dev:
-            localhost:
-                host:     ""
-                username: ""
-                password: ""
-                port:
-
 abc_resource_lock:
     db_driver: orm
     model_manager_name: abc_job_processing

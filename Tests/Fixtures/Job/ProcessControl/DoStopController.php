@@ -15,7 +15,7 @@ use Abc\ProcessControl\ControllerInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class DoExitController implements ControllerInterface
+class DoStopController implements ControllerInterface
 {
     /**
      * @return true
@@ -25,15 +25,19 @@ class DoExitController implements ControllerInterface
         return true;
     }
 
+    /**
+     * @return true
+     */
     public function doStop()
     {
         return true;
     }
 
+    /**
+     * @return false
+     */
     public function doPause()
     {
         return false;
     }
-
-
 }

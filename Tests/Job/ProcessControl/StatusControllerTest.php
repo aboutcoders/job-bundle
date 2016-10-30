@@ -88,7 +88,7 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         new StatusController($job, $this->manager, -1);
     }
 
-    public function testDoExitRefreshesOnFirstInvocation()
+    public function testDoStopRefreshesOnFirstInvocation()
     {
         $this->manager->expects($this->once())
             ->method('refresh')
@@ -101,14 +101,14 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
 
-        $this->subject->doExit();
+        $this->subject->doStop();
     }
 
     /**
      * @param Status $status
      * @dataProvider provideCancelStatus
      */
-    public function testDoExitReturnsTrueIfJobStatus(Status $status)
+    public function testDoStopReturnsTrueIfJobStatus(Status $status)
     {
         $this->manager->expects($this->once())
             ->method('refresh')
@@ -121,14 +121,14 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
 
-        $this->assertTrue($this->subject->doExit());
+        $this->assertTrue($this->subject->doStop());
     }
 
     /**
      * @param Status $status
      * @dataProvider provideNonCancelStatus
      */
-    public function testDoExitReturnsFalseIfJobStatusIs(Status $status)
+    public function testDoStopReturnsFalseIfJobStatusIs(Status $status)
     {
         $this->manager->expects($this->once())
             ->method('refresh')
@@ -141,14 +141,14 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $time = $this->getFunctionMock(__NAMESPACE__, "time");
         $time->expects($this->never());
 
-        $this->assertFalse($this->subject->doExit());
+        $this->assertFalse($this->subject->doStop());
     }
 
     /**
      * @param $secondsPassed
      * @dataProvider provideSecondsGreaterOrEqualToInterval
      */
-    public function testDoExitRefreshesIfIntervalExceeded($secondsPassed)
+    public function testDoStopRefreshesIfIntervalExceeded($secondsPassed)
     {
         $this->manager->expects($this->exactly(2))
             ->method('refresh')
@@ -162,17 +162,17 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $this->time->expects($this->at(1))->willReturn($secondsPassed);
 
         // initial invocation
-        $this->subject->doExit();
+        $this->subject->doStop();
 
         // second invocation
-        $this->subject->doExit();
+        $this->subject->doStop();
     }
 
     /**
      * @param $secondsPassed
      * @dataProvider provideSecondsLessThanInterval
      */
-    public function testDoExitSkipsRefreshingIfIntervalNotExceeded($secondsPassed)
+    public function testDoStopSkipsRefreshingIfIntervalNotExceeded($secondsPassed)
     {
         $this->manager->expects($this->exactly(1))
             ->method('refresh')
@@ -186,10 +186,10 @@ class StatusControllerTest extends \PHPUnit_Framework_TestCase
         $this->time->expects($this->at(1))->willReturn($secondsPassed);
 
         // initial invocation
-        $this->subject->doExit();
+        $this->subject->doStop();
 
         // second invocation
-        $this->subject->doExit();
+        $this->subject->doStop();
     }
 
     public static function provideCancelStatus() {

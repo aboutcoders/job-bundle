@@ -57,14 +57,30 @@ class JobController implements ControllerInterface
      *
      * @return boolean
      */
-    public function doExit()
+    public function doStop()
     {
-        if ($this->controller->doExit()) {
+        if ($this->controller->doStop()) {
             $this->job->setStatus(Status::CANCELLED());
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doPause()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doExit()
+    {
+        return $this->doStop();
     }
 }
