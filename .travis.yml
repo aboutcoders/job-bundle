@@ -34,7 +34,7 @@ install:
     - composer update $COMPOSER_FLAGS
 
 script:
-  - phpunit -v
+  - phpunit --coverage-clover clover
 
 notifications:
   hipchat:
