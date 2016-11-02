@@ -11,7 +11,7 @@ Next you need to make sure that the routing files are imported:
 # app/config/routing.yml
 abc-rest-job:
     type: rest
-    resource: "@AbcJobBundle/Resources/config/routing/rest-all.yml"
+    resource: "@AbcJobBundle/Resources/config/routing/rest-all.xml"
     prefix: /api
 ```
 
