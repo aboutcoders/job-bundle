@@ -27,16 +27,6 @@ class OrmHandlerFactoryTest extends \PHPUnit_Framework_TestCase
     private $manager;
 
     /**
-     * @var int
-     */
-    private $level;
-
-    /**
-     * @var boolean
-     */
-    private $bubble;
-
-    /**
      * @var OrmHandlerFactory
      */
     private $subject;
@@ -46,28 +36,31 @@ class OrmHandlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->level   = -100;
-        $this->bubble  = false;
         $this->manager = $this->createMock(LogManagerInterface::class);
-        $this->subject = new OrmHandlerFactory($this->level, $this->bubble, $this->manager);
+        $this->subject = new OrmHandlerFactory($this->manager);
     }
 
     /**
-     * @param $level
+     * @param int     $level
+     * @param boolean $bubble
      * @dataProvider provideLevels
      */
-    public function testCreateHandler($level)
+    public function testCreateHandler($level, $bubble)
     {
-        $job = new Job();
-        $handler = $this->subject->createHandler($job, $level);
+        $job     = new Job();
+        $handler = $this->subject->createHandler($job, $level, $bubble);
 
         $this->assertInstanceOf(JobAwareOrmHandler::class, $handler);
     }
 
-    public static function provideLevels() {
+    /**
+     * @return array
+     */
+    public static function provideLevels()
+    {
         return [
-            [Logger::CRITICAL],
-            [null]
+            [Logger::CRITICAL, true],
+            [Logger::CRITICAL, false]
         ];
     }
 }

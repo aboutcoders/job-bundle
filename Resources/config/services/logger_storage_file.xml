@@ -7,9 +7,6 @@
     <services>
 
         <service id="abc.job.logger.storage_handler_factory" class="Abc\Bundle\JobBundle\Logger\Handler\StreamHandlerFactory" public="false">
-
-            <argument>%abc.job.logger.storage.level%</argument>
-            <argument>%abc.job.logger.storage.bubble%</argument>
             <argument>%abc.job.logger.storage.path%</argument>
             <argument>json</argument>
             <call method="setFormatter">

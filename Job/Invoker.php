@@ -94,8 +94,8 @@ class Invoker
                 $callable->setController($this->controllerFactory->create($job));
             }
 
-            if ($callable instanceof LoggerAwareInterface && $context->has('logger')) {
-                $callable->setLogger($context->get('logger'));
+            if ($callable instanceof LoggerAwareInterface && $context->has('abc.logger')) {
+                $callable->setLogger($context->get('abc.logger'));
             }
         }
 

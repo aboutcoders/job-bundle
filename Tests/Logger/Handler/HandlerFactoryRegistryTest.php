@@ -34,10 +34,11 @@ class HandlerFactoryRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $level
+     * @param int     $level
+     * @param boolean $bubble
      * @dataProvider provideLevels
      */
-    public function testCreateHandlers($level)
+    public function testCreateHandlers($level, $bubble)
     {
         $job      = new Job();
         $factory1 = $this->createMock(HandlerFactoryInterface::class);
@@ -47,27 +48,28 @@ class HandlerFactoryRegistryTest extends \PHPUnit_Framework_TestCase
 
         $factory1->expects($this->once())
             ->method('createHandler')
-            ->with($job, $level)
+            ->with($job, $level, $bubble)
             ->willReturn($handler1);
 
         $factory2->expects($this->once())
             ->method('createHandler')
-            ->with($job, $level)
+            ->with($job, $level, $bubble)
             ->willReturn($handler2);
 
         $this->subject->register($factory1);
         $this->subject->register($factory2);
 
-        $handlers = $this->subject->createHandlers($job, $level);
+        $handlers = $this->subject->createHandlers($job, $level, $bubble);
 
         $this->assertContains($handler1, $handlers);
         $this->assertContains($handler2, $handlers);
     }
 
-    public static function provideLevels() {
+    public static function provideLevels()
+    {
         return [
-            [null],
-            [100]
+            [100, true],
+            [100, false]
         ];
     }
 }

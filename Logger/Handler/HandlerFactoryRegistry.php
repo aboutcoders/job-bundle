@@ -35,14 +35,15 @@ class HandlerFactoryRegistry
      * Returns the handlers created by all registered factories.
      *
      * @param JobInterface $job
-     * @param int|null     $level The minimum logging level at which this handler will be triggered
+     * @param int          $level The minimum logging level at which this handler will be triggered
+     * @param boolean      $bubble
      * @return array|HandlerInterface[] The created handlers
      */
-    public function createHandlers(JobInterface $job, $level = null)
+    public function createHandlers(JobInterface $job, $level, $bubble)
     {
         $handlers = [];
         foreach ($this->factories as $factory) {
-            $handlers[] = $factory->createHandler($job, $level);
+            $handlers[] = $factory->createHandler($job, $level, $bubble);
         }
 
         return $handlers;

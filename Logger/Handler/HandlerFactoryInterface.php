@@ -21,10 +21,11 @@ interface HandlerFactoryInterface
 {
     /**
      * @param JobInterface $job
-     * @param int|null     $level The minimum logging level at which this handler will be triggered
+     * @param int          $level The minimum logging level at which this handler will be triggered
+     * @param boolean      $bubble
      * @return HandlerInterface
      */
-    public function createHandler(JobInterface $job, $level = null);
+    public function createHandler(JobInterface $job, $level, $bubble);
 
     /**
      * @param FormatterInterface $formatter

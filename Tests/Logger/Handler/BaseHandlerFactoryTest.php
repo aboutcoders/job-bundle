@@ -20,16 +20,6 @@ use Monolog\Handler\HandlerInterface;
 class BaseHandlerFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var integer
-     */
-    private $level;
-
-    /**
-     * @var boolean
-     */
-    private $bubble;
-
-    /**
      * @var BaseHandlerFactory
      */
     private $subject;
@@ -39,9 +29,7 @@ class BaseHandlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->level   = 100;
-        $this->bubble  = false;
-        $this->subject = $this->getMockForAbstractClass(BaseHandlerFactory::class, [$this->level, $this->backupGlobalsBlacklist]);
+        $this->subject = $this->getMockForAbstractClass(BaseHandlerFactory::class);
     }
 
     public function testInitHandler() {

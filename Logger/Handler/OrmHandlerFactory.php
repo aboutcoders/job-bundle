@@ -24,23 +24,19 @@ class OrmHandlerFactory extends BaseHandlerFactory
     protected $manager;
 
     /**
-     * @param int                 $level
-     * @param bool                $bubble
      * @param LogManagerInterface $manager
-     *
      */
-    public function __construct($level, $bubble, LogManagerInterface $manager)
+    public function __construct(LogManagerInterface $manager)
     {
-        parent::__construct($level, $bubble);
         $this->manager = $manager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createHandler(JobInterface $job, $level = null)
+    public function createHandler(JobInterface $job, $level, $bubble)
     {
-        $handler = new JobAwareOrmHandler($this->manager, $level == null ? $this->level : $level, $this->bubble);
+        $handler = new JobAwareOrmHandler($this->manager, $level, $bubble);
         $handler->setJob($job);
 
         return $this->initHandler($handler);

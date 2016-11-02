@@ -33,6 +33,17 @@ class LoggerFactory implements LoggerFactoryInterface
     protected $handlerFactory;
 
     /**
+     * @var int
+     */
+    protected $level;
+
+    /**
+     * @var boolean
+     */
+    protected $bubble;
+
+
+    /**
      * @var array|HandlerInterface[]
      */
     protected $handlers = array();
@@ -40,11 +51,15 @@ class LoggerFactory implements LoggerFactoryInterface
     /**
      * @param JobTypeRegistry        $registry
      * @param HandlerFactoryRegistry $handlerFactory
+     * @param int                    $level
+     * @param bool                   $bubble
      */
-    public function __construct(JobTypeRegistry $registry, HandlerFactoryRegistry $handlerFactory)
+    public function __construct(JobTypeRegistry $registry, HandlerFactoryRegistry $handlerFactory, $level, $bubble)
     {
         $this->registry       = $registry;
         $this->handlerFactory = $handlerFactory;
+        $this->level          = $level;
+        $this->bubble         = $bubble;
     }
 
     /**
@@ -53,12 +68,13 @@ class LoggerFactory implements LoggerFactoryInterface
     public function create(JobInterface $job)
     {
         $level = $this->registry->get($job->getType())->getLogLevel();
-
         if (false === $level) {
             return new NullLogger();
+        } elseif (null === $level) {
+            $level = $this->level;
         }
 
-        $handlers = $this->handlerFactory->createHandlers($job, $level);
+        $handlers = $this->handlerFactory->createHandlers($job, $level, $this->bubble);
 
         return new Logger($this->buildChannel($job), array_merge($handlers, $this->handlers));
     }

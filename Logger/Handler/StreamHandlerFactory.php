@@ -29,14 +29,11 @@ class StreamHandlerFactory extends BaseHandlerFactory
     protected $extension;
 
     /**
-     * @param int    $level
-     * @param bool   $bubble
      * @param string $path
      * @param string $extension
      */
-    public function __construct($level, $bubble, $path, $extension = 'log')
+    public function __construct($path, $extension = 'log')
     {
-        parent::__construct($level, $bubble);
         $this->path      = $path;
         $this->extension = $extension;
     }
@@ -44,9 +41,9 @@ class StreamHandlerFactory extends BaseHandlerFactory
     /**
      * {@inheritdoc}
      */
-    public function createHandler(JobInterface $job, $level = null)
+    public function createHandler(JobInterface $job, $level, $bubble)
     {
-        $handler = new StreamHandler($this->buildPath($job->getTicket()), $level == null ? $this->level : $level, $this->bubble);
+        $handler = new StreamHandler($this->buildPath($job->getTicket()), $level, $bubble);
 
         return $this->initHandler($handler);
     }

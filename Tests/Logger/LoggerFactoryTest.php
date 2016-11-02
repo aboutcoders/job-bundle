@@ -36,6 +36,16 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
     private $handlerFactory;
 
     /**
+     * @var int
+     */
+    private $level;
+
+    /**
+     * @var boolean
+     */
+    private $bubble;
+
+    /**
      * @var LoggerFactory
      */
     private $subject;
@@ -44,11 +54,13 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry       = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->handlerFactory = new HandlerFactoryRegistry();
-        $this->subject        = new LoggerFactory($this->registry, $this->handlerFactory);
+        $this->level          = -100;
+        $this->bubble         = false;
+        $this->subject        = new LoggerFactory($this->registry, $this->handlerFactory, $this->level, $this->bubble);
     }
 
     /**
-     * @param $level
+     * @param int $level
      * @dataProvider provideLevels
      */
     public function testCreateHandlers($level)
@@ -71,12 +83,13 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($job->getType())
             ->willReturn($jobType);
 
-        if(false == $level){
+        if (false === $level) {
             $this->assertInstanceOf(NullLogger::class, $this->subject->create($job));
-        }else {
+        } else {
+            $expectedLevel = $level == null ? $this->level : $level;
             $factory->expects($this->once())
                 ->method('createHandler')
-                ->with($job, $level)
+                ->with($job, $expectedLevel, $this->bubble)
                 ->willReturn($handler);
 
             $logger = $this->subject->create($job);
@@ -86,15 +99,15 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testCreatesLoggerWithAddedHandlers() {
-
+    public function testCreatesLoggerWithAddedHandlers()
+    {
         $job = new Job();
         $job->setType('JobType');
 
-        $handler = $this->createMock(HandlerInterface::class);
+        $handler      = $this->createMock(HandlerInterface::class);
         $extraHandler = $this->createMock(HandlerInterface::class);
-        $factory = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
-        $jobType = $this->createMock(JobTypeInterface::class);;
+        $factory      = $this->getMockBuilder(BaseHandlerFactory::class)->disableOriginalConstructor()->getMock();
+        $jobType      = $this->createMock(JobTypeInterface::class);;
 
         $this->handlerFactory->register($factory);
 
@@ -119,10 +132,16 @@ class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($extraHandler, $logger->getHandlers());
     }
 
-    public static function provideLevels() {
+    /**
+     * @return array
+     */
+    public static function provideLevels()
+    {
         return [
-            ['info'],
-            [false]
+            [Logger::INFO,],
+            [Logger::INFO],
+            [null],
+            [false],
         ];
     }
 }

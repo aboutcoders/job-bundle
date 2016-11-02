@@ -17,19 +17,11 @@ use Monolog\Logger;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-
+/**
+ * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
+ */
 class StreamHandlerFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var int
-     */
-    private $level;
-
-    /**
-     * @var bool
-     */
-    private $bubble;
-
     /**
      * @var vfsStreamDirectory
      */
@@ -45,29 +37,32 @@ class StreamHandlerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->level   = 100;
-        $this->bubble  = false;
         $this->root    = vfsStream::setup();
-        $this->subject = new StreamHandlerFactory($this->level, $this->bubble, $this->root->url());
+        $this->subject = new StreamHandlerFactory($this->root->url());
     }
 
     /**
-     * @param $level
+     * @param int     $level
+     * @param boolean $bubble
      * @dataProvider provideLevels
      */
-    public function testCreateHandler($level)
+    public function testCreateHandler($level, $bubble)
     {
         $job = new Job();
         $job->setTicket('JobTicket');
 
-        $handler = $this->subject->createHandler($job);
+        $handler = $this->subject->createHandler($job, $level, $bubble);
         $this->assertInstanceOf(StreamHandler::class, $handler);
     }
 
-    public static function provideLevels() {
+    /**
+     * @return array
+     */
+    public static function provideLevels()
+    {
         return [
-            [Logger::CRITICAL],
-            [null]
+            [Logger::CRITICAL, true],
+            [Logger::CRITICAL, false]
         ];
     }
 }

@@ -21,16 +21,6 @@ use Monolog\Handler\HandlerInterface;
 abstract class BaseHandlerFactory implements HandlerFactoryInterface
 {
     /**
-     * @var int
-     */
-    protected $level;
-
-    /**
-     * @var boolean
-     */
-    protected $bubble;
-
-    /**
      * @var FormatterInterface
      */
     protected $formatter;
@@ -41,19 +31,9 @@ abstract class BaseHandlerFactory implements HandlerFactoryInterface
     protected $processors = array();
 
     /**
-     * @param int  $level
-     * @param bool $bubble
-     */
-    public function __construct($level, $bubble)
-    {
-        $this->level  = $level;
-        $this->bubble = $bubble;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public abstract function createHandler(JobInterface $job, $level = null);
+    public abstract function createHandler(JobInterface $job, $level, $bubble);
 
     /**
      * {@inheritdoc}

@@ -156,7 +156,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         $callable  = new LoggerAwareJob();
         $jobType   = new JobType($serviceId, $type, array($callable, 'execute'));
         $logger    = $this->createMock(LoggerInterface::class);
-        $context   = new Context($withLogger ? ['logger' => $logger] : []);
+        $context   = new Context($withLogger ? ['abc.logger' => $logger] : []);
 
         $job = new Job($type);
 
@@ -195,6 +195,9 @@ class InvokerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function provideTrueFalse()
     {
         return [
