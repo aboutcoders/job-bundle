@@ -47,8 +47,6 @@ class Sleeper implements ControllerAwareInterface
     /**
      * @ParamType("seconds", type="integer")
      * @ParamType("logger", type="@abc.logger")
-     * @param integer $seconds
-     * @param LoggerInterface $logger
      */
     public function sleep($seconds, LoggerInterface $logger)
     {
@@ -56,3 +54,5 @@ class Sleeper implements ControllerAwareInterface
     }
 }
 ```
+
+Back to [index](../../README.md)

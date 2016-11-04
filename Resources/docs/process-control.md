@@ -8,3 +8,5 @@ By default jobs are only informed if they have been [cancelled manually](./cance
 ## Process Control and SonataNotificationBundle
 
 If you are using the AbcJobBundle together with the [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle) as message queue backend we recommend to also install the [AbcNotificationBundle](https://github.com/aboutcoders/notification-bundle). This bundle inherits from the [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle) and integrates process control more deeply into [SonataNotificationBundle](https://github.com/sonata-project/SonataNotificationBundle) and thereby allows an even better control of [message consuming](./message-consuming.md).
+
+Back to [index](../../README.md)

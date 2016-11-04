@@ -88,14 +88,15 @@ The method returns an array of log records that have the very structure as the o
 
 ## Managing a job at runtime
 
-In some situations it might be necessary to manage a job or other jobs at runtime of the job. There are two ways to achieve that:
+In some situations it might be necessary to manage a job or other jobs at runtime of the job. To do so the job manager needs to be available inside the job. There are three ways to achieve that:
 
 1. Implement the ManagerAwareInterface
 2. Inject the manager as a runtime parameter
+3. Inject the manager using dependency injection
 
 Which one of those you choose is up to your preference.
 
-### Implement the ManagerAwareInterface
+### 1. Implement the ManagerAwareInterface
 
 Your job class must implement the interface [ManagerAwareInterface](../../Job/ManagerAwareInterface.php).
 
@@ -110,7 +111,7 @@ interface ManagerAwareInterface
 }
 ```
 
-### Inject the manager as a runtime parameter
+### 2. Inject the manager as a runtime parameter
 
 To inject the manager as a runtime parameter you simply have to specify the `@abc.manager` service in the `@ParamType` annotation of your method and the manager will be injected.
 
@@ -129,6 +130,21 @@ class MyJob
         $manager->add(...);
     }
 }
+```
+
+### 3. Inject the manager using dependency injection
+
+To inject the manger using dependency injection you proceed as with any other service that has dependencies to another service
+
+```yaml
+# app/config/services.yml
+
+services:
+    my_job:
+        class: My\Bundle\ExampleBundle\Job\MyJob
+        arguments: ['@abc.job.manager']
+        tags:
+            -  { name: 'abc.job', type: 'say_hello', method: 'sayHello' }
 ```
 
 ## Working with the job status
@@ -169,8 +185,10 @@ Alternatively you can use the method ´equals´ of the Status class.
 ```php
 $status = $manager->getStatus($ticket));
 
-if(Status::PROCESSED()->equals($status))
+if($status->equals(Status::PROCESSED()))
 {
     // ...
 }
 ```
+
+Back to [index](../../README.md)

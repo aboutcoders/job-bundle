@@ -3,7 +3,7 @@ Basic Usage
 
 ## Executing a default job
 
-In order to execute a default job registration of default jobs must be enabled in the configuration:
+In order to execute a default job  you have to enable the registration of the default jobs in the configuration:
 
 ```yaml
 # app/config/config.yml
@@ -109,3 +109,5 @@ When the job was processed you can get the logs of the job:
 // get log messages of a job
 $logs = $manager->getLogs($job->getTicket());
 ```
+
+Next Step: [Message Consuming](./message-consuming.md)

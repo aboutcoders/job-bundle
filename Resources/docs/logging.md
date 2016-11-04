@@ -65,3 +65,5 @@ This will return an array of log records that are available for this job.
 __Note:__ Depending on the configuration the records are internally stored either on the filesystem in the JSON format or in the database.
 
 Please refer to the chapter [Configuration](./configuration.md) to get information about the available configuration options.
+
+Back to [index](../../README.md)

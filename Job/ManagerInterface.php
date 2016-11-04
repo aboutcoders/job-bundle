@@ -109,5 +109,4 @@ interface ManagerInterface
      * @throws \RuntimeException
      */
     public function onMessage(Message $message);
-
 }

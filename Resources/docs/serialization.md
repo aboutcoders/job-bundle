@@ -37,3 +37,5 @@ class MyJob
 }
 ```
 __Note:__ The serialization groups are only applied when a job is persisted and loaded from the database. The reason for this is that the [JMS serializer](https://github.com/schmittjoh/serializer) so far does not support the definition of serialization groups for specific properties of an entity but only globally for the whole serialization of an object.
+
+Back to [index](../../README.md)

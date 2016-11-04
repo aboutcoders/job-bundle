@@ -3,7 +3,7 @@ Unit Testing
 
 The AbcJobBundle provides a class [JobTestCase](../../Test/JobTestCase.php) that can be used to test custom jobs.
 
-So far this class provides three methods that can be used to test custom jobs.
+So far this class provides four methods that can be used to test custom jobs.
 
 ## Testing if a job is registered
 
@@ -111,3 +111,5 @@ class MyJobTest extends JobTestCase
     }
 }
 ```
+
+Back to [index](../../README.md)

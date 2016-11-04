@@ -31,7 +31,7 @@ The AbcJobBundle supports multiple message queue backends by providing adapters 
 
 Please follow the installation instructions of the  [BernardBundle](https://github.com/bernardphp/BernardBundle).
 
-__Note:__ If you want using Symfony 3 you have to install the [BernardBundle](https://github.com/bernardphp/BernardBundle) from the master branch, otherwise you can use the latest stable version of the bundle.
+__Note:__ If you want to use Symfony 3 you have to install the [BernardBundle](https://github.com/bernardphp/BernardBundle) from the master branch, otherwise you can use the latest stable version of the bundle.
  
 ### Install SonataNotificationBundle
 

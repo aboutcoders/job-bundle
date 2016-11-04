@@ -16,3 +16,5 @@ abc-rest-job:
 ```
 
 You can now see an overview of all available API methods using API documentation provided by the [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle).
+
+Back to [index](../../README.md)

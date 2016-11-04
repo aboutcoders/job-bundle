@@ -34,9 +34,6 @@ $consumer->consume('default', [
 
 In a production environment it is recommended to use a process control system like [supervisor](http://supervisord.org/) to monitor consumers and restart a process as soon as it stopped.
 
-In case you decided to use [supervisor](http://supervisord.org/) you might consider using the following bundles:
-
-* [YZSupervisorBundle](https://github.com/yzalis/SupervisorBundle)
-* [AbcSupervisorCommandBundle](https://github.com/aboutcoders/supervisor-command-bundle)
+In case you decided to use [supervisor](http://supervisord.org/) you might consider using the [AbcSupervisorBundle](https://github.com/aboutcoders/supervisor-bundle):
 
 Next Step: [Job Management](./job-management.md)

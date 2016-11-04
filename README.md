@@ -36,11 +36,11 @@ This bundle provides the following features:
 - [Serialization](./Resources/docs/serialization.md)
 - [Validation](./Resources/docs/validation.md)
 - [Logging](./Resources/docs/logging.md)
-- [Unit Testing](./Resources/docs/unit-testing.md)
-- [Process Control](./Resources/docs/process-control.md)
 - [Lifecycle Events](./Resources/docs/lifecycle-events.md)
-- [Clustered Environment](./Resources/docs/clustered-environment.md)
+- [Unit Testing](./Resources/docs/unit-testing.md)
 - [REST-API](./Resources/docs/rest-api.md)
+- [Process Control](./Resources/docs/process-control.md)
+- [Clustered Environment](./Resources/docs/clustered-environment.md)
 - [Configuration Reference](./Resources/docs/configuration-reference.md)
 
 ## Demo Project

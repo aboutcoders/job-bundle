@@ -47,9 +47,9 @@ php bin/console doctrine:schema:update --force
 
 It is recommended to run the job processing in a different environment than the default environments.
 
-Since this environment is by symfony commands all you need to do is a `config_ENV.yml` (e.g. `config_job-processing.yml`) file where `ENV` equals the name of the environment. 
+Since this environment is only used to execute symfony commands all you need to do is a `config_ENV.yml` (e.g. `config_job-processing.yml`) file where `ENV` equals the name of the environment. 
 
-Please refer to the [official documentation](http://symfony.com/doc/current/configuration/environments.html) if you need more information.
+Please refer to the [official documentation](http://symfony.com/doc/current/configuration/environments.html) if you need more information about environment configuration.
 
 ## Advanced Configuration
 
@@ -139,7 +139,7 @@ abc_job:
 
 #### Registering Custom Handlers
 
-Besides the storage and log handler you can define additional custom handlers that will be pushed to logger that is injected into the jobs.
+Besides the storage and log handler you can define additional custom handlers that will be used with the logger that is injected into the jobs.
 
 ```yaml
 # app/config/config.yml

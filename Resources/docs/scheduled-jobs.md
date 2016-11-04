@@ -1,7 +1,7 @@
 Scheduled Jobs
 ==============
 
-You can configure one or more schedules for a job in order to configure repeated execution of a job. The bundle relies on the [AbcSchedulerBundle](https://github.org/aboutcoders/scheduler-bundle) to provide this functionality.
+You can define one or more schedules for a job in order to configure repeated execution of a job. The bundle relies on the [AbcSchedulerBundle](https://github.org/aboutcoders/scheduler-bundle) to provide this functionality.
 
 ## Creating a job with schedules
 
@@ -35,3 +35,5 @@ $job->removeSchedule($schedule);
 ```
 
 If you want to add or remove schedules during the execution of the job please refer to the section [Managing a job at runtime](./job-management.md).
+
+Back to [index](../../README.md)
