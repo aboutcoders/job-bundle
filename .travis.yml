@@ -37,7 +37,7 @@ install:
     - composer update $COMPOSER_FLAGS
 
 script:
-  - phpunit --coverage-clover clover
+  - vendor/bin/phpunit --coverage-clover clover
 
 notifications:
   hipchat:
