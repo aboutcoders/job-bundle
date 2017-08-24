@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="abc.job.producer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter" public="false">
+        <service id="abc.job.producer" class="Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter">
             <argument type="service" id="abc.job.sonata.backend_provider"/>
             <argument type="service" id="sonata.notification.dispatcher"/>
             <argument type="service" id="abc.job.registry"/>
