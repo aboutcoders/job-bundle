@@ -82,8 +82,9 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateJobWithStatusTerminatedSetsTerminatedAt($status)
     {
-        $dateTime = new \DateTime;
-        $job      = new Job();
+        $dateTime = new \DateTime();
+        $dateTime->add(new \DateInterval('PT10S'));
+        $job = new Job();
 
         $this->subject->updateJob($job, $status);
         $this->assertLessThanOrEqual($dateTime, $job->getTerminatedAt());
