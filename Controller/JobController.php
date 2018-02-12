@@ -20,7 +20,9 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
 use Abc\Bundle\JobBundle\Validator\Constraints as AbcAssert;
 use Abc\Bundle\JobBundle\Model\JobList;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Nelmio\ApiDocBundle\Annotation\Operation;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -33,24 +35,66 @@ use Symfony\Component\Validator\Constraints as Assert;
 class JobController extends BaseController
 {
     /**
-     * @ApiDoc(
-     *   description="Returns a collection of jobs",
-     *   section="AbcJobBundle",
-     *   filters={
-     *     {"name"="page", "dataType"="integer", "required"=false, "requirement"="\d+", "default"="1", "description"="The page number of the result set"},
-     *     {"name"="limit", "dataType"="integer", "required"=false, "requirement"="\d+", "default"="10", "description"="The page size"},
-     *     {"name"="sortCol", "dataType"="string", "required"=false, "pattern"="(ticket|type|status|createdAt|terminatedAt)", "default"="createdAt", "description"="The sort column"},
-     *     {"name"="sortDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "default"="DESC", "description"="The sort direction"},
-     *     {"name"="criteria", "dataType"="map", "required"=false, "description"="The search criteria defined as associative array, valid keys are ticket|type|status"}
-     *   },
-     *   responseMap = {
-     *     200 = {"class" = "Abc\Bundle\JobBundle\Model\JobList"},
-     *     400 = {"class" = "Abc\Bundle\JobBundle\Api\ErrorResponse::class"}
-     *   },
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     400 = "Returned when request is invalid"
-     * })
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Returns a collection of jobs",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @SWG\Schema(
+     *              type="array",
+     *              @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response="400",
+     *         description="Returned when request is invalid",
+     *         @Model(type=Abc\Bundle\JobBundle\Api\ErrorResponse::class)
+     *     ),
+     *     @SWG\Parameter(
+     *         name="page",
+     *         in="query",
+     *         type="integer",
+     *         default="1",
+     *         requirement="\d+",
+     *         required="false",
+     *         description="The page number of the result set"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         type="integer",
+     *         default="10",
+     *         requirement="\d+",
+     *         required="false",
+     *         description="The page size"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="sortCol",
+     *         in="query",
+     *         type="string",
+     *         default="createdAt",
+     *         requirement="(ticket|type|status|createdAt|terminatedAt)",
+     *         required="false",
+     *         description="The sort column"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="sortDir",
+     *         in="query",
+     *         type="string",
+     *         default="DESC",
+     *         requirement="(ASC|DESC)",
+     *         required="false",
+     *         description="The sort direction"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="criteria",
+     *         in="query",
+     *         type="map",
+     *         required="false",
+     *         description="The search criteria defined as associative array, valid keys are ticket|type|status"
+     *     )
+     * )
      *
      * @param Request $request
      * @return Response
