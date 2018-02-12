@@ -29,7 +29,9 @@ class JobTypeController extends BaseController
      *         description="Returned when successful",
      *         @SWG\Schema(
      *              type="array",
-     *              @Model(type=string)
+     *              @SWG\Items(
+     *                  type="string"
+     *              )
      *         )
      *     )
      * )

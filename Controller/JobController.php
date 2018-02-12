@@ -56,8 +56,8 @@ class JobController extends BaseController
      *         in="query",
      *         type="integer",
      *         default="1",
-     *         requirement="\d+",
-     *         required="false",
+     *         format="\d+",
+     *         required=false,
      *         description="The page number of the result set"
      *     ),
      *     @SWG\Parameter(
@@ -65,8 +65,8 @@ class JobController extends BaseController
      *         in="query",
      *         type="integer",
      *         default="10",
-     *         requirement="\d+",
-     *         required="false",
+     *         format="\d+",
+     *         required=false,
      *         description="The page size"
      *     ),
      *     @SWG\Parameter(
@@ -74,8 +74,8 @@ class JobController extends BaseController
      *         in="query",
      *         type="string",
      *         default="createdAt",
-     *         requirement="(ticket|type|status|createdAt|terminatedAt)",
-     *         required="false",
+     *         format="(ticket|type|status|createdAt|terminatedAt)",
+     *         required=false,
      *         description="The sort column"
      *     ),
      *     @SWG\Parameter(
@@ -83,15 +83,18 @@ class JobController extends BaseController
      *         in="query",
      *         type="string",
      *         default="DESC",
-     *         requirement="(ASC|DESC)",
-     *         required="false",
+     *         format="(ASC|DESC)",
+     *         required=false,
      *         description="The sort direction"
      *     ),
      *     @SWG\Parameter(
      *         name="criteria",
      *         in="query",
-     *         type="map",
-     *         required="false",
+     *         type="array",
+     *         @SWG\Items(
+     *             type="string"
+     *         ),
+     *         required=false,
      *         description="The search criteria defined as associative array, valid keys are ticket|type|status"
      *     )
      * )
@@ -133,17 +136,24 @@ class JobController extends BaseController
     }
 
     /**
-     * @ApiDoc(
-     * description="Returns a job",
-     * section="AbcJobBundle",
-     * requirements={
-     *   {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
-     * },
-     * output="Abc\Bundle\JobBundle\Model\Job",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when node not found",
-     *   }
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Returns a job",
+     *     @SWG\Response(
+     *         response="201",
+     *         description="Returned when successful"
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="Returned when node not found"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     )
      * )
      *
      * @param string $ticket
@@ -160,15 +170,24 @@ class JobController extends BaseController
 
     /**
      * Adds a new job.
-     *
-     * @ApiDoc(
-     *  description="Adds a job",
-     *  section="AbcJobBundle",
-     *  input="Abc\Bundle\JobBundle\Model\Job",
-     *  statusCodes = {
-     *     200 = "Returned when successful",
-     *     400 = "Form validation error"
-     *   }
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Adds a job",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful"
+     *     ),
+     *     @SWG\Response(
+     *         response="400",
+     *         description="Form validation error"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     )
      * )
      *
      * @param Request $request
@@ -194,17 +213,30 @@ class JobController extends BaseController
 
     /**
      * Updates a job.
-     *
-     * @ApiDoc(
-     *   description="Updates a job",
-     *   section="AbcJobBundle",
-     *   input="Abc\Bundle\JobBundle\Model\Job",
-     *   output="Abc\Bundle\JobBundle\Model\Job",
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     400 = "Returned when validation fails",
-     *     404 = "Returned when job not found"
-     * })
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Updates a job",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @Model(type=Abc\Bundle\JobBundle\Model\Job::class)
+     *     ),
+     *     @SWG\Response(
+     *         response="400",
+     *         description="Form validation error"
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="Returned when job not found"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     )
+     * )
      *
      * @param Request $request
      * @return Response
@@ -229,19 +261,34 @@ class JobController extends BaseController
 
     /**
      * Cancels a job.
-     *
-     * @ApiDoc(
-     *   description="Cancels a job",
-     *   section="AbcJobBundle",
-     *   output="Abc\Bundle\JobBundle\Model\Job",
-     *   requirements={
-     *     {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
-     *     {"name"="force", "dataType"="boolean", "required"=false, "default"="false", "description"="The job ticket"},
-     *   },
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when job not found",
-     * })
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Cancels a job",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="Returned when job not found"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="force",
+     *         in="query",
+     *         type="boolean",
+     *         default="false",
+     *         required=false,
+     *         description="The job ticket"
+     *     )
+     * )
      *
      * @param string $ticket
      * @param bool   $force Whether to force cancellation (false by default)
@@ -258,18 +305,26 @@ class JobController extends BaseController
 
     /**
      * Restarts a job.
-     *
-     * @ApiDoc(
-     *   description="Restarts a job",
-     *   section="AbcJobBundle",
-     *   output="Abc\Bundle\JobBundle\Model\Job",
-     *   requirements={
-     *     {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
-     *   },
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when job not found",
-     * })
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Restarts a job",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="Returned when job not found"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     )
+     * )
      *
      * @param string $ticket
      * @return Response
@@ -285,18 +340,29 @@ class JobController extends BaseController
 
     /**
      * Returns the logs of a job.
-     *
-     * @ApiDoc(
-     *   description="Returns the logs of a job",
-     *   section="AbcJobBundle",
-     *   output="array<Abc\Bundle\JobBundle\Model\Log>",
-     *   requirements={
-     *     {"name"="ticket", "dataType"="string", "required"=true, "description"="The job ticket"},
-     *   },
-     *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when job not found"
-     * })
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Returns the logs of a job",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @SWG\Schema(
+     *              type="array",
+     *              @Model(type=Abc\Bundle\JobBundle\Model\Log::class)
+     *         )
+     *     ),
+     *     @SWG\Response(
+     *         response="404",
+     *         description="Returned when job not found"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="ticket",
+     *         in="query",
+     *         type="string",
+     *         required=true,
+     *         description="The job ticket"
+     *     )
+     * )
      *
      * @param string $ticket
      * @return Response
