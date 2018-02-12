@@ -11,9 +11,9 @@
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
 use Monolog\Logger;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -100,11 +100,11 @@ class RegisterJobsPass implements CompilerPassInterface
      * @param callable         $callable
      * @param string|null      $logLevel
      * @param string|null      $formType
-     * @return DefinitionDecorator
+     * @return ChildDefinition
      */
     protected function createType($serviceId, $type, $callable, $logLevel = null, $formType = null)
     {
-        $jobType = new DefinitionDecorator('abc.job.type.prototype');
+        $jobType = new ChildDefinition('abc.job.type.prototype');
         $jobType->replaceArgument(0, $serviceId);
         $jobType->replaceArgument(1, $type);
         $jobType->replaceArgument(2, $callable);
