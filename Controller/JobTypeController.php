@@ -10,7 +10,9 @@
 
 namespace Abc\Bundle\JobBundle\Controller;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Nelmio\ApiDocBundle\Annotation\Operation;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,14 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
 class JobTypeController extends BaseController
 {
     /**
-     * @ApiDoc(
-     * description="Returns a collection of job types",
-     * section="AbcJobBundle",
-     * requirements={},
-     * output="array<string>",
-     *   statusCodes = {
-     *     200 = "Returned when successful"
-     *   }
+     * @Operation(
+     *     tags={"AbcJobBundle"},
+     *     summary="Returns a collection of job types",
+     *     @SWG\Response(
+     *         response="200",
+     *         description="Returned when successful",
+     *         @SWG\Schema(
+     *              type="array",
+     *              @Model(type=string)
+     *         )
+     *     )
      * )
      * @return Response
      */
