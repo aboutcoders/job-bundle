@@ -17,7 +17,7 @@ class MockHelper
 {
     /**
      * @param $class
-     * @return array
+     * @return string
      */
     public static function getNamespace($class) {
         $pieces = explode("\\", $class);

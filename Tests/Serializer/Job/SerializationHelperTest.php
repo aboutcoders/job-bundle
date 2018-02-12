@@ -60,8 +60,9 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
         $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
         $this->serializer = $this->createMock(SerializerInterface::class);
 
-        $this->json_decode = $this->getFunctionMock(MockHelper::getNamespace(SerializationHelper::class), 'json_decode');
-        $this->json_encode = $this->getFunctionMock(MockHelper::getNamespace(SerializationHelper::class), 'json_encode');
+        $namespace         = MockHelper::getNamespace(SerializationHelper::class);
+        $this->json_decode = $this->getFunctionMock($namespace, 'json_decode');
+        $this->json_encode = $this->getFunctionMock($namespace, 'json_encode');
 
         $this->subject = new SerializationHelper($this->registry, $this->serializer);
     }
@@ -116,7 +117,8 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSerializeParametersWithInvalidNumberOfParameters() {
+    public function testSerializeParametersWithInvalidNumberOfParameters()
+    {
         $jobType = $this->createMock(JobTypeInterface::class);
 
         $jobType->expects($this->any())
@@ -134,7 +136,8 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testSerializeParametersWithJsonEncodeFails() {
+    public function testSerializeParametersWithJsonEncodeFails()
+    {
         $jobType = $this->createMock(JobTypeInterface::class);
 
         $jobType->expects($this->any())

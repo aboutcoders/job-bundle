@@ -10,9 +10,10 @@
 
 namespace Abc\Bundle\JobBundle\DependencyInjection\Compiler;
 
-use Abc\Bundle\JobBundle\Adapter\Sonata\ProducerAdapter;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers the service abc.job.producer as listener for all messages dispatched from the sonata backend.
@@ -68,10 +69,10 @@ class RegisterSonataListenersPass implements CompilerPassInterface
             {
                 // workaround
                 $dispatcher->addMethodCall(
-                    'addListenerService',
+                    'addListener',
                     array(
                         $tag['type'],
-                        array($this->queueEngineService, 'process')
+                        array(new ServiceClosureArgument(new Reference($this->queueEngineService)), 'process')
                     )
                 );
             }
