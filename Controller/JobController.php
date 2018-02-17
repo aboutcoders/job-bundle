@@ -49,7 +49,7 @@ class JobController extends BaseController
      *     @SWG\Response(
      *         response="400",
      *         description="Returned when request is invalid",
-     *         @Model(type=Abc\Bundle\JobBundle\Api\ErrorResponse::class)
+     *         @Model(type=Abc\Bundle\JobBundle\Api\BadRequestResponse::class)
      *     ),
      *     @SWG\Parameter(
      *         name="page",

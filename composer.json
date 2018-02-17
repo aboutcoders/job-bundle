@@ -16,7 +16,7 @@
         "symfony/symfony": "~2.6|~3.0",
         "myclabs/php-enum": "~1.5",
         "gedmo/doctrine-extensions": "~2.0",
-        "jms/serializer-bundle": "~1.0",
+        "jms/serializer-bundle": "*",
         "nelmio/api-doc-bundle": "~3",
         "doctrine/annotations": "1.*",
         "aboutcoders/process-control": "~1.3",
