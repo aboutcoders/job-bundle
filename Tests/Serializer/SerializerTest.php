@@ -15,11 +15,12 @@ use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
 use Abc\Bundle\JobBundle\Serializer\SerializationContext;
 use Abc\Bundle\JobBundle\Serializer\Serializer;
 use JMS\Serializer\SerializerInterface as JMSSerializerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class SerializerTest extends \PHPUnit_Framework_TestCase
+class SerializerTest extends TestCase
 {
     /**
      * @var JMSSerializerInterface|\PHPUnit_Framework_MockObject_MockObject

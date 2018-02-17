@@ -20,6 +20,7 @@ class AnnotatedJob
 {
     /**
      * @ParamType("param", type="string")
+     * @param $param
      */
     public function methodWithSingleParameters($param)
     {
@@ -28,6 +29,8 @@ class AnnotatedJob
     /**
      * @ParamType("param1", type="string", options={})
      * @ParamType("param2", type="boolean", options={"groups"={"group1"}})
+     * @param $param1
+     * @param $param2
      */
     public function methodWithMultipleParameters($param1, $param2)
     {

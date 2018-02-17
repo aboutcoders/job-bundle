@@ -12,11 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Locker;
 
 use Abc\Bundle\JobBundle\Locker\NullLocker;
 use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class NullLockerTest extends \PHPUnit_Framework_TestCase
+class NullLockerTest extends TestCase
 {
     /**
      * @var NullLocker

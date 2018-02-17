@@ -38,6 +38,8 @@ class ConsumerCommandTest extends KernelTestCase
 
     /**
      * @dataProvider provideOptions
+     * @param $queue
+     * @param $options
      */
     public function testExecute($queue, $options)
     {

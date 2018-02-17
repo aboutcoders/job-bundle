@@ -14,14 +14,16 @@ use Abc\Bundle\JobBundle\Logger\Manager\FileLogManager;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Test\MockHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use phpmock\phpunit\PHPMock;
 
 /**
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class FileLogManagerTest extends \PHPUnit_Framework_TestCase
+class FileLogManagerTest extends TestCase
 {
     use PHPMock;
 
@@ -155,6 +157,7 @@ class FileLogManagerTest extends \PHPUnit_Framework_TestCase
         $job->setType('job-type');
 
         $this->subject->deleteByJob($job);
+        $this->assertTrue(true);
     }
 
     public function tearDown()

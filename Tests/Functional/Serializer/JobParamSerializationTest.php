@@ -17,11 +17,12 @@ use Abc\Bundle\JobBundle\Serializer\Handler\JobParameterArrayHandler;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobParamSerializationTest extends \PHPUnit_Framework_TestCase
+class JobParamSerializationTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject

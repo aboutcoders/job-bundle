@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Model;
 
 use Abc\Bundle\JobBundle\Model\Log;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LogTest extends \PHPUnit_Framework_TestCase
+class LogTest extends TestCase
 {
     public function testGetContext()
     {

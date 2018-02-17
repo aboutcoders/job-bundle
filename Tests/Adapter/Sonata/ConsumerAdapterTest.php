@@ -14,12 +14,13 @@ use Abc\Bundle\JobBundle\Adapter\Sonata\BackendProvider;
 use Abc\Bundle\JobBundle\Adapter\Sonata\ConsumerAdapter;
 use Abc\Bundle\JobBundle\Tests\Adapter\Sonata\Fixtures\TestIterator;
 use Abc\ProcessControl\ControllerInterface;
+use PHPUnit\Framework\TestCase;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Event\IterateEvent;
 use Sonata\NotificationBundle\Model\MessageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
+class ConsumerAdapterTest extends TestCase
 {
     /**
      * @var BackendProvider|\PHPUnit_Framework_MockObject_MockObject

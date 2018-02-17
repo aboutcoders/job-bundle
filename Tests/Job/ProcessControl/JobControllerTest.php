@@ -15,8 +15,9 @@ use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\ProcessControl\ControllerInterface;
+use PHPUnit\Framework\TestCase;
 
-class JobControllerTest extends \PHPUnit_Framework_TestCase
+class JobControllerTest extends TestCase
 {
     /**
      * @var ControllerInterface|\PHPUnit_Framework_MockObject_MockObject

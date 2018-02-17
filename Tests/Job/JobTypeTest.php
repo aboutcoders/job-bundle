@@ -13,11 +13,12 @@ namespace Abc\Bundle\JobBundle\Tests\Job;
 use Abc\Bundle\JobBundle\Job\JobType;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\JobAwareJob;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTypeTest extends \PHPUnit_Framework_TestCase
+class JobTypeTest extends TestCase
 {
     private $serviceId;
     private $type;

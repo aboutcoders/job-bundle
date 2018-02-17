@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Job\Queue;
 
 use Abc\Bundle\JobBundle\Job\Queue\QueueConfig;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class QueueConfigTest extends \PHPUnit_Framework_TestCase
+class QueueConfigTest extends TestCase
 {
 
     public function testWithDefaultConstructor() {

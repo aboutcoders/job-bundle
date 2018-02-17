@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\JobTypeNotFoundException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTypeNotFoundExceptionTest extends \PHPUnit_Framework_TestCase
+class JobTypeNotFoundExceptionTest extends TestCase
 {
     public function testGetType()
     {

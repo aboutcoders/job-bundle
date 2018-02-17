@@ -14,11 +14,12 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Log;
 use Abc\Bundle\JobBundle\Model\LogManager;
 use Monolog\Formatter\FormatterInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LogManagerTest extends \PHPUnit_Framework_TestCase
+class LogManagerTest extends TestCase
 {
     /**
      * @var LogManager|\PHPUnit_Framework_MockObject_MockObject
@@ -106,6 +107,9 @@ class LogManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $channel
+     * @param $level
+     * @param $message
      * @return Log
      */
     protected function buildLog($channel, $level, $message)

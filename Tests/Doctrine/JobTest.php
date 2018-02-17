@@ -12,11 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Doctrine;
 
 use Abc\Bundle\JobBundle\Doctrine\Job;
 use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobTest extends TestCase
 {
     /**
      * @var SerializationHelper|\PHPUnit_Framework_MockObject_MockObject

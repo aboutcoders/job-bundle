@@ -18,11 +18,12 @@ use Abc\Bundle\JobBundle\Tests\Fixtures\Job\TestJob;
 use Metadata\ClassHierarchyMetadata;
 use Metadata\MetadataFactoryInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTypeRegistryTest extends \PHPUnit_Framework_TestCase
+class JobTypeRegistryTest extends TestCase
 {
     /**
      * @var MetadataFactoryInterface|\PHPUnit_Framework_MockObject_MockObject

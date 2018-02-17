@@ -18,12 +18,13 @@ use Abc\Bundle\JobBundle\Logger\LoggerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LoggerFactoryTest extends \PHPUnit_Framework_TestCase
+class LoggerFactoryTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject

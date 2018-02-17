@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Job;
 
 use Abc\Bundle\JobBundle\Job\Status;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StatusTest extends \PHPUnit_Framework_TestCase
+class StatusTest extends TestCase
 {
     public function testGetTerminatedStatus()
     {

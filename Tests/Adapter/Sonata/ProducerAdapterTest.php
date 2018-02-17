@@ -16,6 +16,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Sonata\NotificationBundle\Backend\BackendInterface;
 use Sonata\NotificationBundle\Consumer\ConsumerEvent;
@@ -25,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
+class ProducerAdapterTest extends TestCase
 {
     /**
      * @var BackendProvider|\PHPUnit_Framework_MockObject_MockObject
@@ -86,7 +87,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testProduce()
     {
         $queue   = 'foobar';
-        $message = new Message('type', 'ticket', 'callback');
+        $message = new Message('type', 'ticket');
         $backend = $this->createMock(BackendInterface::class);
 
         $jobType = $this->createMock(JobTypeInterface::class);
@@ -117,7 +118,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
     public function testProduceThrowsExceptionsThrownByBackend()
     {
         $queue   = 'foobar';
-        $message = new Message('type', 'ticket', 'callback');
+        $message = new Message('type', 'ticket');
         $backend = $this->createMock(BackendInterface::class);
 
         $jobType = $this->createMock(JobTypeInterface::class);

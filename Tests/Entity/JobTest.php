@@ -12,11 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Entity;
 
 use Abc\Bundle\JobBundle\Entity\Job;
 use Abc\Bundle\JobBundle\Entity\Schedule;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobTest extends TestCase
 {
     public function testCreateSchedule()
     {

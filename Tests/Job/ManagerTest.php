@@ -36,12 +36,13 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  * @author Wojciech Ciolko <wojciech.ciolko@aboutcoders.com>
  */
-class ManagerTest extends \PHPUnit_Framework_TestCase
+class ManagerTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject
@@ -866,6 +867,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @param JobInterface $expectedJob    The expected first argument passed to updateJob
      * @param Status       $status         The expected second argument passed to updateJob
      * @param mixed|null   $processingTime The optional expected third argument passed to updateJob
+     * @param null         $response
      */
     protected function expectsCallsUpdateJob(JobInterface $expectedJob, Status $status, $processingTime = 0, $response = null)
     {

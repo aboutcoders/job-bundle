@@ -15,11 +15,12 @@ use Abc\Bundle\JobBundle\Model\Log;
 use Abc\Bundle\JobBundle\Model\LogInterface;
 use Abc\Bundle\JobBundle\Model\LogManagerInterface;
 use Monolog\Formatter\FormatterInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class OrmHandlerTest extends \PHPUnit_Framework_TestCase
+class OrmHandlerTest extends TestCase
 {
 
     /**

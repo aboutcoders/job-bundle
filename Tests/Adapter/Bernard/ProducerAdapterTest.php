@@ -15,13 +15,14 @@ use Abc\Bundle\JobBundle\Job\JobTypeInterface;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
-use Bernard\Message\DefaultMessage;
+use Bernard\Message\PlainMessage;
 use Bernard\Producer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
+class ProducerAdapterTest extends TestCase
 {
     /**
      * @var Producer|\PHPUnit_Framework_MockObject_MockObject
@@ -68,7 +69,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('getQueue')
             ->willReturn($queue);
 
-        $producerMessage = new DefaultMessage('ConsumeJob', [
+        $producerMessage = new PlainMessage('ConsumeJob', [
             'type'   => $type,
             'ticket' => $ticket
         ]);
@@ -90,7 +91,7 @@ class ProducerAdapterTest extends \PHPUnit_Framework_TestCase
         $type   = 'JobType';
         $ticket = 'JobTicket';
 
-        $producerMessage = new DefaultMessage('ConsumeJob', [
+        $producerMessage = new PlainMessage('ConsumeJob', [
             'type'   => $type,
             'ticket' => $ticket
         ]);

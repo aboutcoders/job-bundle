@@ -16,11 +16,12 @@ use Abc\Bundle\JobBundle\Logger\Handler\OrmHandler;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\LogManagerInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobAwareOrmHandlerTest extends \PHPUnit_Framework_TestCase
+class JobAwareOrmHandlerTest extends TestCase
 {
     /**
      * @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject

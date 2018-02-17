@@ -18,12 +18,14 @@ use Abc\Bundle\JobBundle\Serializer\SerializationContext;
 use Abc\Bundle\JobBundle\Serializer\SerializerInterface;
 use Abc\Bundle\JobBundle\Test\MockHelper;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class SerializationHelperTest extends \PHPUnit_Framework_TestCase
+class SerializationHelperTest extends TestCase
 {
     use PHPMock;
 
@@ -57,7 +59,7 @@ class SerializationHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->registry   = $this->getMockBuilder(JobTypeRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->registry   = $this->createMock(JobTypeRegistry::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
 
         $namespace         = MockHelper::getNamespace(SerializationHelper::class);

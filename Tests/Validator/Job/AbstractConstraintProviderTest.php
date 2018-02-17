@@ -12,8 +12,9 @@ namespace Abc\Bundle\JobBundle\Tests\Validator\Job;
 
 
 use Abc\Bundle\JobBundle\Validator\Job\AbstractConstraintProvider;
+use PHPUnit\Framework\TestCase;
 
-class AbstractConstraintProviderTest extends \PHPUnit_Framework_TestCase
+class AbstractConstraintProviderTest extends TestCase
 {
     public function testGetPriority()
     {

@@ -13,11 +13,12 @@ namespace Abc\Bundle\JobBundle\Tests\Job\Response;
 use Abc\Bundle\JobBundle\Job\ExceptionResponse;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ExceptionResponseTest extends \PHPUnit_Framework_TestCase
+class ExceptionResponseTest extends TestCase
 {
     /**
      * @var SerializerInterface

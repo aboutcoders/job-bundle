@@ -17,11 +17,12 @@ use Abc\Bundle\JobBundle\Serializer\Job\SerializationHelper;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobManagerTest extends \PHPUnit_Framework_TestCase
+class JobManagerTest extends TestCase
 {
     /**
      * @var string

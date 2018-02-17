@@ -14,6 +14,7 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Validator\Constraints\Job as JobConstraint;
 use Abc\Bundle\JobBundle\Validator\Constraints\JobValidator;
 use Abc\Bundle\JobBundle\Validator\Constraints\Parameters;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobValidatorTest extends \PHPUnit_Framework_TestCase
+class JobValidatorTest extends TestCase
 {
 
     /**

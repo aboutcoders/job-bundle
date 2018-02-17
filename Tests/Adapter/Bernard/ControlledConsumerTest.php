@@ -14,12 +14,13 @@ use Abc\Bundle\JobBundle\Adapter\Bernard\ControlledConsumer;
 use Abc\ProcessControl\ControllerInterface;
 use Bernard\Queue;
 use Bernard\Router;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ControlledConsumerTest extends \PHPUnit_Framework_TestCase
+class ControlledConsumerTest extends TestCase
 {
     /**
      * @var Router|\PHPUnit_Framework_MockObject_MockObject

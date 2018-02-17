@@ -17,11 +17,12 @@ use Abc\Bundle\JobBundle\Model\LogInterface;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class LogManagerTest extends \PHPUnit_Framework_TestCase
+class LogManagerTest extends TestCase
 {
 
     /**
