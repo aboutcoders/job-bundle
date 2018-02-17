@@ -101,6 +101,12 @@ class JobSerializationTest extends KernelTestCase
     }
 
     /**
+     * @param null  $ticket
+     * @param null  $type
+     * @param null  $status
+     * @param null  $processingTime
+     * @param null  $parameters
+     * @param array $schedules
      * @return Job
      */
     public static function createJob($ticket = null, $type = null, $status = null, $processingTime = null, $parameters = null, array $schedules = array())

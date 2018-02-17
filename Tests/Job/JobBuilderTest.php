@@ -14,11 +14,12 @@ use Abc\Bundle\JobBundle\Job\JobBuilder;
 use Abc\Bundle\JobBundle\Job\JobInterface;
 use Abc\Bundle\JobBundle\Job\Mailer\Message;
 use Abc\Bundle\JobBundle\Model\ScheduleInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobBuilderTest extends \PHPUnit_Framework_TestCase
+class JobBuilderTest extends TestCase
 {
     public function testCreate()
     {

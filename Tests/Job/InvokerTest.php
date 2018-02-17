@@ -24,12 +24,13 @@ use Abc\Bundle\JobBundle\Tests\Fixtures\Job\JobAwareJob;
 use Abc\Bundle\JobBundle\Tests\Fixtures\Job\ManagerAwareJob;
 use Abc\ProcessControl\ControllerInterface;
 use Metadata\MetadataFactoryInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class InvokerTest extends \PHPUnit_Framework_TestCase
+class InvokerTest extends TestCase
 {
     /**
      * @var MetadataFactoryInterface|\PHPUnit_Framework_MockObject_MockObject

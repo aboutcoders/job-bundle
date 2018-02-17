@@ -15,12 +15,14 @@ use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\Bundle\JobBundle\Job\ProcessControl\StatusController;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StatusControllerTest extends \PHPUnit_Framework_TestCase
+class StatusControllerTest extends TestCase
 {
     use PHPMock;
 

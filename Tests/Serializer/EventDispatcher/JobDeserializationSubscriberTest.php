@@ -14,11 +14,12 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Serializer\EventDispatcher\JobDeserializationSubscriber;
 use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
+class JobDeserializationSubscriberTest extends TestCase
 {
     /**
      * @var JobDeserializationSubscriber
@@ -69,6 +70,8 @@ class JobDeserializationSubscriberTest extends \PHPUnit_Framework_TestCase
 
         if (isset($data['parameters'])) {
             $this->assertArrayNotHasKey('abc.job.type', $data['parameters']);
+        } else {
+            $this->assertTrue(is_null($data['parameters']));
         }
     }
 

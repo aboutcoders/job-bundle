@@ -16,12 +16,13 @@ use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Listener\JobListener;
 use Abc\Bundle\JobBundle\Logger\LoggerFactoryInterface;
 use Abc\Bundle\JobBundle\Model\Job;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobListenerTest extends \PHPUnit_Framework_TestCase
+class JobListenerTest extends TestCase
 {
     /**
      * @var ManagerInterface

@@ -17,8 +17,9 @@ use Abc\Bundle\JobBundle\Model\JobInterface;
 use Abc\Bundle\JobBundle\Model\JobManagerInterface;
 use Abc\ProcessControl\ChainController;
 use Abc\ProcessControl\ControllerInterface;
+use PHPUnit\Framework\TestCase;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     /**
      * @var JobInterface|\PHPUnit_Framework_MockObject_MockObject

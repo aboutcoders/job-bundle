@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Model;
 
 use Abc\Bundle\JobBundle\Model\Schedule;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ScheduleTest extends \PHPUnit_Framework_TestCase
+class ScheduleTest extends TestCase
 {
     public function testClone()
     {

@@ -14,11 +14,12 @@ use Abc\Bundle\JobBundle\Adapter\Bernard\ConsumerAdapter;
 use Bernard\Consumer;
 use Bernard\Queue;
 use Bernard\QueueFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ConsumerAdapterTest extends \PHPUnit_Framework_TestCase
+class ConsumerAdapterTest extends TestCase
 {
     /**
      * @var Consumer|\PHPUnit_Framework_MockObject_MockObject

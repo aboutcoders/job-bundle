@@ -16,11 +16,12 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\JobManager;
 use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Abc\Bundle\JobBundle\Model\Schedule;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobManagerTest extends \PHPUnit_Framework_TestCase
+class JobManagerTest extends TestCase
 {
     /**
      * @var \Abc\Bundle\JobBundle\Model\JobManager|\PHPUnit_Framework_MockObject_MockObject
@@ -66,7 +67,8 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->with(array('ticket' => $ticket));
 
-        $this->subject->findByTicket($ticket);
+        $result = $this->subject->findByTicket($ticket);
+        $this->assertTrue(is_null($result));
     }
 
     public function testIsManagerRecognizesManagedJobs() {

@@ -14,10 +14,11 @@ namespace Abc\Bundle\JobBundle\Tests\Validator\Constraints;
 use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Validator\Constraints\JobType;
 use Abc\Bundle\JobBundle\Validator\Constraints\JobTypeValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class JobTypeValidatorTest extends \PHPUnit_Framework_TestCase
+class JobTypeValidatorTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject

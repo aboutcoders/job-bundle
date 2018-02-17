@@ -15,11 +15,12 @@ use Abc\Bundle\JobBundle\Entity\Schedule;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
+class ScheduleManagerTest extends TestCase
 {
     /**
      * @var string

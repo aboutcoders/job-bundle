@@ -12,11 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Event;
 
 use Abc\Bundle\JobBundle\Event\TerminationEvent;
 use Abc\Bundle\JobBundle\Model\Job;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TerminationEventTest extends \PHPUnit_Framework_TestCase
+class TerminationEventTest extends TestCase
 {
     public function testGetJob()
     {

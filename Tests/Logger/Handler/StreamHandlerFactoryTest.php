@@ -16,11 +16,12 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class StreamHandlerFactoryTest extends \PHPUnit_Framework_TestCase
+class StreamHandlerFactoryTest extends TestCase
 {
     /**
      * @var vfsStreamDirectory

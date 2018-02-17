@@ -12,11 +12,12 @@ namespace Abc\Bundle\JobBundle\Tests\Job\Context;
 
 use Abc\Bundle\JobBundle\Job\Context\Context;
 use Abc\Bundle\JobBundle\Job\Context\Exception\ParameterNotFoundException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends TestCase
 {
     /**
      * @var Context

@@ -15,13 +15,14 @@ use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Validator\Constraints\Parameters as ParametersConstraint;
 use Abc\Bundle\JobBundle\Validator\Constraints\ParametersValidator;
 use Abc\Bundle\JobBundle\Validator\Job\ConstraintProviderInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ParametersValidatorTest extends \PHPUnit_Framework_TestCase
+class ParametersValidatorTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject

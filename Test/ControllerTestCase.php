@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ControllerTestCase extends \PHPUnit_Framework_TestCase
+class ControllerTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject

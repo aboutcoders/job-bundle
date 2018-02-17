@@ -34,13 +34,13 @@ class MailerTest extends JobTestCase
     {
         $message = new Message('mail@domain.tld', 'to@domain.td', 'Subject', 'MessageBody');
 
-        $this->assertValid('abc.mailer', [$message]);
+        $this->assertTrue($this->assertValid('abc.mailer', [$message]));
     }
 
     public function testValidationFails()
     {
         $message = new Message('foobar', 'to@domain.td', 'Subject', 'MessageBody');
 
-        $this->assertNotValid('abc.mailer', [$message]);
+        $this->assertTrue($this->assertNotValid('abc.mailer', [$message]));
     }
 }

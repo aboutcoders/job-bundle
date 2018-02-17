@@ -71,11 +71,11 @@ abstract class JobTestCase extends KernelTestCase
      * @param string $expectedServiceId The expected id of the service
      * @param string $expectedMethod    The expected name of the method
      */
-    public static function assertJobIsRegistered($type, $expectedServiceId, $expectedMethod)
+    public function assertJobIsRegistered($type, $expectedServiceId, $expectedMethod)
     {
-        static::assertTrue(static::getRegistry()->has($type));
-        static::assertEquals($expectedServiceId, static::getRegistry()->get($type)->getServiceId());
-        static::assertEquals($expectedMethod, static::getRegistry()->get($type)->getMethod());
+        $this->assertTrue(static::getRegistry()->has($type));
+        $this->assertEquals($expectedServiceId, static::getRegistry()->get($type)->getServiceId());
+        $this->assertEquals($expectedMethod, static::getRegistry()->get($type)->getMethod());
     }
 
     /**
@@ -85,9 +85,9 @@ abstract class JobTestCase extends KernelTestCase
      * @param array  $parameters The job parameters
      * @return bool
      */
-    public static function assertValid($type, array $parameters)
+    public function assertValid($type, array $parameters)
     {
-        return static::validateParameters($type, $parameters)->count() == 0;
+        return $this->validateParameters($type, $parameters)->count() == 0;
     }
 
     /**
@@ -97,9 +97,9 @@ abstract class JobTestCase extends KernelTestCase
      * @param array  $parameters The job parameters
      * @return bool
      */
-    public static function assertNotValid($type, array $parameters)
+    public function assertNotValid($type, array $parameters)
     {
-        return static::validateParameters($type, $parameters)->count() > 0;
+        return $this->validateParameters($type, $parameters)->count() > 0;
     }
 
     /**

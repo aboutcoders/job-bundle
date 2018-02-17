@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Job\Metadata;
 
 use Abc\Bundle\JobBundle\Job\Metadata\ClassMetadata;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ClassMetadataTest extends \PHPUnit_Framework_TestCase
+class ClassMetadataTest extends TestCase
 {
     /**
      * @var ClassMetadata

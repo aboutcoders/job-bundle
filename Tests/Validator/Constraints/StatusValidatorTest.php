@@ -14,10 +14,11 @@ namespace Abc\Bundle\JobBundle\Tests\Validator\Constraints;
 use Abc\Bundle\JobBundle\Job\Status;
 use Abc\Bundle\JobBundle\Validator\Constraints\Status as StatusConstraint;
 use Abc\Bundle\JobBundle\Validator\Constraints\StatusValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class StatusValidatorTest extends \PHPUnit_Framework_TestCase
+class StatusValidatorTest extends TestCase
 {
     /**
      * @var ExecutionContext|\PHPUnit_Framework_MockObject_MockObject

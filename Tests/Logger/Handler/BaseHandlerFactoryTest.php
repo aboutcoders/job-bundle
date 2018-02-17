@@ -13,11 +13,12 @@ namespace Abc\Bundle\JobBundle\Tests\Logger\Handler;
 use Abc\Bundle\JobBundle\Logger\Handler\BaseHandlerFactory;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class BaseHandlerFactoryTest extends \PHPUnit_Framework_TestCase
+class BaseHandlerFactoryTest extends TestCase
 {
     /**
      * @var BaseHandlerFactory

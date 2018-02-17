@@ -16,11 +16,12 @@ use Abc\Bundle\JobBundle\Listener\ScheduleListener;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Event\SchedulerEvent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class ScheduleListenerTest extends \PHPUnit_Framework_TestCase
+class ScheduleListenerTest extends TestCase
 {
     /**
      * @var ProducerInterface|\PHPUnit_Framework_MockObject_MockObject

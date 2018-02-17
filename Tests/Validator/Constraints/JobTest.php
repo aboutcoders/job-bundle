@@ -11,12 +11,13 @@
 namespace Abc\Bundle\JobBundle\Tests\Validator\Constraints;
 
 use Abc\Bundle\JobBundle\Validator\Constraints\Job;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobTest extends TestCase
 {
     public function testGetTargets()
     {

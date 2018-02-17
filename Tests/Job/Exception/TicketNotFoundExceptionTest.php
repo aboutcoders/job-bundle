@@ -11,11 +11,12 @@
 namespace Abc\Bundle\JobBundle\Tests\Job\Exception;
 
 use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class TicketNotFoundExceptionTest extends \PHPUnit_Framework_TestCase
+class TicketNotFoundExceptionTest extends TestCase
 {
     public function testGetTicket()
     {

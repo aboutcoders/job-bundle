@@ -14,7 +14,7 @@ use Abc\Bundle\JobBundle\Job\JobTypeRegistry;
 use Abc\Bundle\JobBundle\Job\ManagerInterface;
 use Abc\Bundle\JobBundle\Job\Queue\Message;
 use Abc\Bundle\JobBundle\Job\Queue\ProducerInterface;
-use Bernard\Message\DefaultMessage;
+use Bernard\Message\PlainMessage;
 use Bernard\Producer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -69,7 +69,7 @@ class ProducerAdapter implements ProducerInterface
      */
     public function produce(Message $message)
     {
-        $producerMessage = new DefaultMessage('ConsumeJob', [
+        $producerMessage = new PlainMessage('ConsumeJob', [
             'type' => $message->getType(),
             'ticket' => $message->getTicket()
         ]);
@@ -84,9 +84,10 @@ class ProducerAdapter implements ProducerInterface
      *
      * This method is registered as the message handler for messages with name "ConsumeJob".
      *
-     * @param DefaultMessage $message
+     * @param PlainMessage $message
+     * @throws \Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException
      */
-    public function consumeJob(DefaultMessage $message){
+    public function consumeJob(PlainMessage $message){
 
         $ticket = $message->ticket;
         $type = $message->type;

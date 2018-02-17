@@ -18,12 +18,13 @@ use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface;
 use Abc\Bundle\SchedulerBundle\Schedule\SchedulerInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobHelperTest extends \PHPUnit_Framework_TestCase
+class JobHelperTest extends TestCase
 {
     /**
      * @var LoggerFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -61,6 +62,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getNonTerminatedStatus
+     * @param $status
      */
     public function testUpdateJobWithNonTerminatedStatusValues($status)
     {
@@ -79,6 +81,8 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getTerminatedStatus
+     * @param $status
+     * @throws \Exception
      */
     public function testUpdateJobWithStatusTerminatedSetsTerminatedAt($status)
     {
@@ -92,6 +96,7 @@ class JobHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getTerminatedStatus
+     * @param $status
      */
     public function testUpdateJobWithStatusTerminatedDisablesSchedule($status)
     {

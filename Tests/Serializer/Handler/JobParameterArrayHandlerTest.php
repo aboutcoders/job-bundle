@@ -22,11 +22,12 @@ use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\VisitorInterface;
 use Metadata\MetadataFactoryInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class JobParameterArrayHandlerTest extends \PHPUnit_Framework_TestCase
+class JobParameterArrayHandlerTest extends TestCase
 {
     /**
      * @var JobTypeRegistry|\PHPUnit_Framework_MockObject_MockObject

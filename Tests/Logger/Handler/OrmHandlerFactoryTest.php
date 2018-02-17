@@ -15,11 +15,12 @@ use Abc\Bundle\JobBundle\Logger\Handler\OrmHandlerFactory;
 use Abc\Bundle\JobBundle\Model\Job;
 use Abc\Bundle\JobBundle\Model\LogManagerInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class OrmHandlerFactoryTest extends \PHPUnit_Framework_TestCase
+class OrmHandlerFactoryTest extends TestCase
 {
     /**
      * @var LogManagerInterface|\PHPUnit_Framework_MockObject_MockObject

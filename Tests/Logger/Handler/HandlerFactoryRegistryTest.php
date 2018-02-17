@@ -14,11 +14,12 @@ use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryInterface;
 use Abc\Bundle\JobBundle\Logger\Handler\HandlerFactoryRegistry;
 use Abc\Bundle\JobBundle\Model\Job;
 use Monolog\Handler\HandlerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
  */
-class HandlerFactoryRegistryTest extends \PHPUnit_Framework_TestCase
+class HandlerFactoryRegistryTest extends TestCase
 {
     /**
      * @var HandlerFactoryRegistry
