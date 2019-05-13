@@ -25,6 +25,7 @@ use Abc\Bundle\ResourceLockBundle\Model\LockInterface;
 use Abc\Bundle\SchedulerBundle\Model\ScheduleInterface as BaseScheduleInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -102,19 +103,19 @@ class Manager implements ManagerInterface
     /**
      * @var array
      */
-    private $jobLogger = array();
+    private $jobLogger = [];
 
     /**
-     * @param JobTypeRegistry          $registry
-     * @param JobManagerInterface      $jobManager
-     * @param Invoker                  $invoker
-     * @param LoggerFactoryInterface   $loggerFactory
-     * @param LogManagerInterface      $logManager
+     * @param JobTypeRegistry $registry
+     * @param JobManagerInterface $jobManager
+     * @param Invoker $invoker
+     * @param LoggerFactoryInterface $loggerFactory
+     * @param LogManagerInterface $logManager
      * @param EventDispatcherInterface $eventDispatcher
-     * @param JobHelper                $helper
-     * @param LockInterface            $locker
-     * @param ValidatorInterface|null  $validator
-     * @param LoggerInterface|null     $logger
+     * @param JobHelper $helper
+     * @param LockInterface $locker
+     * @param ValidatorInterface|null $validator
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         JobTypeRegistry $registry,
@@ -126,19 +127,19 @@ class Manager implements ManagerInterface
         JobHelper $helper,
         LockInterface $locker,
         ValidatorInterface $validator = null,
-        LoggerInterface $logger = null)
-    {
-        $this->registry      = $registry;
-        $this->jobManager    = $jobManager;
-        $this->invoker       = $invoker;
+        LoggerInterface $logger = null
+    ) {
+        $this->registry = $registry;
+        $this->jobManager = $jobManager;
+        $this->invoker = $invoker;
         $this->loggerFactory = $loggerFactory;
-        $this->logManager    = $logManager;
-        $this->dispatcher    = $eventDispatcher;
-        $this->helper        = $helper;
-        $this->locker        = $locker;
-        $this->validator     = $validator;
-        $this->logger        = $logger == null ? new NullLogger() : $logger;
-        $this->stopwatch     = new Stopwatch();
+        $this->logManager = $logManager;
+        $this->dispatcher = $eventDispatcher;
+        $this->helper = $helper;
+        $this->locker = $locker;
+        $this->validator = $validator;
+        $this->logger = $logger == null ? new NullLogger() : $logger;
+        $this->stopwatch = new Stopwatch();
     }
 
     /**
@@ -172,7 +173,7 @@ class Manager implements ManagerInterface
             }
         }
 
-        if (!$this->jobManager->isManagerOf($job)) {
+        if (! $this->jobManager->isManagerOf($job)) {
             $job = $this->helper->copyJob($job, $this->jobManager->create());
         }
 
@@ -183,10 +184,10 @@ class Manager implements ManagerInterface
 
         $this->logger->info(sprintf('Added job %s of type "%s"', $job->getTicket(), $job->getType()), [
             'parameters' => $job->getParameters(),
-            'schedules'  => $job->getSchedules()
+            'schedules' => $job->getSchedules(),
         ]);
 
-        if (!$job->hasSchedules()) {
+        if (! $job->hasSchedules()) {
             $this->publishJob($job);
         }
 
@@ -205,7 +206,7 @@ class Manager implements ManagerInterface
         }
 
         $isProcessing = $job->getStatus() == Status::PROCESSING();
-        $status       = $force ? Status::CANCELLED() : ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
+        $status = $force ? Status::CANCELLED() : ($isProcessing ? Status::CANCELLING() : Status::CANCELLED());
 
         $this->helper->updateJob($job, $status);
         $this->jobManager->save($job);
@@ -214,12 +215,12 @@ class Manager implements ManagerInterface
             $this->locker->release($job->getTicket());
         }
 
-        if (!$isProcessing || $force) {
+        if (! $isProcessing || $force) {
             $this->dispatcher->dispatch(JobEvents::JOB_TERMINATED, new TerminationEvent($job));
             $message = $force ? 'Forced cancellation of job ' : 'Cancelled job ';
-            $this->logger->info($message . $job->getTicket());
+            $this->logger->info($message.$job->getTicket());
         } else {
-            $this->logger->info('Request cancellation of job ' . $job->getTicket());
+            $this->logger->info('Request cancellation of job '.$job->getTicket());
         }
 
         return $job;
@@ -230,7 +231,7 @@ class Manager implements ManagerInterface
      */
     public function get($ticket)
     {
-        $this->logger->debug('Get job ' . $ticket);
+        $this->logger->debug('Get job '.$ticket);
 
         return $this->findJob($ticket);
     }
@@ -240,7 +241,7 @@ class Manager implements ManagerInterface
      */
     public function getLogs($ticket)
     {
-        $this->logger->debug('Get logs of job ' . $ticket);
+        $this->logger->debug('Get logs of job '.$ticket);
 
         return $this->logManager->findByJob($this->findJob($ticket));
     }
@@ -251,6 +252,8 @@ class Manager implements ManagerInterface
     public function onMessage(Message $message)
     {
         $this->stopwatch->start('processMessage');
+
+        $this->dispatchEvent(JobEvents::JOB_MESSAGE_CONSUME, new Event());
 
         $job = $this->findJob($message->getTicket());
 
@@ -263,25 +266,25 @@ class Manager implements ManagerInterface
         try {
             $this->locker->lock($this->getLockName($job));
         } catch (LockException $e) {
-            $this->logger->warning('Failed to get lock for job ' . $job->getTicket());
+            $this->logger->warning('Failed to get lock for job '.$job->getTicket());
 
             return;
         }
 
         $event = new ExecutionEvent($job, new Context());
 
-        $this->dispatchExecutionEvent(JobEvents::JOB_PRE_EXECUTE, $event);
+        $this->dispatchEvent(JobEvents::JOB_PRE_EXECUTE, $event);
 
         $job->setStatus(Status::PROCESSING());
         $job->setProcessingTime(0);
         $this->jobManager->save($job);
 
-        $response       = null;
+        $response = null;
         $this->stopwatch->start('processJob');
 
         try {
             $this->logger->debug(sprintf('Execute job %s of type "%s"', $job->getTicket(), $job->getType()), [
-                'parameters' => $job->getParameters()
+                'parameters' => $job->getParameters(),
             ]);
 
             // invoke the job
@@ -293,31 +296,27 @@ class Manager implements ManagerInterface
                 $status = Status::CANCELLED();
             }
 
-            $this->dispatchExecutionEvent(JobEvents::JOB_POST_EXECUTE, $event);
-        }
-        catch (\Throwable $e)
-        {
+            $this->dispatchEvent(JobEvents::JOB_POST_EXECUTE, $event);
+        } catch (\Throwable $e) {
             $this->logger->warning(sprintf('Failed to execute job %s (Error: $s)', $job->getTicket(), $e->getMessage()), [
-                'job'       => $job,
-                'exception' => $e
+                'job' => $job,
+                'exception' => $e,
             ]);
 
             $this->getJobLogger($job)->error($e->getMessage(), ['exception' => $e]);
 
             $response = new ExceptionResponse($e);
-            $status   = Status::ERROR();
-        }
-        catch (\Exception $e)
-        {
+            $status = Status::ERROR();
+        } catch (\Exception $e) {
             $this->logger->warning(sprintf('Failed to execute job %s (Error: $s)', $job->getTicket(), $e->getMessage()), [
-                'job'       => $job,
-                'exception' => $e
+                'job' => $job,
+                'exception' => $e,
             ]);
 
             $this->getJobLogger($job)->error($e->getMessage(), ['exception' => $e]);
 
             $response = new ExceptionResponse($e);
-            $status   = Status::ERROR();
+            $status = Status::ERROR();
         }
 
         $this->releaseLock($job);
@@ -335,7 +334,7 @@ class Manager implements ManagerInterface
      */
     public function restart($ticket)
     {
-        $this->logger->debug('Restart job ' . $ticket);
+        $this->logger->debug('Restart job '.$ticket);
 
         $job = $this->findJob($ticket);
 
@@ -352,7 +351,7 @@ class Manager implements ManagerInterface
             return $this->add($job);
         }
 
-        $this->logger->debug('Update job ' . $job->getTicket(), ['job' => $job]);
+        $this->logger->debug('Update job '.$job->getTicket(), ['job' => $job]);
 
         $job = $this->helper->copyJob($job, $existingJob);
 
@@ -382,8 +381,8 @@ class Manager implements ManagerInterface
             $this->producer->produce($message);
         } catch (\Exception $e) {
             $this->logger->critical(sprintf('Failed to publish message for job %s (Error: %s)', $job->getTicket(), $e->getMessage()), [
-                'job'       => $job,
-                'exception' => $e
+                'job' => $job,
+                'exception' => $e,
             ]);
 
             throw $e;
@@ -407,14 +406,17 @@ class Manager implements ManagerInterface
     }
 
     /**
-     * @param string         $eventName
+     * @param string $eventName
      * @param ExecutionEvent $event
      * @return void
      */
-    private function dispatchExecutionEvent($eventName, ExecutionEvent $event)
+    private function dispatchEvent($eventName, Event $event)
     {
         try {
-            $this->logger->debug(sprintf('Dispatch event %s for job %s', $eventName, $event->getJob()->getTicket()));
+
+            if ($event instanceof ExecutionEvent) {
+                $this->logger->debug(sprintf('Dispatch event %s or job %s', $eventName, $event->getJob()->getTicket()));
+            }
 
             $this->dispatcher->dispatch($eventName, $event);
         } catch (\Exception $e) {
@@ -430,7 +432,7 @@ class Manager implements ManagerInterface
      */
     private function getLockName(JobInterface $job)
     {
-        return self::JOB_LOCK_PREFIX . $job->getTicket();
+        return self::JOB_LOCK_PREFIX.$job->getTicket();
     }
 
     /**
@@ -441,7 +443,7 @@ class Manager implements ManagerInterface
     {
         $this->locker->release($this->getLockName($job));
 
-        $this->logger->debug('Released lock for job ' . $job->getTicket());
+        $this->logger->debug('Released lock for job '.$job->getTicket());
     }
 
     /**
@@ -450,7 +452,7 @@ class Manager implements ManagerInterface
      */
     private function getJobLogger(JobInterface $job)
     {
-        if (!isset($this->jobLogger[0]) || $job !== $this->jobLogger[0]) {
+        if (! isset($this->jobLogger[0]) || $job !== $this->jobLogger[0]) {
             $this->jobLogger[0] = $job;
             $this->jobLogger[1] = $this->loggerFactory->create($job);
         }

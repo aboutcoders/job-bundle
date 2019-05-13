@@ -15,6 +15,16 @@ namespace Abc\Bundle\JobBundle\Event;
  */
 final class JobEvents
 {
+
+    /**
+     * The abc.job.message_consume event is triggered each time a message is consumed from the queue
+     *
+     * The event listener receives an event of type Symfony\Component\EventDispatcher\Event
+     *
+     * @var string
+     */
+    const JOB_MESSAGE_CONSUME = 'abc.job.message_consume';
+
     /**
      * The abc.job.pre_execute event is triggered each time before a job is executed
      *

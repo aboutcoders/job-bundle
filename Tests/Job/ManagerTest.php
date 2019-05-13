@@ -31,9 +31,9 @@ use Abc\Bundle\JobBundle\Model\Schedule;
 use Abc\Bundle\JobBundle\Model\ScheduleInterface;
 use Abc\Bundle\ResourceLockBundle\Exception\LockException;
 use Abc\Bundle\ResourceLockBundle\Model\LockManagerInterface;
-use Doctrine\DBAL\DBALException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
@@ -447,7 +447,7 @@ class ManagerTest extends TestCase
             ->with($message->getTicket())
             ->willReturn($job);
 
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->at(1))
             ->method('dispatch')
             ->with(
                 JobEvents::JOB_PRE_EXECUTE,
@@ -472,7 +472,7 @@ class ManagerTest extends TestCase
                 )
             );
 
-        $this->dispatcher->expects($this->at(1))
+        $this->dispatcher->expects($this->at(2))
             ->method('dispatch')
             ->with(
                 JobEvents::JOB_POST_EXECUTE,
@@ -557,8 +557,9 @@ class ManagerTest extends TestCase
         $this->invoker->expects($this->never())
             ->method('invoke');
 
-        $this->dispatcher->expects($this->never())
-            ->method('dispatch');
+        $this->dispatcher->expects($this->exactly(1))
+            ->method('dispatch')
+            ->with(JobEvents::JOB_MESSAGE_CONSUME, $this->equalTo(new Event()));
 
         $this->locker->expects($this->never())
             ->method('release');
@@ -732,8 +733,9 @@ class ManagerTest extends TestCase
             ->method('findByTicket')
             ->willReturn($job);
 
-        $this->dispatcher->expects($this->never())
-            ->method('dispatch');
+        $this->dispatcher->expects($this->exactly(1))
+            ->method('dispatch')
+            ->with(JobEvents::JOB_MESSAGE_CONSUME);
 
         $this->locker->expects($this->never())
             ->method('lock');
@@ -911,7 +913,7 @@ class ManagerTest extends TestCase
             ->with(
                 $this->callback(
                     function ($name) use ($expectedEventName) {
-                        return $expectedEventName != JobEvents::JOB_TERMINATED;
+                        return $name != $expectedEventName;
                     }
                 )
             );
