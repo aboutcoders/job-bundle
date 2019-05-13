@@ -251,9 +251,9 @@ class Manager implements ManagerInterface
      */
     public function onMessage(Message $message)
     {
-        $this->stopwatch->start('processMessage');
-
         $this->dispatchEvent(JobEvents::JOB_MESSAGE_CONSUME, new Event());
+
+        $this->stopwatch->start('processMessage');
 
         $job = $this->findJob($message->getTicket());
 
