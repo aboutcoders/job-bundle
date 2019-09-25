@@ -1,8 +1,8 @@
 {
     "name": "aboutcoders/job-bundle",
     "type": "symfony-bundle",
-    "description": "A symfony bundle for asynchronous job processing.",
-    "keywords": ["job", "jobs", "schedule", "scheduler", "cron", "cronjob", "bundle", "queue", "task", "background", "rest", "rest-api" , "asynchronous"],
+    "description": "A symfony bundle for asynchronous distributed job processing.",
+    "keywords": ["job", "asynchronous", "distributed", "schedule", "cron", "queue"],
     "homepage": "http://aboutcoders.com",
     "license": "MIT",
     "authors": [
@@ -12,36 +12,29 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
-        "symfony/symfony": "~2.6|~3.0",
-        "myclabs/php-enum": "~1.5",
-        "gedmo/doctrine-extensions": "~2.0",
-        "jms/serializer-bundle": "*",
-        "nelmio/api-doc-bundle": "~3",
-        "doctrine/annotations": "1.*",
-        "aboutcoders/process-control": "~1.3",
-        "aboutcoders/scheduler-bundle": "~1.2",
-        "aboutcoders/resource-lock-bundle": "~0.1"
+        "php": "^7.2",
+        "psr/log": "^1.0",
+        "symfony/framework-bundle": "^3.4|^4",
+        "abc/job": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "~5.0|~6.0",
-        "php-mock/php-mock-phpunit": "dev-master",
-        "mikey179/vfsStream": "^1.5",
-        "doctrine/orm": "~2.2,>=2.2.3",
-        "doctrine/doctrine-bundle": "~1.2",
-        "symfony/monolog-bundle": "~2",
-        "symfony/swiftmailer-bundle": "~2.3",
-        "sonata-project/notification-bundle": "~2.2",
-        "zendframework/zendxml": "~1",
-        "bernard/bernard-bundle" : "dev-master",
-        "aboutcoders/process-control-bundle": "~1.3@dev"
-    },
-    "suggest": {
-        "aboutcoders/process-control-bundle": "Adds process control, requires ^1.3",
-        "aboutcoders/supervisor-bundle": "Manage supervisor processes, requires dev-master"
+        "phpunit/phpunit": "^7.0",
+        "symfony/browser-kit": "^3.4|^4",
+        "doctrine/doctrine-bundle": "^1.3",
+        "doctrine/orm": "^2.6",
+        "enqueue/enqueue-bundle": "^0.9",
+        "enqueue/null": "^0.9"
     },
     "autoload": {
-        "psr-4": { "Abc\\Bundle\\JobBundle\\": "" }
+        "psr-4": { "Abc\\JobBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Abc\\JobBundle\\Tests\\": "tests/"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

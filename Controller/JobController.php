@@ -1,493 +1,97 @@
 <?php
-/*
-* This file is part of the job-bundle package.
-*
-* (c) Hannes Schulz <hannes.schulz@aboutcoders.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
 
-namespace Abc\Bundle\JobBundle\Controller;
+namespace Abc\JobBundle\Controller;
 
-use Abc\Bundle\JobBundle\Api\BadRequestResponse;
-use Abc\Bundle\JobBundle\Api\ParameterConstraintViolation;
-use Abc\Bundle\JobBundle\Job\Exception\TicketNotFoundException;
-use Abc\Bundle\JobBundle\Job\Exception\ValidationFailedException;
-use Abc\Bundle\JobBundle\Job\JobInterface;
-use Abc\Bundle\JobBundle\Job\Status;
-use Abc\Bundle\JobBundle\Model\Job;
-use Abc\Bundle\JobBundle\Serializer\DeserializationContext;
-use Abc\Bundle\JobBundle\Validator\Constraints as AbcAssert;
-use Abc\Bundle\JobBundle\Model\JobList;
-use Nelmio\ApiDocBundle\Annotation\Operation;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Swagger\Annotations as SWG;
+use Abc\Job\HttpServer;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @author Hannes Schulz <hannes.schulz@aboutcoders.com>
- */
-class JobController extends BaseController
+class JobController extends AbstractController
 {
     /**
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Returns a collection of jobs",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful",
-     *         @SWG\Schema(
-     *              type="array",
-     *              @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
-     *         )
-     *     ),
-     *     @SWG\Response(
-     *         response="400",
-     *         description="Returned when request is invalid",
-     *         @Model(type=Abc\Bundle\JobBundle\Api\BadRequestResponse::class)
-     *     ),
-     *     @SWG\Parameter(
-     *         name="page",
-     *         in="query",
-     *         type="integer",
-     *         default="1",
-     *         format="\d+",
-     *         required=false,
-     *         description="The page number of the result set"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="limit",
-     *         in="query",
-     *         type="integer",
-     *         default="10",
-     *         format="\d+",
-     *         required=false,
-     *         description="The page size"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="sortCol",
-     *         in="query",
-     *         type="string",
-     *         default="createdAt",
-     *         format="(ticket|type|status|createdAt|terminatedAt)",
-     *         required=false,
-     *         description="The sort column"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="sortDir",
-     *         in="query",
-     *         type="string",
-     *         default="DESC",
-     *         format="(ASC|DESC)",
-     *         required=false,
-     *         description="The sort direction"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="criteria",
-     *         in="query",
-     *         type="array",
-     *         @SWG\Items(
-     *             type="string"
-     *         ),
-     *         required=false,
-     *         description="The search criteria defined as associative array, valid keys are ticket|type|status"
-     *     )
-     * )
+     * @var HttpServer
+     */
+    private $httpServer;
+
+    public function __construct(HttpServer $httpServer)
+    {
+        $this->httpServer = $httpServer;
+    }
+
+    /**
+     * @Route("/job", methods="GET")
      *
      * @param Request $request
      * @return Response
      */
-    public function listAction(Request $request)
+    public function index(Request $request)
     {
-        $criteria   = $request->query->get('criteria', array());
-        $page       = $request->query->get('page', 1);
-        $sortColumn = $request->query->get('sortCol', 'createdAt');
-        $sortDir    = $request->query->get('sortDir', 'DESC');
-        $limit      = $request->query->get('limit', 10);
-
-        if ($errors = $this->validateQueryParameters($page, $sortColumn, $sortDir, $limit, $criteria)) {
-
-            $response = new BadRequestResponse('Invalid query parameters', 'One or more query parameters are invalid');
-            $response->setErrors($errors);
-
-            return $this->serialize($response, 400);
-        }
-
-        $page   = (int)$page - 1;
-        $offset = ($page > 0) ? ($page) * $limit : 0;
-
-        $criteria = $this->filterCriteria($criteria);
-
-        $manager = $this->getJobManager();
-
-        $entities = $manager->findBy($criteria, [$sortColumn => $sortDir], $limit, $offset);
-        $count    = $manager->findByCount($criteria);
-
-        $list = new JobList();
-        $list->setItems($entities);
-        $list->setTotalCount($count);
-
-        return $this->serialize($list);
+        return $this->createResponse($this->httpServer->index($request->getQueryString(), $request->getUri()));
     }
 
     /**
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Returns a job",
-     *     @SWG\Response(
-     *         response="201",
-     *         description="Returned when successful"
-     *     ),
-     *     @SWG\Response(
-     *         response="404",
-     *         description="Returned when node not found"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     )
-     * )
-     *
-     * @param string $ticket
-     * @return Response
-     */
-    public function getAction($ticket)
-    {
-        try {
-            return $this->serialize($this->getManager()->get($ticket));
-        } catch (TicketNotFoundException $e) {
-            return $this->createNotFoundResponse($e->getMessage());
-        }
-    }
-
-    /**
-     * Adds a new job.
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Adds a job",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful"
-     *     ),
-     *     @SWG\Response(
-     *         response="400",
-     *         description="Form validation error"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     )
-     * )
+     * @Route("/job", methods="POST")
      *
      * @param Request $request
      * @return Response
      */
-    public function addAction(Request $request)
+    public function process(Request $request)
     {
-        $job = $this->deserializeJob($request);
-
-        if ($response = $this->validateJob($job)) {
-            return $this->serialize($response, 400);
-        }
-
-        try {
-            return $this->serialize($this->getManager()->add($job));
-        } catch (ValidationFailedException $e) {
-            $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
-            $response->setErrors($e->getConstraintViolationList());
-
-            return $this->serialize($response, 400);
-        }
+        return $this->createResponse($this->httpServer->process($request->getContent(), $request->getUri()));
     }
 
     /**
-     * Updates a job.
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Updates a job",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful",
-     *         @Model(type=Abc\Bundle\JobBundle\Model\Job::class)
-     *     ),
-     *     @SWG\Response(
-     *         response="400",
-     *         description="Form validation error"
-     *     ),
-     *     @SWG\Response(
-     *         response="404",
-     *         description="Returned when job not found"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     )
-     * )
+     * @Route("/job/{id}", methods="GET")
      *
+     * @param string $id
+     * @return Response
+     */
+    public function result(string $id, Request $request): Response
+    {
+        return $this->createResponse($this->httpServer->result($id, $request->getUri()));
+    }
+
+    /**
+     * @Route("/job/{id}/restart", methods="PUT")
+     *
+     * @param string $id
      * @param Request $request
      * @return Response
      */
-    public function updateAction(Request $request)
+    public function restart(string $id, Request $request): Response
     {
-        $job = $this->deserializeJob($request);
-
-        if ($response = $this->validateJob($job)) {
-            return $this->serialize($response, 400);
-        }
-
-        try {
-            return $this->serialize($this->getManager()->update($job));
-        } catch (ValidationFailedException $e) {
-            $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
-            $response->setErrors($e->getConstraintViolationList());
-
-            return $this->serialize($response, 400);
-        }
+        return $this->createResponse($this->httpServer->restart($id, $request->getUri()));
     }
 
     /**
-     * Cancels a job.
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Cancels a job",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful",
-     *         @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
-     *     ),
-     *     @SWG\Response(
-     *         response="404",
-     *         description="Returned when job not found"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="force",
-     *         in="query",
-     *         type="boolean",
-     *         default="false",
-     *         required=false,
-     *         description="The job ticket"
-     *     )
-     * )
+     * @Route("/job/{id}/cancel", methods="PUT")
      *
-     * @param string $ticket
-     * @param bool   $force Whether to force cancellation (false by default)
-     * @return Response
-     */
-    public function cancelAction($ticket, $force = false)
-    {
-        try {
-            return $this->serialize($this->getManager()->cancel($ticket, $force));
-        } catch (TicketNotFoundException $e) {
-            return $this->createNotFoundResponse($e->getMessage());
-        }
-    }
-
-    /**
-     * Restarts a job.
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Restarts a job",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful",
-     *         @Model(type=Abc\Bundle\JobBundle\Model\JobList::class)
-     *     ),
-     *     @SWG\Response(
-     *         response="404",
-     *         description="Returned when job not found"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     )
-     * )
-     *
-     * @param string $ticket
-     * @return Response
-     */
-    public function restartAction($ticket)
-    {
-        try {
-            return $this->serialize($this->getManager()->restart($ticket));
-        } catch (TicketNotFoundException $e) {
-            return $this->createNotFoundResponse($e->getMessage());
-        }
-    }
-
-    /**
-     * Returns the logs of a job.
-     * @Operation(
-     *     tags={"AbcJobBundle"},
-     *     summary="Returns the logs of a job",
-     *     @SWG\Response(
-     *         response="200",
-     *         description="Returned when successful",
-     *         @SWG\Schema(
-     *              type="array",
-     *              @Model(type=Abc\Bundle\JobBundle\Model\Log::class)
-     *         )
-     *     ),
-     *     @SWG\Response(
-     *         response="404",
-     *         description="Returned when job not found"
-     *     ),
-     *     @SWG\Parameter(
-     *         name="ticket",
-     *         in="query",
-     *         type="string",
-     *         required=true,
-     *         description="The job ticket"
-     *     )
-     * )
-     *
-     * @param string $ticket
-     * @return Response
-     */
-    public function logsAction($ticket)
-    {
-        try {
-            return $this->serialize($this->getManager()->getLogs($ticket));
-        } catch (TicketNotFoundException $e) {
-            return $this->createNotFoundResponse($e->getMessage());
-        }
-    }
-
-    /**
+     * @param string $id
      * @param Request $request
-     * @param array   $groups
-     * @return JobInterface|mixed
-     */
-    protected function deserializeJob(Request $request, array $groups = [])
-    {
-        $context = null;
-        if (count($groups) > 0) {
-            $context = new DeserializationContext();
-            $context->setGroups($groups);
-        }
-
-        return $this->getSerializer()->deserialize(
-            json_encode($request->request->all(), true),
-            Job::class,
-            'json',
-            $context
-        );
-    }
-
-    /**
-     * @param $criteria
-     * @return array
-     * @throws BadRequestHttpException If invalid status value is set in $criteria
-     */
-    protected function filterCriteria($criteria)
-    {
-        if (!is_array($criteria)) {
-            throw new HttpException(400, 'Invalid search criteria');
-        }
-
-        if (isset($criteria['status'])) {
-            try {
-                $criteria['status'] = new Status($criteria['status']);
-            } catch (\Exception $e) {
-                throw new BadRequestHttpException('Invalid status defined in criteria');
-            }
-        }
-
-        return $criteria;
-    }
-
-    /**
-     * @param mixed $page
-     * @param mixed $sortColumn
-     * @param mixed $sortDir
-     * @param mixed $limit
-     * @param mixed $criteria
-     * @return array
-     */
-    private function validateQueryParameters($page, $sortColumn, $sortDir, $limit, $criteria)
-    {
-        $validationErrors = [];
-
-        $this->validateQueryParameter($validationErrors, 'page', $page, new Assert\Range(['min' => 1]));
-        $this->validateQueryParameter($validationErrors, 'sortCol', $sortColumn, new Assert\Choice(['choices' => ['ticket', 'type', 'status', 'createdAt', 'terminatedAt'], 'message' => 'The value should be a valid sort column']));
-        $this->validateQueryParameter($validationErrors, 'sortDir', $sortDir, new Assert\Choice(['choices' => ['ASC', 'DESC'], 'message' => 'The value should be a valid sort direction']));
-        $this->validateQueryParameter($validationErrors, 'limit', $limit, new Assert\Range(['min' => 1]));
-        $this->validateQueryParameter($validationErrors, 'criteria', $criteria, new Assert\Collection([
-            'fields'             => [
-                'ticket' => new Assert\Uuid(),
-                'status' => new AbcAssert\Status(),
-                'type'   => new AbcAssert\JobType(),
-            ],
-            'allowMissingFields' => true
-        ]));
-
-        return $validationErrors;
-    }
-
-    /**
-     * @param array $validationErrors
-     * @param       $name
-     * @param       $value
-     * @param       $constraint
-     */
-    private function validateQueryParameter(array &$validationErrors, $name, $value, $constraint)
-    {
-        $errors = $this->getValidator()->validate($value, $constraint);
-        if (count($errors) > 0) {
-            foreach ($errors as $error) {
-                $validationErrors[] = new ParameterConstraintViolation($name, $error->getMessage());
-            }
-        }
-    }
-
-    /**
-     * @param $job
-     * @return BadRequestResponse|null
-     */
-    private function validateJob($job)
-    {
-        if ($this->getParameter('abc.job.rest.validate')) {
-            $errors = $this->getValidator()->validate($job);
-            if (count($errors) > 0) {
-                $response = new BadRequestResponse('Invalid request', 'The request contains invalid job parameters');
-                $response->setErrors($errors);
-
-                return $response;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $message
      * @return Response
      */
-    private function createNotFoundResponse($message)
+    public function cancel(string $id, Request $request): Response
     {
-        return $this->serialize(new BadRequestResponse('Not found', $message), 404);
+        return $this->createResponse($this->httpServer->cancel($id, $request->getUri()));
+    }
+
+    /**
+     * @Route("/job/{id}", methods="DELETE")
+     *
+     * @param string $id
+     * @param Request $request
+     * @return Response
+     */
+    public function delete(string $id, Request $request): Response
+    {
+        return $this->createResponse($this->httpServer->delete($id, $request->getUri()));
+    }
+
+    private function createResponse(ResponseInterface $response): Response
+    {
+        return new Response($response->getBody(), $response->getStatusCode(), $response->getHeaders());
     }
 }

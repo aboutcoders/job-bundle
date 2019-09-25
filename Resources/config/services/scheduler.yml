@@ -1,0 +1,25 @@
+services:
+    Abc\JobBundle\Controller\ScheduleController:
+        public: true
+        arguments:
+            - '@abc.job.schedule_manager'
+
+    abc.job.schedule_manager:
+        class: Abc\Job\Doctrine\ScheduleManager
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - 'Abc\Job\Model\Schedule'
+
+    abc.job.schedule_provider:
+        class: Abc\Job\Schedule\ScheduleProvider
+        arguments:
+            - '@abc.job.schedule_manager'
+        tags:
+            - { name: 'abc.scheduler.schedule_provider' }
+
+    abc.job.schedule_processor:
+        class: Abc\Job\Schedule\ScheduleProcessor
+        arguments:
+            - '@abc.job.server'
+        tags:
+            - { name: 'abc.scheduler.schedule_processor', provider: 'abc.job.schedule_provider' }

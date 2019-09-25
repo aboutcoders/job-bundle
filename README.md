@@ -1,57 +1,86 @@
-AbcJobBundle
-============
+# AbcJobBundle
 
-A symfony bundle to process jobs asynchronously by simply annotating a method and registering the class within the service container.
+A symfony bundle for asynchronous distributed job processing using [php-enqueue](https://github.com/php-enqueue/enqueue-dev) as transport layer.
 
-Build Status: [![Build Status](https://travis-ci.org/aboutcoders/job-bundle.svg?branch=master)](https://travis-ci.org/aboutcoders/job-bundle)
+**Note: This project is still in an experimental phase!**
+
+## Requirements:
+* PHP >= 7.2
 
 ## Features
 
 This bundle provides the following features:
 
-- Asynchronous execution of jobs
+- Asynchronous distributed processing of Job (single job), Batch (multiple jobs processed in parallel), and Sequence (multiple jobs processed in sequential order)
 - Status information about jobs
-- Functionality to cancel, update, restart a job
-- Repeated execution of jobs with schedules (cron based expressions)
-- JSON REST-Api
-- Support for multiple message queue systems:
-  - Doctrine DBAL
-  - PhpAmqp / RabbitMQ
-  - InMemory
-  - Predis / PhpRedis
-  - Amazon SQS
-  - Iron MQ
-  - Pheanstalk
-
-## Documentation
-
-- [Installation](./Resources/docs/installation.md)
-- [Configuration](./Resources/docs/configuration.md)
-- [Basic Usage](./Resources/docs/basic-usage.md)
-- [Message Consuming](./Resources/docs/message-consuming.md)
-- [Job Management](./Resources/docs/job-management.md)
-- [Scheduled Jobs](./Resources/docs/scheduled-jobs.md)
-- [Cancel Jobs](./Resources/docs/cancel-jobs.md)
-- [Runtime Parameters](./Resources/docs/runtime-parameters.md)
-- [Serialization](./Resources/docs/serialization.md)
-- [Validation](./Resources/docs/validation.md)
-- [Logging](./Resources/docs/logging.md)
-- [Lifecycle Events](./Resources/docs/lifecycle-events.md)
-- [Unit Testing](./Resources/docs/unit-testing.md)
-- [REST-API](./Resources/docs/rest-api.md)
-- [Process Control](./Resources/docs/process-control.md)
-- [Clustered Environment](./Resources/docs/clustered-environment.md)
-- [Configuration Reference](./Resources/docs/configuration-reference.md)
+- Process, cancel, restart jobs.
+- Scheduled processing of jobs with based on cron expressions (requires AbcSchedulerBundle) 
+- JSON REST-Api & PHP client library
+- [OpenApi](https://www.openapis.org/) documentation
 
 ## Demo Project
 
-Please take a look at [aboutcoders/job-bundle-skeleton-app](https://github.com/aboutcoders/job-bundle-skeleton-app) to see how the AbcJobBundle can be used within Symfony project.
+Please take a look at [job-docker-compose](https://gitlab.com/hasc/job-docker-compose) to see how the AbcJobBundle can be used within Symfony project.
 
-### Planned Features
+## Getting Started
 
-- Add support for CouchDB, MongoDB
-- Add support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
-- Integrate https://github.com/beberlei/metrics
+**Prerequisites**
+* Configure a Symfony application with AbcJobBundle
+* Configure the enqueue transport layer
+
+1. In case you configured a transport with a key different that `default` you have to configure this transport also for the AbcJobBundle
+
+	```yaml
+	abc_job:
+	    transport: my_transport_name
+	```
+
+2. Create database and database schema
+
+	```bash
+	bin/console doctrine:database:create
+	bin/console doctrine:schema:create
+	```
+
+3. Setup the broker
+
+	```bash
+	bin/console abc:setup-broker -vvv
+	```
+
+4. Start the command that processes replies from workers
+
+	```bash
+	bin/console enqueue:transport:consume job_reply abc.reply -vvv
+	```
+
+5. Start the worker processes
+
+	see AbcWorkerBundle
+
+## Configuration Reference
+
+```yaml
+abc_job:
+    # the enqueue transport name
+    transport: default
+    
+    # the name of the queue jobs are sent to by default
+    default_queue: default
+    
+    # the name of the queue where replies of jobs are sent to by default
+    default_replyTo: reply
+    
+    # a prefix to be used for queue names
+    prefix: abc
+    
+    # a separator for used for queue names
+    separator: .
+    
+    # whether to enable the scheduler component
+    scheduler:
+        enabled: true
+```
 
 ## License
 

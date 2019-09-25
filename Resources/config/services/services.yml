@@ -1,0 +1,69 @@
+services:
+
+    Abc\JobBundle\Controller\JobController:
+        public: true
+        arguments:
+            - '@abc.job.http_server'
+
+    abc.job.http_server:
+        class: Abc\Job\HttpServer
+        public: true
+        arguments:
+            - '@abc.job.server'
+            - '@abc.job.validator'
+            - '@logger'
+
+    Abc\Job\Model\JobManagerInterface:
+        alias: 'abc.job.job_manager'
+
+    abc.job.job_manager:
+        class: 'Abc\Job\Doctrine\JobManager'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - 'Abc\Job\Model\Job'
+
+    abc.job.server:
+        class: Abc\Job\Server
+        public: true
+        arguments:
+            - '@abc.job.producer'
+            - '@Abc\Job\Model\JobManagerInterface'
+            - '@logger'
+
+    abc.job.validator:
+        class: Abc\Job\Validator
+
+    abc.job.producer:
+        class: Abc\Job\Interop\Producer
+        arguments:
+            - '@abc.job.driver'
+
+    abc.job.route_collection:
+        class: Abc\Job\Broker\RouteCollection
+        factory: ['Abc\Job\Broker\RouteCollection', 'fromArray']
+        arguments: [[]]
+
+    abc.job.setup_broker_command:
+        class: Abc\Job\Symfony\Command\SetupBrokerCommand
+        public: true
+        arguments:
+            - '@service_container'
+            - '@abc.job.driver'
+        tags:
+            - { name: 'console.command' }
+
+    abc.job.reply_consumer:
+        class: Abc\Job\Interop\ReplyConsumer
+        public: true
+        arguments:
+            - '@abc.job.reply_processor'
+            - '@logger'
+        tags:
+            - { name: 'enqueue.transport.processor', processor: 'job_reply' }
+
+    abc.job.reply_processor:
+        class: Abc\Job\ReplyProcessor
+        arguments:
+            - '@abc.job.server'
+            - '@Abc\Job\Model\JobManagerInterface'
+            - '@logger'

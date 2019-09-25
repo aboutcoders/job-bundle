@@ -1,6 +1,4 @@
-.idea/*
-build/*
-composer.lock
-phpunit.xml
-/Tests/Fixtures/App/app/config/parameters.yml
-vendor/*
+/build/
+/composer.lock
+/phpunit.xml
+/vendor/

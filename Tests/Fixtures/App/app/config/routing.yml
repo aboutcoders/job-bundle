@@ -1,3 +1,0 @@
-abc-rest-all:
-    resource: "@AbcJobBundle/Resources/config/routing/rest-all.xml"
-    prefix: /api
