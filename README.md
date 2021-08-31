@@ -47,12 +47,6 @@ This bundle provides the following features:
 
 Please take a look at [aboutcoders/job-bundle-skeleton-app](https://github.com/aboutcoders/job-bundle-skeleton-app) to see how the AbcJobBundle can be used within Symfony project.
 
-### Planned Features
-
-- Add support for CouchDB, MongoDB
-- Add support for [qpush-bundle](https://www.google.de/webhp?q=qpushbundle)
-- Integrate https://github.com/beberlei/metrics
-
 ## License
 
 The MIT License (MIT). Please see [License File](./LICENSE) for more information.
