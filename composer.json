@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "symfony/symfony": "~2.6|~3.0",
+        "symfony/symfony": "~2.6|~3.0|~4.0",
         "myclabs/php-enum": "~1.5",
         "gedmo/doctrine-extensions": "~2.0",
         "jms/serializer-bundle": "*",
