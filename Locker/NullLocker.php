@@ -27,7 +27,7 @@ class NullLocker implements LockInterface
     /**
      * {@inheritdoc}
      */
-    public function isLocked($name)
+    public function isLocked($name, int $autoReleaseTime = 0)
     {
         return false;
     }
